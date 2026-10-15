@@ -1,0 +1,318 @@
+[
+ {
+  "name": "k16t_p0",
+  "prompt": "art/prompts/k16t_p0.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16t_p0.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16t_p22",
+  "prompt": "art/prompts/k16t_p22.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16t_p22.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16t_p45",
+  "prompt": "art/prompts/k16t_p45.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16t_p45.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16t_p67",
+  "prompt": "art/prompts/k16t_p67.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16t_p67.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16t_p90",
+  "prompt": "art/prompts/k16t_p90.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16t_p90.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16t_m22",
+  "prompt": "art/prompts/k16t_m22.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16t_m22.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16t_m45",
+  "prompt": "art/prompts/k16t_m45.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16t_m45.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16t_m67",
+  "prompt": "art/prompts/k16t_m67.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16t_m67.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16t_m90",
+  "prompt": "art/prompts/k16t_m90.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16t_m90.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16r_p0",
+  "prompt": "art/prompts/k16r_p0.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16r_p0.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16r_p22",
+  "prompt": "art/prompts/k16r_p22.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16r_p22.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16r_p45",
+  "prompt": "art/prompts/k16r_p45.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16r_p45.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16r_p67",
+  "prompt": "art/prompts/k16r_p67.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16r_p67.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16r_p90",
+  "prompt": "art/prompts/k16r_p90.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16r_p90.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16r_m22",
+  "prompt": "art/prompts/k16r_m22.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16r_m22.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16r_m45",
+  "prompt": "art/prompts/k16r_m45.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16r_m45.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16r_m67",
+  "prompt": "art/prompts/k16r_m67.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16r_m67.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "k16r_m90",
+  "prompt": "art/prompts/k16r_m90.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/w16r_m90.png=POSE GUIDE only: 3D mannequin poses per frame (red = right limbs, blue = left limbs, the held object in yellow or black), 5 x 2 grid; do not draw it"
+  ]
+ },
+ {
+  "name": "car_police_e",
+  "prompt": "art/prompts/car_police_e.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/car_police.png=the vehicle itself (identity, paint, markings) — currently facing the lower-left",
+   "art/gen/car_a.png=orientation reference only: a car whose front points to the upper-right (match this camera and direction)"
+  ]
+ },
+ {
+  "name": "car_army_e",
+  "prompt": "art/prompts/car_army_e.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/car_army.png=the vehicle itself (identity, paint, markings) — currently facing the lower-left",
+   "art/gen/car_a.png=orientation reference only: a car whose front points to the upper-right (match this camera and direction)"
+  ]
+ },
+ {
+  "name": "cg_gift_kirill",
+  "prompt": "art/prompts/cg_gift_kirill.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kirill.png=character sheet: kirill"
+  ]
+ },
+ {
+  "name": "cg_gift_raiva",
+  "prompt": "art/prompts/cg_gift_raiva.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/raiva.png=character sheet: raiva"
+  ]
+ },
+ {
+  "name": "cg_gift_elf",
+  "prompt": "art/prompts/cg_gift_elf.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/elf.png=character sheet: elf"
+  ]
+ },
+ {
+  "name": "shed",
+  "prompt": "art/prompts/shed.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "medium"
+ },
+ {
+  "name": "swingset",
+  "prompt": "art/prompts/swingset.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "medium"
+ },
+ {
+  "name": "trampoline",
+  "prompt": "art/prompts/trampoline.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "medium"
+ },
+ {
+  "name": "clothesline",
+  "prompt": "art/prompts/clothesline.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "medium"
+ },
+ {
+  "name": "pumpkin_patch",
+  "prompt": "art/prompts/pumpkin_patch.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "medium"
+ },
+ {
+  "name": "greenhouse",
+  "prompt": "art/prompts/greenhouse.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "medium"
+ }
+]

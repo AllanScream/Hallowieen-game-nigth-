@@ -1,0 +1,12 @@
+SPRITE SHEET of the moderator Elf from Image 2 (a young woman with pointed elf ears, very long straight silver-white hair, pale skin, light green eyes, black crop top, an oversized grey jacket slipping off the shoulders, baggy grey sweatpants, grey-and-white sneakers; identical face, proportions and colours) as an in-game pixel-art sprite in the style of Image 3 (the game's hero sprite: same size, pixel density, outline and lighting). Image 4 is a LAYOUT GUIDE ONLY: a 4 x 2 grid of equal cells read left to right, top row frames 1-4, bottom row frames 5-8; each frame is one full-body figure standing on that cell's ground line, the same size in every cell (about 400 px tall), centred in its cell, nothing crossing into another cell. Do NOT draw the grid, the lines, the boxes or the numbers.
+VIEW: 3/4 front view facing DOWN-RIGHT (toward the lower-right corner of the image), seen from the game's high camera (looking down about 30 degrees), the same view in all 8 frames, standing in place.
+EIGHT POSES:
+1 idle: standing relaxed, hands in the pockets of the oversized jacket.
+2 arms crossed, cold and unimpressed, weight on one leg, chin up.
+3 talking: one hand raised and open, a smug half-smile.
+4 typing on a black smartphone held in both hands at chest height, the screen glowing.
+5 angry: pointing at the viewer and shouting, hair swinging.
+6 happy: holding a steaming mug of herbal tea in both hands, eyes closed, smiling.
+7 shading her eyes with one hand, peering into the dark.
+8 holding the phone to her ear, calling someone, with an evil grin.
+Every frame complete and clean, identical character design and size in all frames, crisp pixel clusters, transparent background, no shadow, no ground, no text.

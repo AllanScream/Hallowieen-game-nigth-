@@ -1,0 +1,7 @@
+HD pixel-art 2D game art matching Image 1, a cozy-spooky Halloween night in a small suburban street: crisp visible pixel clusters (one art pixel = 2-3 screen px at 1536x1024), hand-placed pixel shading with 3-5 flat tones per material, no smooth airbrush gradients inside sprites, slight pixel dithering only in large dark areas.
+Palette: low-key night; near-black warm darks (#050304, #110a0a, #1c0b09), deep red-browns (#360e08, #4b1509, #64341f), pumpkin oranges (#d54006, #e57c29) and warm candle highlights (#f2bd60) used sparingly at light sources; cool charcoal and muted violet-grey (#131116, #20171c, #312229) for shadow sides.
+Line: selective dark red-brown outline (#1c0b09 to #280d0a), one art pixel wide, on characters and props; none inside large background surfaces.
+Shapes: chunky readable silhouettes, slightly stylised anime-like characters about 7 heads tall; autumn materials: wet asphalt, worn painted wood siding, dark shingle roofs, picket fences, red-orange fallen leaves.
+Light: warm orange key from porch lamps and jack-o'-lanterns, cool dark violet-grey fill, faint cold moon rim from the top left; no cast shadows.
+Strict high-angle orthographic 3/4 isometric view (2:1 dimetric, about 30 degrees down), no perspective distortion.
+No text, no letters, no logos, no watermark, no glow halos, no light rays, no cast shadows.

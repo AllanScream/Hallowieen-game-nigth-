@@ -1,0 +1,260 @@
+[
+ {
+  "name": "lamp",
+  "prompt": "art/prompts/lamp.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "tree_a",
+  "prompt": "art/prompts/tree_a.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "tree_b",
+  "prompt": "art/prompts/tree_b.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "bush",
+  "prompt": "art/prompts/bush.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "car_a",
+  "prompt": "art/prompts/car_a.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "car_b",
+  "prompt": "art/prompts/car_b.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "bins",
+  "prompt": "art/prompts/bins.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "bench",
+  "prompt": "art/prompts/bench.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "mailbox",
+  "prompt": "art/prompts/mailbox.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "rotten",
+  "prompt": "art/prompts/rotten.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "leafpile",
+  "prompt": "art/prompts/leafpile.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "coin",
+  "prompt": "art/prompts/coin.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "garage",
+  "prompt": "art/prompts/garage.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "study/guide_house.png=camera angle guide only (grey mass model): match its isometric orientation, ignore colours"
+  ]
+ },
+ {
+  "name": "npc_ghost_se",
+  "prompt": "art/prompts/npc_ghost_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc1.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_ghost_ne",
+  "prompt": "art/prompts/npc_ghost_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc1.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_witch2_se",
+  "prompt": "art/prompts/npc_witch2_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc2.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_witch2_ne",
+  "prompt": "art/prompts/npc_witch2_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc2.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_cloak_se",
+  "prompt": "art/prompts/npc_cloak_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc3.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_cloak_ne",
+  "prompt": "art/prompts/npc_cloak_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc3.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_devil_se",
+  "prompt": "art/prompts/npc_devil_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc5.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_devil_ne",
+  "prompt": "art/prompts/npc_devil_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc5.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_skeleton_se",
+  "prompt": "art/prompts/npc_skeleton_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc6.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_skeleton_ne",
+  "prompt": "art/prompts/npc_skeleton_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc6.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_hoodie_se",
+  "prompt": "art/prompts/npc_hoodie_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc7.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_hoodie_ne",
+  "prompt": "art/prompts/npc_hoodie_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc7.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_witch_se",
+  "prompt": "art/prompts/npc_witch_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc9.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_kid_se",
+  "prompt": "art/prompts/npc_kid_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc4.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "npc_kid_ne",
+  "prompt": "art/prompts/npc_kid_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/npc4.png=same character: keep face, hair, costume, colours, proportions (character sheet)"
+  ]
+ },
+ {
+  "name": "courier_se",
+  "prompt": "art/prompts/courier_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium"
+ },
+ {
+  "name": "courier_ne",
+  "prompt": "art/prompts/courier_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium"
+ }
+]

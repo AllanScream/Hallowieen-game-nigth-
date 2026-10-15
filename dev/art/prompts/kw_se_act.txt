@@ -1,0 +1,12 @@
+SPRITE SHEET of the young man Kolya from Image 2 (identical face, messy light-brown hair, oversized black-brown hoodie, charcoal cargo trousers with side pockets, dark sneakers, same proportions and colours); Image 3 is his turnaround sheet. Image 4 is a LAYOUT GUIDE ONLY: a 4 x 2 grid of equal cells read left to right, top row frames 1-4, bottom row frames 5-8; each frame is one full-body figure standing on that cell's ground line, the same size in every cell (about 400 px tall), centred in its cell, nothing crossing into another cell. Do NOT draw the grid, the lines, the boxes or the numbers.
+VIEW: 3/4 FRONT view facing DOWN-RIGHT: his body is turned toward the lower-right corner of the image, we see his face and chest and his left side; he walks diagonally toward the lower right; seen from the game's high camera (looking down about 30 degrees), exactly the view of Image 2.
+EIGHT DIFFERENT POSES (one per frame, same view in all):
+1 idle: standing relaxed, arms hanging at the sides, feet slightly apart, weight even.
+2 throw wind-up: his right arm raised up and back behind his head holding one small white egg, left arm pointing forward for balance, weight on the back foot.
+3 throw release: right arm whipped forward at shoulder height toward the direction he faces, hand open and empty, body leaning forward, weight on the front foot.
+4 throw follow-through: right arm swung down and across the body, body leaning forward, hand empty.
+5 use: both hands reaching forward at chest height in the direction he faces, as if pressing a doorbell.
+6 pick up: crouching down, knees bent, right hand reaching down to the ground in front of him.
+7 flashlight: standing, right arm raised forward at chest height holding a black smartphone with its flashlight LED glowing white, pointing in the direction he faces; left arm relaxed.
+8 carry: standing, hugging a big rotten pumpkin (mouldy green-brown and orange) in front of his belly with both arms.
+Every frame complete and clean, identical character design and size in all frames, crisp pixel clusters, transparent background, no shadow, no ground, no text.

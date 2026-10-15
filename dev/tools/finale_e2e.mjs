@@ -1,0 +1,31 @@
+// Main menu + pause + phone text field, as the player uses them: node tools/menu.mjs [dir] [outDir]
+// dir: live (default) or dist/halloween/game. Screenshots: 1_menu, 2_settings, 3_play, 4_pause, 5_console, 6_continue.
+import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module';
+const { chromium } = createRequire(import.meta.url)('/root/.cache/ref2game/claude/scripts/node_modules/playwright');
+const [dir = 'live', out = 'frames/menu'] = process.argv.slice(2); fs.mkdirSync(out, { recursive: true });
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png' };
+const srv = http.createServer((q, r) => { const f = path.join(dir, decodeURIComponent(q.url.split('?')[0]));
+  fs.stat(f, (e) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream', 'last-modified': 'x' }); fs.createReadStream(f).pipe(r); }); });
+await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+const p = await b.newPage({ viewport: { width: 1280, height: 720 } });
+const errs = []; p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
+const url = `http://127.0.0.1:${srv.address().port}/index.html`;
+await p.goto(url);
+await p.waitForFunction(() => window.__ready, null, { timeout: 90000 }); await p.waitForTimeout(800);
+const st = () => p.evaluate(() => { const s = SCENE.state; return s ? { x: Math.round(s.x), y: Math.round(s.y), money: s.money, phone: s.phone && s.phone.app, log: (s.devLog || []).slice(-2).map((m) => m.text) } : null; });
+const W = (fn, arg) => p.waitForFunction(fn, arg, { timeout: 180000 });
+const hold = async (key, fn) => { await p.keyboard.down(key); await W(fn); await p.keyboard.up(key); };
+await p.click('#m_new'); await W(() => SCENE.state);
+await hold('Tab', () => SCENE.state && SCENE.state.phone);
+const dev = await p.evaluate(() => { const L = SIM.phoneLayout(SCENE.state).find((b) => b.id === 'dev'), r = document.getElementById('c').getBoundingClientRect(); return [r.left + (L.x + L.w / 2) / 1920 * r.width, r.top + (L.y + L.h / 2) / 1080 * r.height]; });
+await p.mouse.click(dev[0], dev[1]); await W(() => document.activeElement === document.getElementById('txt'));
+await p.keyboard.type('finale'); await p.keyboard.press('Enter'); await W(() => SCENE.state.finale);
+console.log('finale on, field', await p.$eval('#txt', (e) => e.style.display));
+await p.mouse.click(640, 360); await W(() => SCENE.state.finale.i >= 1); console.log('page', await p.evaluate(() => SCENE.state.finale.i));
+await p.waitForTimeout(1500); await p.screenshot({ path: out + '/7_finale.png' });
+await p.evaluate(() => { SCENE.state.finale.end = true; }); await p.mouse.click(640, 360);
+await W(() => document.getElementById('menu').classList.contains('on'));
+console.log('menu after finale; save', await p.evaluate(() => localStorage.getItem('sog_save')), 'cont disabled', await p.$eval('#m_cont', (e) => e.disabled));
+console.log('errors', JSON.stringify(errs));
+await b.close(); srv.close();

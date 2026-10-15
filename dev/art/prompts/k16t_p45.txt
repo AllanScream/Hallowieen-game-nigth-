@@ -1,0 +1,15 @@
+SPRITE SHEET of the young man Kolya from Image 2 (identical face, messy light-brown hair, oversized black-brown hoodie, charcoal cargo trousers with side pockets, dark sneakers, same proportions, colours and pixel style); Image 3 is his turnaround sheet.
+Image 4 is the POSE GUIDE: a 3D mannequin rendered from the game camera in a 5 x 2 grid of equal cells read left to right, top row frames 1-5, bottom row frames 6-10. Redraw Kolya in EXACTLY the mannequin's pose in every cell: the same leg angles, knee bends, which foot is forward, which foot is lifted, the same arms, the same body facing and the same place in the cell, standing on that cell's ground line, the same size in every cell (about 400 px tall). The mannequin's RED limbs are Kolya's RIGHT arm and leg, the BLUE limbs are his LEFT arm and leg. Do NOT draw the mannequin, the red and blue colours, the grey boxes, the lines or the numbers.
+VIEW (all 10 frames): 3/4 FRONT view facing DOWN-RIGHT: he walks toward the lower-right corner; we see his face and chest and his right side; seen from the game's high camera (looking down about 30 degrees).
+In his RIGHT hand he holds his black smartphone up in front of his chest like a flashlight, its back toward where he walks, and the phone's FLASHLIGHT is ON: a small, very bright white LED glowing on the back of the phone. The right arm stays raised holding the phone at chest height in EVERY frame (the mannequin's yellow block is the phone); only his LEFT arm swings with the walk.
+FRAMES 1-8 are one smooth WALK CYCLE, every frame clearly different (the legs move a lot, readable even from the front and the back):
+1 right foot forward touching down, left leg behind, legs apart.
+2 right foot planted under the body, left heel lifting behind.
+3 left leg swinging forward past the right leg, left knee bent high, left foot off the ground.
+4 left leg reaching forward, right heel lifting.
+5 left foot forward touching down, right leg behind, legs apart.
+6 left foot planted, right heel lifting behind.
+7 right leg swinging forward past the left leg, right knee bent high, right foot off the ground.
+8 right leg reaching forward, left heel lifting.
+FRAMES 9-10: standing still, relaxed, holding the lit phone forward at chest height (10 is a tiny breathing variation of 9).
+Every figure complete and clean, identical character design, size and colours in all 10 frames, crisp pixel clusters, transparent background, no shadow, no ground, no text.

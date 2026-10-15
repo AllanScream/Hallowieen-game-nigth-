@@ -1,0 +1,170 @@
+[
+ {
+  "name": "kw_s_walk",
+  "prompt": "art/prompts/kw_s_walk.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_s_act",
+  "prompt": "art/prompts/kw_s_act.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_s_carry",
+  "prompt": "art/prompts/kw_s_carry.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_se_walk",
+  "prompt": "art/prompts/kw_se_walk.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_se_act",
+  "prompt": "art/prompts/kw_se_act.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_se_carry",
+  "prompt": "art/prompts/kw_se_carry.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_ne_walk",
+  "prompt": "art/prompts/kw_ne_walk.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_ne_act",
+  "prompt": "art/prompts/kw_ne_act.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_ne_carry",
+  "prompt": "art/prompts/kw_ne_carry.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_n_walk",
+  "prompt": "art/prompts/kw_n_walk.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_n_act",
+  "prompt": "art/prompts/kw_n_act.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_n_carry",
+  "prompt": "art/prompts/kw_n_carry.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_e_act",
+  "prompt": "art/prompts/kw_e_act.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ },
+ {
+  "name": "kw_e_carry",
+  "prompt": "art/prompts/kw_e_carry.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views",
+   "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"
+  ]
+ }
+]

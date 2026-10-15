@@ -1,0 +1,2 @@
+[{"name": "kw_e_walk", "prompt": "art/prompts/kw_e_walk.txt", "size": "1536x1024", "alpha": "native", "quality": "medium",
+  "ref": ["art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)", "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views", "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"]}]

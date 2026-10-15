@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Сладость или гадость</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--ar:1.7778;--or:#ff8a1e;--ink:#f6e7c8;--dim:#c9a27a;--panel:rgba(18,10,12,.92)}
+html,body{margin:0;background:#000;height:100%;overflow:hidden;font-family:"Trebuchet MS","Segoe UI","DejaVu Sans",Verdana,sans-serif}
+canvas{display:block;width:min(100vw,calc(100vh*var(--ar)));height:auto;aspect-ratio:var(--ar);margin:auto;position:absolute;inset:0;transition:filter .35s}
+canvas.dim{filter:blur(5px) brightness(.42) saturate(.8)}
+#dev{position:absolute;left:10px;bottom:8px;font:12px ui-monospace,Menlo,monospace;color:#fff;background:#0008;padding:5px 8px;border-radius:6px;opacity:.55;white-space:pre;z-index:9}
+#dev:hover{opacity:1}
+#flash{position:absolute;right:12px;bottom:10px;font:600 13px -apple-system,sans-serif;color:#9f9;background:#000a;padding:4px 10px;border-radius:6px;opacity:0;transition:opacity .6s;z-index:9}
+#txt{position:absolute;display:none;z-index:4;background:transparent;border:0;outline:0;color:#f0e6ff;font-family:inherit;padding:0 1em;box-sizing:border-box;caret-color:#ffb45a}
+#txt::placeholder{color:#8a7aa0}
+/* ---- main menu / pause ---- */
+#menu{position:absolute;inset:0;display:none;overflow:hidden;color:var(--ink);user-select:none;z-index:6}
+#menu.on{display:block}
+#menu .bg{position:absolute;inset:-5%;background:#0b0608 url(assets/menu_art.png) center/cover no-repeat;animation:kb 46s ease-in-out infinite alternate;image-rendering:auto}
+#menu .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,4,6,.94) 0%,rgba(9,4,6,.8) 28%,rgba(9,4,6,.25) 55%,rgba(9,4,6,0) 72%),radial-gradient(ellipse at 72% 55%,transparent 45%,rgba(0,0,0,.65) 100%)}
+#menu .fog{position:absolute;left:-10%;right:-10%;bottom:-6%;height:34%;background:radial-gradient(ellipse at 30% 100%,rgba(255,160,90,.13),transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(190,170,220,.12),transparent 60%);animation:fog 14s ease-in-out infinite alternate;pointer-events:none}
+#menu.pause .bg,#menu.pause .fog{display:none}
+#menu.pause .shade{background:linear-gradient(90deg,rgba(8,4,6,.88) 0%,rgba(8,4,6,.6) 40%,rgba(8,4,6,.3) 100%)}
+@keyframes kb{from{transform:scale(1) translate(0,0)}to{transform:scale(1.07) translate(-1.6%,-1.2%)}}
+@keyframes fog{from{transform:translateX(-3%)}to{transform:translateX(3%)}}
+.leaf{position:absolute;top:-6%;border-radius:0 85% 0 85%;opacity:.85;pointer-events:none;animation:fall linear infinite}
+@keyframes fall{0%{transform:translate(0,-8vh) rotate(0deg)}50%{transform:translate(calc(var(--dx) * .6),52vh) rotate(calc(var(--r) * .5))}100%{transform:translate(var(--dx),112vh) rotate(var(--r))}}
+.col{position:absolute;left:6.5vw;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;width:min(500px,84vw)}
+.title{font:700 clamp(42px,5.4vw,100px)/.95 Georgia,"Times New Roman","DejaVu Serif",serif;margin:0;background:linear-gradient(180deg,#ffe7a8 0%,#ffae45 42%,#e2560f 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(255,120,20,.42)) drop-shadow(0 4px 0 #3a1204);animation:flick 7s infinite}
+.title small{display:block;font-size:.5em;letter-spacing:.02em;margin-top:.12em}
+@keyframes flick{0%,100%{opacity:1}46%{opacity:1}47%{opacity:.82}48%{opacity:1}71%{opacity:.93}72%{opacity:1}}
+.sub{font-size:clamp(13px,1.15vw,19px);color:var(--dim);letter-spacing:.2em;text-transform:uppercase;margin:1.1em 0 4.2vh}
+.ptitle{font:700 clamp(34px,3.6vw,64px) Georgia,serif;color:#ffb45a;margin:0 0 3vh;text-shadow:0 0 18px rgba(255,120,20,.4)}
+#menu.pause .title,#menu.pause .sub{display:none}
+#menu:not(.pause) .ptitle{display:none}
+.btn{display:flex;align-items:center;gap:.6em;width:100%;background:none;border:0;color:var(--ink);font:600 clamp(19px,1.75vw,30px) "Trebuchet MS","Segoe UI",sans-serif;text-align:left;padding:.42em .7em .42em .9em;margin:.1em 0;cursor:pointer;position:relative;border-radius:12px;transition:transform .18s,background .18s,color .18s;text-shadow:0 2px 6px #000}
+.btn::before{content:"";position:absolute;left:0;top:20%;bottom:20%;width:4px;border-radius:2px;background:var(--or);transform:scaleY(0);transition:transform .18s;box-shadow:0 0 12px var(--or)}
+.btn:hover:not([disabled]),.btn:focus-visible{outline:0;transform:translateX(10px);background:linear-gradient(90deg,rgba(255,138,30,.24),rgba(255,138,30,0));color:#fff}
+.btn:hover:not([disabled])::before,.btn:focus-visible::before{transform:scaleY(1)}
+.btn .ic{width:1.25em;text-align:center;color:#ffb45a;font-size:.85em}
+.btn[disabled]{opacity:.35;cursor:default}
+.btn .note{margin-left:auto;font-size:.5em;color:var(--dim);font-weight:400;text-align:right;line-height:1.25}
+.btn.warn{color:#ffb0a0}
+#load{margin:3vh 0 0 .9em;width:min(320px,70%);font-size:14px;color:var(--dim)}
+#load .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.12);margin-top:6px;overflow:hidden}
+#load .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#e2560f,#ffcf6a);transition:width .25s}
+.panel{position:absolute;right:6vw;top:50%;transform:translateY(-50%);width:min(560px,86vw);max-height:82vh;overflow:auto;box-sizing:border-box;background:var(--panel);border:2px solid #8a4a1e;border-radius:20px;padding:24px 30px 22px;box-shadow:0 24px 70px rgba(0,0,0,.65),inset 0 0 0 1px rgba(255,170,80,.12);display:none}
+.panel.on{display:block;animation:pin .22s ease-out}
+@keyframes pin{from{opacity:0;transform:translate(16px,-50%)}to{opacity:1;transform:translate(0,-50%)}}
+.panel h2{margin:0 0 14px;font:700 30px Georgia,serif;color:#ffb45a}
+.panel h3{margin:18px 0 6px;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#a88a70}
+.row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:10px 0;font-size:17px}
+.row output{min-width:3ch;text-align:right;color:#ffd76a;font-weight:700}
+.row .ctl{display:flex;align-items:center;gap:10px}
+input[type=range]{accent-color:var(--or);width:190px;cursor:pointer}
+.sw{position:relative;width:52px;height:28px;border-radius:14px;background:#3a2a2a;border:0;cursor:pointer;transition:background .2s;flex:none}
+.sw::after{content:"";position:absolute;left:4px;top:4px;width:20px;height:20px;border-radius:50%;background:#d8c8b8;transition:transform .2s}
+.sw.on{background:#e2701a}.sw.on::after{transform:translateX(24px);background:#fff}
+.sbtn{background:#3a2420;color:var(--ink);border:1px solid #8a4a1e;border-radius:10px;padding:8px 14px;font:600 15px inherit;cursor:pointer}
+.sbtn:hover{background:#52301f}
+.sbtn.red{border-color:#a03a2a;color:#ffb0a0}
+.keys{list-style:none;margin:0;padding:0}
+.keys li{display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:16px}
+.keys li b{color:#ffd76a;font-weight:700;white-space:nowrap}
+.panel p{line-height:1.5;font-size:16px;color:#e8dcc8;margin:.6em 0}
+.back{margin-top:16px}
+.slot{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.045);margin:8px 0;border:1px solid rgba(255,170,80,.14)}
+.slot.empty{opacity:.72}
+.slot .sl-main{flex:1;min-width:0}
+.slot input.sl-name{width:100%;box-sizing:border-box;background:transparent;border:0;border-bottom:1px dashed rgba(255,190,120,.35);color:#ffd9a0;font:700 17px "Trebuchet MS","Segoe UI",sans-serif;padding:2px 0;outline:0}
+.slot input.sl-name:focus{border-bottom-color:#ff8a1e}
+.slot input.sl-name[readonly]{border-bottom-color:transparent;cursor:default}
+.sl-meta{font-size:13px;color:#b9a48e;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-btns{display:flex;gap:6px;flex:none}
+.sbtn.small{padding:6px 11px;font-size:14px}
+#slotMsg{min-height:20px;font-size:14px;color:#9ad08a;margin-top:6px}
+.foot{position:absolute;right:18px;bottom:12px;font-size:13px;color:#a08a78;opacity:.85;text-shadow:0 1px 3px #000}
+@media (max-width:700px){.panel{right:4vw;left:4vw;width:auto}.col{left:5vw}}
+</style>
+</head><body><canvas id="c"></canvas>
+<input id="txt" type="text" autocomplete="off" spellcheck="false" maxlength="200">
+<div id="menu">
+  <div class="bg"></div><div class="fog"></div><div class="shade"></div><div id="leaves"></div>
+  <div class="col">
+    <h1 class="title">Сладость<small>или гадость</small></h1>
+    <div class="sub">Хэллоуин в Тыквенном переулке</div>
+    <div class="ptitle">Пауза</div>
+    <div id="mainBtns">
+      <button class="btn" id="m_cont" disabled><span class="ic">▶</span>Продолжить<span class="note" id="contNote"></span></button>
+      <button class="btn" id="m_new" disabled><span class="ic">✦</span>Новая игра</button>
+      <button class="btn" id="m_load" disabled><span class="ic">⤓</span>Загрузить</button>
+      <button class="btn" data-panel="p_set"><span class="ic">⚙</span>Настройки</button>
+      <button class="btn" data-panel="p_keys"><span class="ic">⌨</span>Управление</button>
+      <button class="btn" data-panel="p_about"><span class="ic">☾</span>Об игре</button>
+      <button class="btn" id="m_full"><span class="ic">⛶</span>Во весь экран</button>
+    </div>
+    <div id="pauseBtns" style="display:none">
+      <button class="btn" id="p_resume"><span class="ic">▶</span>Продолжить</button>
+      <button class="btn" id="p_save"><span class="ic">✚</span>Сохранить игру</button>
+      <button class="btn" id="p_load"><span class="ic">⤓</span>Загрузить</button>
+      <button class="btn" data-panel="p_set"><span class="ic">⚙</span>Настройки</button>
+      <button class="btn" data-panel="p_keys"><span class="ic">⌨</span>Управление</button>
+      <button class="btn" id="p_exit"><span class="ic">⌂</span>Сохранить и выйти в меню</button>
+    </div>
+    <div id="load">Загрузка…<div class="bar"><i id="loadBar"></i></div></div>
+  </div>
+  <div class="panel" id="p_set">
+    <h2>Настройки</h2>
+    <h3>Звук</h3>
+    <div class="row">Общая громкость<span class="ctl"><input type="range" min="0" max="100" data-k="master"><output></output></span></div>
+    <div class="row">Музыка и атмосфера<span class="ctl"><input type="range" min="0" max="100" data-k="music"><output></output></span></div>
+    <div class="row">Эффекты<span class="ctl"><input type="range" min="0" max="100" data-k="sfx"><output></output></span></div>
+    <h3>Изображение</h3>
+    <div class="row">Темнота ночи<span class="ctl"><input type="range" min="0" max="100" data-k="dark"><output></output></span></div>
+    <div class="row">Тряска камеры<button class="sw" data-k="shake"></button></div>
+    <div class="row">Подсказки к предметам<button class="sw" data-k="hints"></button></div>
+    <div class="row">Во весь экран<button class="sbtn" id="s_full">Переключить</button></div>
+    <h3>Сохранение</h3>
+    <div class="row"><span id="saveInfo">Нет сохранений</span><button class="sbtn red" id="s_wipe">Стереть все</button></div>
+    <button class="sbtn back">‹ Назад</button>
+  </div>
+  <div class="panel" id="p_saves"><h2 id="savesTitle">Сохранения</h2><div id="slotList"></div><div id="slotMsg"></div><button class="sbtn back">‹ Назад</button></div>
+  <div class="panel" id="p_keys"><h2>Управление</h2><ul class="keys" id="keyList"></ul><button class="sbtn back">‹ Назад</button></div>
+  <div class="panel" id="p_about"><h2>Об игре</h2>
+    <p>Хэллоуин, 22:00. Коля выходит из дома с коробкой яиц и рулоном туалетной бумаги. В переулке живут три модера: Кирилл, Райва и Эльф.</p>
+    <p>Постучи в дверь и попроси сладость. Отказали — устрой гадость и закидай дом на 100 %. Только учти, что каждый модер мстит по-своему.</p>
+    <p>Подарок может всё исправить. Когда разберёшься со всеми тремя, возвращайся домой: там тебя кое-что ждёт.</p>
+    <p style="color:#a88a70;font-size:14px">Пиксельная изометрия, звук синтезируется на лету. Консоль разработчика есть в телефоне (Tab → Консоль).</p>
+    <button class="sbtn back">‹ Назад</button></div>
+  <div class="foot" id="foot"></div>
+</div>
+<div id="dev"></div><div id="flash">reloaded</div>
+<script>window.__STATIC__ = 1;</script>
+<script>
+// Main menu (new game / continue from the autosave / settings / controls), Esc pause, the phone text field, the game loop.
+// Dev keys (live preview or ?dev): P pause, [ ] speed, . single step. ?render=1 exposes window.__renderAt(t) (no loop, no menu).
+const V = Date.now(), STATIC = !!window.__STATIC__;          // STATIC: packed build (no polling, no dev overlay)
+const load = (src) => new Promise((res, rej) => { const s = document.createElement('script'); s.src = src + '?v=' + V; s.onload = res; s.onerror = () => rej(new Error('failed ' + src)); document.head.appendChild(s); });
+const $ = (id) => document.getElementById(id), LS = { get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+// ---- settings (applied before the game scripts read them) ----
+const DEF = { master: 80, music: 70, sfx: 90, dark: 60, shake: true, hints: true };
+const SET = Object.assign({}, DEF, LS.get('sog_settings') || {});
+window.SETTINGS = {};
+function applySet() { SETTINGS.night = 0.12 + 0.5 * SET.dark / 100; SETTINGS.shake = SET.shake; SETTINGS.hints = SET.hints;
+  if (window.AUDIO && AUDIO.setVol) AUDIO.setVol({ master: SET.master / 100, music: SET.music / 100, sfx: SET.sfx / 100 }); }
+applySet();
+const render = new URLSearchParams(location.search).has('render');
+// ---- menu ----
+const menu = $('menu'); let menuMode = null, ready = false;
+for (let i = 0; i < 18; i++) { const l = document.createElement('i'), s = 9 + Math.random() * 12; l.className = 'leaf';
+  Object.assign(l.style, { left: Math.random() * 100 + '%', width: s + 'px', height: s + 'px', background: ['#c4501a', '#e07a24', '#8a2e12', '#d89a30', '#a63a16'][i % 5], animationDuration: 9 + Math.random() * 11 + 's', animationDelay: -Math.random() * 20 + 's' });
+  l.style.setProperty('--dx', (Math.random() * 30 - 12) + 'vw'); l.style.setProperty('--r', (Math.random() * 900 - 450) + 'deg'); $('leaves').appendChild(l); }
+function showPanel(id) { document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('on', p.id === id)); if (id) { const f = $(id).querySelector('input,button'); if (f) f.focus({ preventScroll: true }); } }
+function openMenu(mode) { menuMode = mode; menu.classList.add('on'); menu.classList.toggle('pause', mode === 'pause'); $('mainBtns').style.display = mode === 'main' ? '' : 'none'; $('pauseBtns').style.display = mode === 'pause' ? '' : 'none';
+  $('load').style.display = mode === 'main' && !ready ? '' : 'none'; showPanel(null); refreshSave(); $('c').classList.toggle('dim', mode === 'pause');
+  const b = menu.querySelector(mode === 'pause' ? '#p_resume' : (!$('m_cont').disabled ? '#m_cont' : '#m_new')); if (b && !b.disabled) b.focus({ preventScroll: true }); }
+function closeMenu() { menuMode = null; menu.classList.remove('on'); showPanel(null); $('c').classList.remove('dim'); }
+const NSLOT = 6, okv = (sv) => !!(sv && sv.play && /^v([6-9]|\d\d)$/.test(sv.v || ''));          // saves from v6 on load (new fields get defaults)
+const getSlots = () => { const a = LS.get('sog_slots'); return Array.isArray(a) ? a : []; }, setSlots = (a) => LS.set('sog_slots', a);
+const allSaves = () => [LS.get('sog_save'), ...getSlots()].filter(okv).sort((a, b) => (b.at || 0) - (a.at || 0));   // the autosave + the named slots, newest first
+let saveToSlot = () => false, loadSave = () => {}, savesMode = 'load';                  // set once the game has loaded
+function slotMeta(sv) { let money = ''; try { money = ' · ' + sv.play.money + ' ₽'; } catch (e) {} const d = new Date(sv.at || 0);
+  return `${saveInfo(sv) || ''}${money} — ${d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })} ${d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`; }
+function renderSlots(msg) {
+  const list = $('slotList'), slots = getSlots(), arm = {}; $('savesTitle').textContent = savesMode === 'save' ? 'Сохранить игру' : 'Загрузить игру'; $('slotMsg').textContent = msg || ''; list.innerHTML = '';
+  const rows = (savesMode === 'load' ? [{ k: 'auto', sv: LS.get('sog_save') }] : []).concat([...Array(NSLOT)].map((_, i) => ({ k: i, sv: slots[i] || null })));
+  rows.forEach((r) => { const el = document.createElement('div'), has = okv(r.sv); el.className = 'slot' + (has ? '' : ' empty');
+    el.innerHTML = '<div class="sl-main"><input class="sl-name" maxlength="40" spellcheck="false"><div class="sl-meta"></div></div><div class="sl-btns"></div>';
+    const nm = el.querySelector('.sl-name'), bt = el.querySelector('.sl-btns');
+    nm.value = r.k === 'auto' ? 'Автосохранение' : has ? (r.sv.name || `Слот ${r.k + 1}`) : savesMode === 'save' ? `Сохранение ${r.k + 1}` : `Слот ${r.k + 1}`;
+    nm.readOnly = r.k === 'auto' || (!has && savesMode === 'load'); el.querySelector('.sl-meta').textContent = has ? slotMeta(r.sv) : r.sv && r.sv.play ? 'другая версия игры' : 'Пусто';
+    nm.addEventListener('keydown', (e) => { if (e.key !== 'Escape') e.stopPropagation(); if (e.key === 'Enter') nm.blur(); });
+    nm.addEventListener('change', () => { if (r.k === 'auto' || !has) return; const s2 = getSlots(); if (s2[r.k]) { s2[r.k].name = nm.value.trim() || `Слот ${r.k + 1}`; setSlots(s2); refreshSave(); } });
+    const mk = (label, cls, fn) => { const b = document.createElement('button'); b.className = 'sbtn small ' + cls; b.textContent = label; b.onclick = () => fn(b); bt.appendChild(b); };
+    const confirm2 = (b, key, ask, back, go) => { if (!arm[key]) { arm[key] = 1; b.textContent = ask; setTimeout(() => { arm[key] = 0; b.textContent = back; }, 2500); return; } go(); };
+    if (savesMode === 'save' && r.k !== 'auto') mk(has ? 'Перезаписать' : 'Сохранить', '', (b) => { const go = () => renderSlots(saveToSlot(r.k, nm.value.trim() || `Сохранение ${r.k + 1}`) ? 'Сохранено ✓' : 'Не удалось сохранить: в браузере нет места');
+      if (has) confirm2(b, 'w' + r.k, 'Точно?', 'Перезаписать', go); else go(); });
+    if (savesMode === 'load' && has) mk('Загрузить', '', () => loadSave(r.sv));
+    if (has) mk('✕', 'red', (b) => confirm2(b, 'd' + r.k, 'Удалить?', '✕', () => { if (r.k === 'auto') LS.del('sog_save'); else { const s2 = getSlots(); s2[r.k] = null; setSlots(s2); } renderSlots('Удалено'); refreshSave(); }));
+    list.appendChild(el); });
+}
+function openSaves(mode) { savesMode = mode; renderSlots(); showPanel('p_saves'); }
+function saveInfo(sv) { if (!sv || !sv.play) return null; let clock = ''; try { clock = SIM.clockStr(sv.play); } catch (e) {}
+  let n = 0; try { n = SIM.MODIDS.filter((id) => { const k = sv.play[SIM.MODS[id].key]; return k && (k.done >= 0 || k.sweet); }).length; } catch (e) {}
+  return `${clock} · модеры ${n}/3`; }
+function refreshSave() { const all = allSaves(), sv = all[0], inf = sv ? (sv.name ? sv.name + ' · ' : '') + saveInfo(sv) : null;
+  $('m_cont').disabled = !sv || !ready; $('contNote').textContent = inf || ''; $('m_load').disabled = !all.length || !ready; $('m_new').disabled = !ready;
+  $('saveInfo').textContent = all.length ? 'Сохранений: ' + all.length : 'Нет сохранений'; }
+// settings panel
+document.querySelectorAll('#p_set input[type=range]').forEach((r) => { const k = r.dataset.k, o = r.nextElementSibling; r.value = SET[k]; o.textContent = SET[k];
+  r.addEventListener('input', () => { SET[k] = +r.value; o.textContent = r.value; applySet(); LS.set('sog_settings', SET); }); });
+document.querySelectorAll('#p_set .sw').forEach((b) => { const k = b.dataset.k; b.classList.toggle('on', !!SET[k]);
+  b.addEventListener('click', () => { SET[k] = !SET[k]; b.classList.toggle('on', SET[k]); applySet(); LS.set('sog_settings', SET); }); });
+const fullscreen = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); } catch (e) {} };
+$('s_full').onclick = fullscreen; $('m_full').onclick = fullscreen;
+let wipeArm = 0; $('s_wipe').onclick = () => { if (Date.now() - wipeArm > 2500) { wipeArm = Date.now(); $('s_wipe').textContent = 'Точно стереть все?'; setTimeout(() => ($('s_wipe').textContent = 'Стереть все'), 2500); return; } LS.del('sog_save'); LS.del('sog_slots'); $('s_wipe').textContent = 'Стереть все'; refreshSave(); };
+menu.querySelectorAll('[data-panel]').forEach((b) => (b.onclick = () => showPanel(b.dataset.panel)));
+menu.querySelectorAll('.back').forEach((b) => (b.onclick = () => { showPanel(null); const f = menu.querySelector(menuMode === 'pause' ? '#p_resume' : '#m_new'); if (f) f.focus({ preventScroll: true }); }));
+$('m_load').onclick = () => openSaves('load'); $('p_save').onclick = () => openSaves('save'); $('p_load').onclick = () => openSaves('load');
+menu.addEventListener('keydown', (e) => { if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return; if (e.target.type === 'range') return;
+  const vis = [...menu.querySelectorAll('.panel.on button, .panel.on input, #' + (menuMode === 'pause' ? 'pauseBtns' : 'mainBtns') + ' .btn:not([disabled])')].filter((b) => b.offsetParent);
+  const panelOn = menu.querySelector('.panel.on'), list = panelOn ? vis.filter((b) => panelOn.contains(b)) : vis; const i = list.indexOf(document.activeElement);
+  const n = list[(i + (e.key === 'ArrowDown' ? 1 : -1) + list.length) % list.length]; if (n) { n.focus(); e.preventDefault(); } });
+if (!render) openMenu('main');
+(async () => {
+  for (const f of ['assets.js', 'sizes.js', 'anchors.js', 'rigs.js', 'kframes.js', 'gl.js', 'lib.js', 'sim.js', 'scene.js', 'audio.js']) await load(f);
+  applySet();
+  const q = new URLSearchParams(location.search), DEV = !STATIC || q.has('dev');
+  const VW = (SIM.VIEW || {}).W || 1920, VH = (SIM.VIEW || {}).H || 1080;             // view size and aspect come from the sim
+  document.documentElement.style.setProperty('--ar', VW / VH);
+  $('foot').textContent = 'версия ' + (SIM.VERSION || '') + ' · Esc — пауза';
+  $('keyList').innerHTML = (SIM.HINT || '').split(' · ').concat(['Esc — пауза и меню', 'Tab → Консоль — команды разработчика (help)', 'Tab → Контакты — написать модерам, занять денег'])
+    .map((s) => { const i = s.indexOf(' — '); return i < 0 ? `<li><span>${s}</span></li>` : `<li><b>${s.slice(0, i)}</b><span>${s.slice(i + 3)}</span></li>`; }).join('');
+  G.init($('c'), VW, VH);
+  const rep = new Set(SCENE.REPEAT || []), near = (n) => SCENE.NEAREST === true || (SCENE.NEAREST || []).includes(n);   // NEAREST: true = all
+  const names = Object.keys(ASSETS); let nDone = 0;
+  await Promise.all(names.map((n) => G.load(n, 'assets/' + n + '.png?v=' + V, { repeat: rep.has(n), nearest: near(n) }).then((r) => { nDone++; $('loadBar').style.width = (100 * nDone / names.length).toFixed(1) + '%'; return r; })));
+  SCENE.programs();
+  window.__duration = SIM.L;
+  window.__renderAt = (t) => { SCENE.render(t); return $('c').toDataURL('image/png'); };
+  window.__ready = true;
+  if (render) return;
+  ready = true; $('load').style.display = 'none'; refreshSave(); if (menuMode === 'main') openMenu('main');
+
+  const keys = {}, dev = $('dev'), flash = $('flash'), txt = $('txt'), cv = $('c');
+  const SPEEDS = [0.1, 0.25, 0.5, 1];
+  let play = null, prevSnap = null, acc = 0, simT = 0, speed = 1, paused = false, stepOnce = false, fps = 60, lastSave = 0;
+  const start = (S, t) => { play = S; simT = t; prevSnap = null; acc = 0; closeMenu(); for (const k in keys) keys[k] = 0; if (window.AUDIO && AUDIO.unlock) AUDIO.unlock(); };
+  const autosave = () => { if (play && !play.finale) LS.set('sog_save', { v: SIM.VERSION, simT, play, at: Date.now() }); };
+  // live preview: keep the play state across reloads; Claude's hot restore can drop straight into play
+  if (!STATIC) try { const sv = JSON.parse(sessionStorage.getItem('live') || 'null');
+    if (sv) { speed = sv.speed; paused = sv.paused; if (sv.play) start(Object.assign(SIM.create(), sv.play), sv.simT); flash.style.opacity = 1; setTimeout(() => (flash.style.opacity = 0), 1200); } } catch (e) {}
+  const saveLive = () => { try { sessionStorage.setItem('live', JSON.stringify({ simT, speed, paused, play })); } catch (e) {} };
+  try { const hot = window.claude && window.claude.hot; if (hot) { const hd = hot.data; if (hd && hd.play) start(Object.assign(SIM.create(), hd.play), hd.simT || 0);
+    if (hot.snapshot) hot.snapshot(() => ({ play, simT })); } } catch (e) {}
+  // menu buttons
+  let newArm = 0;
+  saveToSlot = (k, name) => { if (!play) return false; const s2 = getSlots(); while (s2.length < NSLOT) s2.push(null); s2[k] = { v: SIM.VERSION, name, simT, play, at: Date.now() }; return setSlots(s2); };
+  loadSave = (sv) => { if (play) autosave(); start(Object.assign(SIM.create(), sv.play), sv.simT || 0); lastSave = performance.now(); };
+  $('m_new').onclick = () => { const sv = LS.get('sog_save'); if (sv && sv.play && Date.now() - newArm > 2500) { newArm = Date.now(); $('m_new').lastChild.textContent = 'Начать заново? Автосохранение перезапишется';
+      setTimeout(() => ($('m_new').lastChild.textContent = 'Новая игра'), 2500); return; }
+    $('m_new').lastChild.textContent = 'Новая игра'; LS.del('sog_save'); start(SIM.spawn(simT), simT); lastSave = performance.now(); };
+  $('m_cont').onclick = () => { const sv = allSaves()[0]; if (sv) loadSave(sv); };
+  $('p_resume').onclick = () => closeMenu();
+  $('p_exit').onclick = () => { autosave(); play = null; SCENE.state = null; openMenu('main'); };
+  document.addEventListener('visibilitychange', () => { if (document.hidden && play && !menuMode) { autosave(); openMenu('pause'); } });
+  addEventListener('beforeunload', () => { if (STATIC) autosave(); });
+  // the phone's text field: a real <input> laid over the drawn field (console commands, messages to contacts)
+  const pend = { slot: 0, wheel: 0, texts: [] }; let txtApp = null;
+  txt.addEventListener('keydown', (e) => { e.stopPropagation();
+    if (e.key === 'Enter') { const v = txt.value.trim(); if (v) pend.texts.push(v); txt.value = ''; e.preventDefault(); }
+    else if (e.key === 'Escape') { txt.blur(); e.preventDefault(); }
+    else if (e.key === 'Tab') { e.preventDefault(); txt.blur(); keys.Tab = 1; setTimeout(() => (keys.Tab = 0), 80); } });
+  txt.addEventListener('pointerdown', (e) => e.stopPropagation());
+  function placeTxt() { const ph = play && play.phone, app = ph && !menuMode && !play.finale && (ph.app === 'dev' || ph.app === 'dm') && play.t - ph.t > 0.2 ? ph.app + (ph.who || '') : null;
+    if (app !== txtApp) { txtApp = app; txt.style.display = app ? 'block' : 'none'; txt.value = '';
+      if (app) { txt.placeholder = ph.app === 'dev' ? 'команда, например: money 5000 · help' : 'Напиши сообщение и нажми Enter…'; setTimeout(() => txt.focus({ preventScroll: true }), 0); } else txt.blur(); }
+    window.__typing = !!app;
+    if (app) { const r = cv.getBoundingClientRect(), P0 = SIM.HUD.phone, k = r.width / VW;
+      Object.assign(txt.style, { left: r.left + (P0.x + 30) * k + 'px', top: r.top + (P0.y + P0.h - 128) * k + 'px', width: (P0.w - 60) * k + 'px', height: 46 * k + 'px', fontSize: Math.max(11, 16 * k) + 'px' }); } }
+  addEventListener('keydown', (e) => {
+    const c = e.code;
+    if (menuMode) { if (c === 'Escape') { e.preventDefault(); if (menu.querySelector('.panel.on')) { showPanel(null); const f = menu.querySelector(menuMode === 'pause' ? '#p_resume' : '#m_new'); if (f) f.focus(); } else if (menuMode === 'pause') closeMenu(); } return; }
+    if (!play) return;
+    if (DEV) { if (c === 'KeyP') { paused = !paused; e.preventDefault(); return; }
+      if (c === 'Period') { stepOnce = true; paused = true; e.preventDefault(); return; }
+      if (c === 'BracketLeft') { speed = SPEEDS[Math.max(0, SPEEDS.indexOf(speed) - 1)]; return; }
+      if (c === 'BracketRight') { speed = SPEEDS[Math.min(SPEEDS.length - 1, SPEEDS.indexOf(speed) + 1)]; return; } }
+    if (c === 'Escape' && !play.dlg && !play.phone && !play.chalk && !play.finale) { e.preventDefault(); autosave(); openMenu('pause'); return; }
+    if (c === 'F11') return;
+    keys[c] = 1;
+    const dg = /^Digit(\d)$/.exec(c); if (dg) pend.slot = +dg[1] || 10;                     // 1–9, 0 → inp.slot (hotbars)
+    e.preventDefault();
+  });
+  addEventListener('keyup', (e) => { keys[e.code] = 0; });
+  // pointer in view pixels (VW×VH); click is true for exactly one sim step
+  const ptr = { x: VW / 2, y: VH / 2, down: 0, rdown: 0, click: 0, rclick: 0 };
+  addEventListener('wheel', (e) => { if (play && !menuMode) { pend.wheel = Math.sign(e.deltaY); e.preventDefault(); } }, { passive: false });
+  addEventListener('contextmenu', (e) => e.preventDefault());
+  const toView = (e) => { const r = cv.getBoundingClientRect(); ptr.x = (e.clientX - r.left) / r.width * VW; ptr.y = (e.clientY - r.top) / r.height * VH; };
+  addEventListener('pointermove', toView);
+  addEventListener('pointerdown', (e) => { if (menuMode || !play) return; toView(e); if (txtApp && document.activeElement === txt) txt.blur();
+    if (e.button === 2) { ptr.rdown = 1; ptr.rclick = 1; } else { ptr.down = 1; ptr.click = 1; } });
+  addEventListener('pointerup', (e) => { if (e.button === 2) ptr.rdown = 0; else ptr.down = 0; });
+  addEventListener('blur', () => { for (const k in keys) keys[k] = 0; ptr.down = ptr.rdown = 0; });
+  let last = performance.now(), fpsAcc = 0, fpsN = 0;
+  const loop = () => {
+    const now = performance.now(), wall = Math.min(0.1, (now - last) / 1000); last = now;
+    fpsAcc += wall; fpsN++; if (fpsAcc > 0.5) { fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; }
+    const run = play && !menuMode, dt = !run ? 0 : paused ? (stepOnce ? 1 / 60 : 0) : wall * speed; stepOnce = false;
+    simT += dt;
+    if (play) {
+      if (run) { acc += dt;
+        const inp = { left: keys.ArrowLeft || keys.KeyA, right: keys.ArrowRight || keys.KeyD, up: keys.ArrowUp || keys.KeyW, down: keys.ArrowDown || keys.KeyS,
+          jump: keys.Space, space: keys.Space, run: keys.ShiftLeft || keys.ShiftRight, act: keys.KeyX || keys.KeyJ || keys.Enter, e: keys.KeyE, tab: keys.Tab, esc: keys.Escape, f: keys.KeyF, enter: keys.Enter,
+          px: ptr.x, py: ptr.y, press: ptr.down, rpress: ptr.rdown || ptr.rclick, click: ptr.click, slot: pend.slot, wheel: pend.wheel, text: acc >= SIM.DT ? pend.texts.shift() || '' : '' };   // typed text only when a step will consume it (a frame can run no step at 144 Hz)
+        while (acc >= SIM.DT) { if (SIM.snap) prevSnap = SIM.snap(play); SIM.step(play, inp); inp.click = ptr.click = 0; ptr.rclick = 0; inp.rpress = ptr.rdown;   // a quick right tap still lands (latched for one step)
+          inp.slot = pend.slot = 0; inp.wheel = pend.wheel = 0; inp.text = ''; acc -= SIM.DT; }
+        if (SIM.outOfPlay && SIM.outOfPlay(play)) { play = SIM.respawn ? SIM.respawn(play, simT) : SIM.spawn(simT); prevSnap = null; }
+        if (play.finale && play.finale.over) { LS.del('sog_save'); play = null; SCENE.state = null; openMenu('main'); }
+        else if (STATIC && now - lastSave > 10000) { lastSave = now; autosave(); } }
+      if (play) SCENE.state = run && SIM.lerpState ? SIM.lerpState(prevSnap, play, acc / SIM.DT) : play;      // draw between the last two fixed steps: smooth at any refresh rate
+    } else SCENE.state = null;
+    placeTxt();
+    if (play) { try { SCENE.render(simT); } catch (e) { if (!window.__renderErr) { window.__renderErr = e; console.error(e); } } }   // log once, keep the loop alive
+    if (!STATIC) dev.style.display = (paused || speed !== 1 || q.has('dev')) ? 'block' : 'none';   // debug line only when paused / slowed or with ?dev
+    if (!STATIC) dev.textContent = `LIVE  ${play ? 'play' : 'menu'}  ${paused ? 'PAUSED' : speed + '×'}  ${fps.toFixed(0)} fps   P pause  [ ] speed  . step  Esc pause menu`;
+    requestAnimationFrame(loop);
+  };
+  loop();
+  if (STATIC) { dev.style.display = 'none'; return; }
+  const WATCH = ['index.html', 'scene.js', 'sim.js', 'lib.js', 'gl.js', 'assets.js', 'sizes.js', 'audio.js'], stamp = {};
+  const poll = async () => {
+    for (const f of WATCH) {
+      try { const r = await fetch(f + '?poll=' + Date.now(), { method: 'HEAD', cache: 'no-store' }); const m = r.headers.get('last-modified') + r.headers.get('content-length');
+        if (stamp[f] && stamp[f] !== m) { saveLive(); location.reload(); return; } stamp[f] = m; } catch (e) {}
+    }
+    setTimeout(poll, 700);
+  };
+  poll();
+})().catch((e) => { console.error(e); document.body.insertAdjacentHTML('beforeend', '<pre style="color:#f88;position:absolute;top:0;left:0;background:#000c;padding:12px;font:13px monospace;white-space:pre-wrap;z-index:20">' + e.stack + '</pre>');
+  const f = ['scene.js', 'sim.js', 'lib.js', 'gl.js', 'assets.js', 'index.html'], st = {};               // keep polling: fixing the error reloads by itself
+  if (!window.__STATIC__) setInterval(async () => { for (const x of f) { try { const r = await fetch(x + '?p=' + Date.now(), { method: 'HEAD', cache: 'no-store' }); const m = r.headers.get('last-modified');
+    if (st[x] && st[x] !== m) location.reload(); st[x] = m; } catch (e) {} } }, 800); });
+</script></body></html>

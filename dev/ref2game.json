@@ -1,0 +1,73 @@
+{
+ "generator": {
+  "provider": "openai",
+  "model": "gpt-image-2.5-sunburst",
+  "size": "1536x1024",
+  "quality": "medium",
+  "opaque": [
+   "bg_sky*",
+   "*_tex"
+  ],
+  "jobs": 4,
+  "opts": {
+   "openai": {}
+  }
+ },
+ "style_bible": "art/style_bible.txt",
+ "style_ref": [
+  "ref.png"
+ ],
+ "view": [
+  1920,
+  1080
+ ],
+ "prep": {
+  "src": "art/gen",
+  "dst": "live/assets",
+  "manifest": "live/assets.js",
+  "notrim": [
+   "*__*",
+   "*_tex",
+   "bg_*",
+   "kf_*",
+   "rf_*",
+   "k16_*w",
+   "pw_*w",
+   "sw_*w",
+   "ef_*",
+   "cg_*",
+   "menu_art",
+   "k16t_*w",
+   "k16r_*w",
+   "k16c_*w",
+   "ka_*w"
+  ],
+  "skip": [
+   "*_raw",
+   "*_sheet",
+   "kolya_*",
+   "kw_*",
+   "rv_*",
+   "k16_p*[0-9]",
+   "k16_m*[0-9]",
+   "pw_p*[0-9]",
+   "pw_m*[0-9]",
+   "sw_p*[0-9]",
+   "sw_m*[0-9]",
+   "el_*",
+   "k16t_p*[0-9]",
+   "k16t_m*[0-9]",
+   "k16r_p*[0-9]",
+   "k16r_m*[0-9]",
+   "k16c_p*[0-9]",
+   "k16c_m*[0-9]",
+   "ka_p*[0-9]",
+   "ka_m*[0-9]"
+  ],
+  "max": 2048,
+  "walk": {
+   "ground": 0.6,
+   "ledge*": 0.45
+  }
+ }
+}

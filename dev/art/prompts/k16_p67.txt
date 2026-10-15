@@ -1,0 +1,14 @@
+SPRITE SHEET of the young man Kolya from Image 2 (identical face, messy light-brown hair, oversized black-brown hoodie, charcoal cargo trousers with side pockets, dark sneakers, same proportions, colours and pixel style); Image 3 is his turnaround sheet.
+Image 4 is the POSE GUIDE: a 3D mannequin rendered from the game camera in a 5 x 2 grid of equal cells read left to right, top row frames 1-5, bottom row frames 6-10. Redraw Kolya in EXACTLY the mannequin's pose in every cell: the same leg angles, knee bends, which foot is forward, which foot is lifted, the same arm swing, the same body facing and the same place in the cell, standing on that cell's ground line, the same size in every cell (about 400 px tall). The mannequin's RED limbs are Kolya's RIGHT arm and leg, the BLUE limbs are his LEFT arm and leg. Do NOT draw the mannequin, the red and blue colours, the grey boxes, the lines or the numbers.
+VIEW (all 10 frames): almost FRONT view facing DOWN and a little to the right (about 20 degrees right of straight toward the viewer): he walks toward the viewer; we see his face and the whole front of his hoodie, slightly turned to his left (our right); seen from the game's high camera (looking down about 30 degrees).
+FRAMES 1-8 are one smooth WALK CYCLE (a relaxed stroll), every frame clearly different:
+1 right foot forward touching down, left leg behind, legs apart; left arm forward, right arm back.
+2 right foot planted under the body, left heel lifting behind.
+3 left leg swinging forward past the right leg, left knee bent, left foot off the ground.
+4 left leg reaching forward, right heel lifting.
+5 left foot forward touching down, right leg behind, legs apart; right arm forward, left arm back.
+6 left foot planted, right heel lifting behind.
+7 right leg swinging forward past the left leg, right knee bent, right foot off the ground.
+8 right leg reaching forward, left heel lifting.
+FRAMES 9-10: standing still, relaxed, feet apart under the hips, arms hanging (10 is a tiny breathing variation of 9).
+Hands relaxed and empty. Every figure complete and clean, identical character design, size and colours in all 10 frames, crisp pixel clusters, transparent background, no shadow, no ground, no text.

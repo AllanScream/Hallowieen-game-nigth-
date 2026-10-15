@@ -1,0 +1,22 @@
+[
+ {
+  "name": "bench_back",
+  "prompt": "art/prompts/bench_back.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/bench.png=the same bench seen from its front (match its materials, size and pixel style)"
+  ]
+ },
+ {
+  "name": "icon_rifle",
+  "prompt": "art/prompts/icon_rifle.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "live/assets/icon_eggs.png=an icon already in the game: match its style exactly"
+  ]
+ }
+]

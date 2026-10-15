@@ -1,0 +1,1 @@
+A tall weathered wooden plank fence segment of a back alley, dark grey-brown boards with gaps, a few posters torn off, moss at the bottom. Image 2 is a grey mass model that fixes the camera angle and orientation: the fence runs diagonally from the upper-left to the lower-right of the image exactly like the slab in Image 2; ignore its colours. Isolated, no ground, margin.

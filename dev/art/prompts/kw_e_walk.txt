@@ -1,0 +1,12 @@
+SPRITE SHEET: an 8-frame walk cycle of the young man Kolya from Image 2 (identical face, messy light-brown hair, oversized black-brown hoodie, charcoal cargo trousers with side pockets, dark sneakers, same proportions and colours); Image 3 is his turnaround sheet. Image 4 is a LAYOUT GUIDE ONLY: a 4 x 2 grid of equal cells read left to right, top row frames 1-4, bottom row frames 5-8; each frame is one full-body figure standing on that cell's ground line, the same size in every cell (about 400 px tall), centred in its cell, nothing crossing into another cell. Do NOT draw the grid, the lines, the boxes or the numbers.
+VIEW: strict side profile facing RIGHT, seen from the game's high camera (looking down about 30 degrees), the same view in all 8 frames.
+WALK CYCLE (natural, relaxed, short steps, a casual stroll, not a march):
+1 contact: right heel touches down in front, left leg behind on its toes, legs apart, left arm forward, right arm back.
+2 down: right foot flat under the body, knee slightly bent, body slightly lower, left foot lifting behind.
+3 passing: left leg swinging forward past the straight right leg, left knee bent and foot off the ground, arms close to the body, body highest.
+4 up: left leg reaching forward, right heel lifting off, body high.
+5 contact: left heel touches down in front, right leg behind on its toes, right arm forward, left arm back.
+6 down: mirror of 2 with legs swapped.
+7 passing: mirror of 3 with the right leg swinging.
+8 up: mirror of 4.
+Arms swing gently opposite to the legs, hands relaxed and empty. Keep the near leg and near arm in front of the body and the far ones behind, as a real side-view walk cycle in a professional pixel-art game. Every frame complete and clean, consistent proportions, crisp pixel clusters, transparent background, no shadow, no ground, no text.

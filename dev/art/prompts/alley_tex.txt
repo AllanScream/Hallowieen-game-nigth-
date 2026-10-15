@@ -1,0 +1,1 @@
+Seamless tileable texture of a dirty back-alley ground at night, camera looking straight down (top-down orthographic), even flat lighting: cracked dark asphalt with patches of mud, a couple of small puddles, scattered wet leaves, cigarette butts and a crushed can, no objects taller than the ground, no vignette. The texture must wrap seamlessly on all four edges.

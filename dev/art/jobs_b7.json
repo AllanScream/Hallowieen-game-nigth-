@@ -1,0 +1,2 @@
+[{"name": "rv_act", "prompt": "art/prompts/rv_act.txt", "size": "1536x1024", "alpha": "native", "quality": "medium",
+  "ref": ["refs/raiva.png=Raiva character sheet: identity, outfit, colours (front, side, back views and a close-up)", "art/gen/kolya_se.png=the game's hero sprite: match its pixel style, size, outline and lighting (do not copy the person)", "art/guides/grid8.png=layout guide only: 4 x 2 grid, frame numbers, ground lines; do not draw it"]}]

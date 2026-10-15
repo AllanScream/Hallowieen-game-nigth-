@@ -1,0 +1,113 @@
+[
+ {
+  "name": "asphalt_tex",
+  "prompt": "art/prompts/asphalt_tex.txt",
+  "size": "1024x1024",
+  "alpha": "none",
+  "quality": "low"
+ },
+ {
+  "name": "sidewalk_tex",
+  "prompt": "art/prompts/sidewalk_tex.txt",
+  "size": "1024x1024",
+  "alpha": "none",
+  "quality": "low"
+ },
+ {
+  "name": "lawn_tex",
+  "prompt": "art/prompts/lawn_tex.txt",
+  "size": "1024x1024",
+  "alpha": "none",
+  "quality": "low"
+ },
+ {
+  "name": "house_kirill",
+  "prompt": "art/prompts/house_kirill.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "study/guide_house.png=camera angle and footprint guide only (grey mass model): match its isometric orientation, ignore its colours"
+  ]
+ },
+ {
+  "name": "house_vera",
+  "prompt": "art/prompts/house_vera.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "study/guide_house.png=camera angle and footprint guide only (grey mass model): match its isometric orientation, ignore its colours"
+  ]
+ },
+ {
+  "name": "house_raiva",
+  "prompt": "art/prompts/house_raiva.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "study/guide_house.png=camera angle and footprint guide only (grey mass model): match its isometric orientation, ignore its colours"
+  ]
+ },
+ {
+  "name": "house_elf",
+  "prompt": "art/prompts/house_elf.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "study/guide_house.png=camera angle and footprint guide only (grey mass model): match its isometric orientation, ignore its colours"
+  ]
+ },
+ {
+  "name": "house_a",
+  "prompt": "art/prompts/house_a.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "study/guide_house.png=camera angle and footprint guide only (grey mass model): match its isometric orientation, ignore its colours"
+  ]
+ },
+ {
+  "name": "house_b",
+  "prompt": "art/prompts/house_b.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "study/guide_house.png=camera angle and footprint guide only (grey mass model): match its isometric orientation, ignore its colours"
+  ]
+ },
+ {
+  "name": "kolya_se",
+  "prompt": "art/prompts/kolya_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/kolya.png=same character: keep face, hair, outfit, proportions (turnaround sheet)"
+  ]
+ },
+ {
+  "name": "kolya_ne",
+  "prompt": "art/prompts/kolya_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/kolya.png=same character: keep hair, outfit, proportions (turnaround sheet)"
+  ]
+ },
+ {
+  "name": "kirill_se",
+  "prompt": "art/prompts/kirill_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "refs/kirill.png=same character: keep face, glasses, outfit, proportions (turnaround sheet)"
+  ]
+ }
+]

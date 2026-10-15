@@ -1,0 +1,1 @@
+Seamless tileable texture of a dark autumn front-yard lawn at night, camera looking straight down (top-down orthographic), even flat lighting, no objects, no vignette: short dark olive-brown grass densely covered with fallen red, orange and brown leaves. The texture must wrap seamlessly on all four edges.

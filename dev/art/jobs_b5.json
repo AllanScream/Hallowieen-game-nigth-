@@ -1,0 +1,101 @@
+[
+ {
+  "name": "kolya_s",
+  "prompt": "art/prompts/kolya_s.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=same character (current approved sprite)",
+   "refs/kolya.png=turnaround sheet: front, side and back views"
+  ]
+ },
+ {
+  "name": "kolya_e",
+  "prompt": "art/prompts/kolya_e.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=same character (current approved sprite)",
+   "refs/kolya.png=turnaround sheet: front, side and back views"
+  ]
+ },
+ {
+  "name": "kolya_n",
+  "prompt": "art/prompts/kolya_n.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=same character (current approved sprite)",
+   "refs/kolya.png=turnaround sheet: front, side and back views"
+  ]
+ },
+ {
+  "name": "pizza_stack",
+  "prompt": "art/prompts/pizza_stack.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "egg_splat_a",
+  "prompt": "art/prompts/egg_splat_a.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "egg_splat_b",
+  "prompt": "art/prompts/egg_splat_b.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "tp_drape_a",
+  "prompt": "art/prompts/tp_drape_a.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "tp_drape_b",
+  "prompt": "art/prompts/tp_drape_b.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "dumpster",
+  "prompt": "art/prompts/dumpster.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "crates",
+  "prompt": "art/prompts/crates.txt",
+  "size": "1024x1024",
+  "alpha": "native",
+  "quality": "low"
+ },
+ {
+  "name": "alley_tex",
+  "prompt": "art/prompts/alley_tex.txt",
+  "size": "1024x1024",
+  "alpha": "none",
+  "quality": "low"
+ },
+ {
+  "name": "fence_side",
+  "prompt": "art/prompts/fence_side.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "study/guide_fence_y.png=camera angle and orientation guide only (grey slab): match its isometric orientation, ignore colours"
+  ]
+ }
+]

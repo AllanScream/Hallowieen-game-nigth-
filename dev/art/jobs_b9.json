@@ -1,0 +1,101 @@
+[
+ {
+  "name": "house_kolya",
+  "prompt": "art/prompts/house_kolya.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "study/guide_house2.png=camera angle, footprint and height guide only (grey mass model of a two-storey house): match its isometric orientation, ignore its colours"
+  ]
+ },
+ {
+  "name": "cg_party1",
+  "prompt": "art/prompts/cg_party1.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya",
+   "refs/kirill.png=character sheet: kirill",
+   "refs/raiva.png=character sheet: raiva",
+   "refs/elf.png=character sheet: elf",
+   "refs/police.png=character sheet: police",
+   "refs/soldier.png=character sheet: soldier"
+  ]
+ },
+ {
+  "name": "cg_party2",
+  "prompt": "art/prompts/cg_party2.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/elf.png=character sheet: elf"
+  ]
+ },
+ {
+  "name": "cg_party3",
+  "prompt": "art/prompts/cg_party3.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kirill.png=character sheet: kirill",
+   "refs/raiva.png=character sheet: raiva",
+   "refs/kolya.png=character sheet: kolya"
+  ]
+ },
+ {
+  "name": "cg_party4",
+  "prompt": "art/prompts/cg_party4.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/police.png=character sheet: police",
+   "refs/soldier.png=character sheet: soldier",
+   "refs/kolya.png=character sheet: kolya"
+  ]
+ },
+ {
+  "name": "cg_party5",
+  "prompt": "art/prompts/cg_party5.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya",
+   "refs/kirill.png=character sheet: kirill",
+   "refs/raiva.png=character sheet: raiva",
+   "refs/elf.png=character sheet: elf",
+   "refs/police.png=character sheet: police",
+   "refs/soldier.png=character sheet: soldier"
+  ]
+ },
+ {
+  "name": "menu_art",
+  "prompt": "art/prompts/menu_art.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya",
+   "refs/kirill.png=character sheet: kirill",
+   "refs/raiva.png=character sheet: raiva",
+   "refs/elf.png=character sheet: elf"
+  ]
+ }
+]

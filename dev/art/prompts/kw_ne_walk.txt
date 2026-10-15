@@ -1,0 +1,13 @@
+SPRITE SHEET of the young man Kolya from Image 2 (identical face, messy light-brown hair, oversized black-brown hoodie, charcoal cargo trousers with side pockets, dark sneakers, same proportions and colours); Image 3 is his turnaround sheet. Image 4 is a LAYOUT GUIDE ONLY: a 4 x 2 grid of equal cells read left to right, top row frames 1-4, bottom row frames 5-8; each frame is one full-body figure standing on that cell's ground line, the same size in every cell (about 400 px tall), centred in its cell, nothing crossing into another cell. Do NOT draw the grid, the lines, the boxes or the numbers.
+VIEW: 3/4 BACK view facing UP-RIGHT: he walks away from the viewer diagonally toward the upper-right corner; we see his back, the back of his hood and hair, and a little of his right cheek; seen from the game's high camera (looking down about 30 degrees).
+WALK CYCLE, 8 frames (natural, relaxed, short steps, a casual stroll, not a march):
+1 contact: right foot steps forward and touches down, left leg behind, legs apart, left arm forward, right arm back.
+2 down: right foot planted under the body, body slightly lower, left foot lifting behind.
+3 passing: left leg swinging forward past the planted right leg, left knee bent, foot off the ground, body highest.
+4 up: left leg reaching forward, right heel lifting.
+5 contact: left foot steps forward and touches down, right leg behind, right arm forward, left arm back.
+6 down: left foot planted, right foot lifting behind.
+7 passing: right leg swinging forward past the planted left leg.
+8 up: right leg reaching forward, left heel lifting.
+The legs step along the up-right diagonal away from the viewer: the stepping foot lands upper-right of the body (slightly smaller), the back foot is lower-left with the sole showing as it lifts; arms swing along the same diagonal in opposition to the legs. Hands relaxed and empty.
+Every frame complete and clean, identical character design and size in all frames, crisp pixel clusters, transparent background, no shadow, no ground, no text.

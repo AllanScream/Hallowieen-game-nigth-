@@ -1,0 +1,220 @@
+[
+ {
+  "name": "kolya_se",
+  "prompt": "art/prompts/rig_kolya_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/kolya_se.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/kolya.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "kolya_ne",
+  "prompt": "art/prompts/rig_kolya_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/kolya_ne.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/kolya.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "kirill_se",
+  "prompt": "art/prompts/rig_kirill_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/kirill_se.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/kirill.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_ghost_se",
+  "prompt": "art/prompts/rig_npc_ghost_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_ghost_se.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc1.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_ghost_ne",
+  "prompt": "art/prompts/rig_npc_ghost_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_ghost_ne.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc1.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_witch2_se",
+  "prompt": "art/prompts/rig_npc_witch2_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_witch2_se.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc2.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_witch2_ne",
+  "prompt": "art/prompts/rig_npc_witch2_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_witch2_ne.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc2.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_cloak_se",
+  "prompt": "art/prompts/rig_npc_cloak_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_cloak_se.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc3.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_cloak_ne",
+  "prompt": "art/prompts/rig_npc_cloak_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_cloak_ne.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc3.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_devil_se",
+  "prompt": "art/prompts/rig_npc_devil_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_devil_se.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc5.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_devil_ne",
+  "prompt": "art/prompts/rig_npc_devil_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_devil_ne.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc5.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_skeleton_se",
+  "prompt": "art/prompts/rig_npc_skeleton_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_skeleton_se.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc6.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_skeleton_ne",
+  "prompt": "art/prompts/rig_npc_skeleton_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_skeleton_ne.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc6.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_hoodie_se",
+  "prompt": "art/prompts/rig_npc_hoodie_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_hoodie_se.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc7.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_hoodie_ne",
+  "prompt": "art/prompts/rig_npc_hoodie_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_hoodie_ne.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc7.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_kid_se",
+  "prompt": "art/prompts/rig_npc_kid_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_kid_se.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc4.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_kid_ne",
+  "prompt": "art/prompts/rig_npc_kid_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_kid_ne.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc4.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "npc_witch_se",
+  "prompt": "art/prompts/rig_npc_witch_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/npc_witch_se.png=same character and view (current sprite): keep everything identical except the pose",
+   "refs/npc9.png=character sheet for identity only"
+  ]
+ },
+ {
+  "name": "courier_se",
+  "prompt": "art/prompts/rig_courier_se.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/courier_se.png=same character and view (current sprite): keep everything identical except the pose"
+  ]
+ },
+ {
+  "name": "courier_ne",
+  "prompt": "art/prompts/rig_courier_ne.txt",
+  "size": "1024x1536",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/anchors_v1/courier_ne.png=same character and view (current sprite): keep everything identical except the pose"
+  ]
+ }
+]

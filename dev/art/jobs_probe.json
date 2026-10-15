@@ -1,0 +1,3 @@
+[{"name":"probe_prop","prompt":"art/prompts/probe_prop.txt","size":"1024x1024","alpha":"auto","quality":"low"},
+ {"name":"probe_hero","prompt":"art/prompts/probe_hero.txt","size":"1024x1024","alpha":"auto","quality":"low","ref":["refs/kolya.png=same character: keep face, hair, outfit, proportions (turnaround sheet)"]},
+ {"name":"probe_house","prompt":"art/prompts/probe_house.txt","size":"1536x1024","alpha":"auto","quality":"low"}]
