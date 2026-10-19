@@ -40,7 +40,8 @@
    "k16t_*w",
    "k16r_*w",
    "k16c_*w",
-   "ka_*w"
+   "ka_*w",
+   "ach_icons"
   ],
   "skip": [
    "*_raw",

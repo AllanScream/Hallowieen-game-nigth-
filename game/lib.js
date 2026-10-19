@@ -363,6 +363,8 @@ void main(){ vec2 p = (v_uv - 0.5) * u_sz; vec2 q = abs(p) - (u_sz * 0.5 - u_r);
   // ---------------- sprite ----------------
   const DEF = { alpha: 1, lod: 0, src: [0, 0, 1, 1], grade: [1, 1, 0, 1], haze: [0.93, 0.88, 0.76], sway: [0, 0, 0, 0], pad: [0, 0], rim: [0, 0, 0, 0],
     rimCol: [1, 0.85, 0.55], tint: [1, 1, 1, 0], fade: [0, 0], vfade: 0, tfade: 0, bulge: [0, 0, 0, 0], bend: [0, 0, 0, 0], lean: [0, 0], disc: 0, bone0: [0, 0, 0, 0], bone1: [0, 0, 0, 0], bone2: [0, 0, 0, 0], wsz: [1, 1] };
+  const DEFU = {}; for (const k in DEF) DEFU['u_' + k] = DEF[k];
+  const UNI = Object.assign({ u_tex: null, u_pad: null, u_src: null }, DEFU), PAD0 = [0, 0], XTRA = [];
   L.sp = null;   // pass override: { dx, dy, a, lod } = soft drop shadow, { ..., ink: [r,g,b] } = flat ink silhouette
   // sprite(name, x, y, { w | h, src, pad, flip, rot, pivot, m, u: { uniforms without the u_ prefix } })
   //   x,y = top-left of the visible image. pad grows the quad (fraction of w/h) so deformed pixels are not clipped.
@@ -373,12 +375,13 @@ void main(){ vec2 p = (v_uv - 0.5) * u_sz; vec2 q = abs(p) - (u_sz * 0.5 - u_r);
     const sw = tx.w * (src[2] - src[0]), sh = tx.h * (src[3] - src[1]);
     let w = o.w, h = o.h; if (w && !h) h = w * sh / sw; if (h && !w) w = h * sw / sh; if (!w) { w = sw; h = sh; }
     const pad = o.pad || 0, pw = w * pad, ph = h * pad;
-    const U = Object.assign({}, DEF, o.u || {}, { u_tex: tx });
+    const uni = UNI; for (const k of XTRA) delete uni[k]; XTRA.length = 0; for (const k in DEFU) uni[k] = DEFU[k];          // v9: one scratch object, no garbage per sprite
+    if (o.u) for (const k in o.u) { const kk = k.charCodeAt(0) === 117 && k.charCodeAt(1) === 95 ? k : 'u_' + k; if (!(kk in DEFU) && kk !== 'u_tex') XTRA.push(kk); uni[kk] = o.u[k]; }
+    uni.u_tex = tx;
     if (L.sp) { const sp = L.sp;
-      Object.assign(U, { grade: sp.ink ? [0, 0, 1, 1] : [0, 0, 0, 1], haze: sp.ink || U.haze, alpha: sp.a * (U.alpha === undefined ? 1 : U.alpha), lod: sp.lod || 0, rim: [0, 0, 0, 0], tint: [1, 1, 1, 0] });
+      Object.assign(uni, { u_grade: sp.ink ? [0, 0, 1, 1] : [0, 0, 0, 1], u_haze: sp.ink || uni.u_haze, u_alpha: sp.a * (uni.u_alpha === undefined ? 1 : uni.u_alpha), u_lod: sp.lod || 0, u_rim: [0, 0, 0, 0], u_tint: [1, 1, 1, 0] });
       x += sp.dx; y += sp.dy; if (o.m) o = Object.assign({}, o, { m: M.mul(M.t(sp.dx, sp.dy), o.m) }); }
-    const uni = {}; for (const k in U) uni[k.startsWith('u_') ? k : 'u_' + k] = U[k];
-    uni.u_pad = [pad / (1 + 2 * pad), pad / (1 + 2 * pad)];
+    uni.u_pad = pad ? [pad / (1 + 2 * pad), pad / (1 + 2 * pad)] : PAD0;
     uni.u_src = src;
     const rot = o.rot || 0, piv = o.pivot || [0, 0];
     if (o.m) { const F = M.mul(o.m, [w + 2 * pw, 0, 0, h + 2 * ph, -pw - piv[0], -ph - piv[1]]);
@@ -456,6 +459,7 @@ void main(){ vec2 p = (v_uv - 0.5) * u_sz; vec2 q = abs(p) - (u_sz * 0.5 - u_r);
   // labelW(...) measures without drawing (size panels to their content — never hard-code a panel width for variable text).
   const LBL = {};
   const lblTex = (slot, str, { size = 30, col = '#f6e7c8', out = '#2d1315', font = '"Trebuchet MS", "Segoe UI", Verdana, sans-serif', weight = 'bold' } = {}) => {
+    if (window.TR) str = window.TR(String(str));                                         // the language (i18n.js): the texture holds the translation
     let r = LBL[slot]; const key = [str, size, col, out, font, weight].join('|'); if (r && r.key === key) return r;
     const cv = document.createElement('canvas'), g = cv.getContext('2d'), f = `${weight} ${size}px ${font}`, pad = Math.ceil(size * 0.3);
     g.font = f; const tw = g.measureText(str).width, w = Math.ceil(tw) + 2 * pad, h = Math.ceil(size * 1.3) + 2 * pad;
@@ -463,9 +467,8 @@ void main(){ vec2 p = (v_uv - 0.5) * u_sz; vec2 q = abs(p) - (u_sz * 0.5 - u_r);
     g.fillStyle = 'rgba(15,5,8,0.6)'; g.fillText(str, pad, h / 2 + Math.max(2, size * 0.09));
     if (out) { g.lineWidth = Math.max(3, size * 0.16); g.strokeStyle = out; g.strokeText(str, pad, h / 2); }
     g.fillStyle = col; g.fillText(str, pad, h / 2);
-    if (!r) r = LBL[slot] = { rec: G.canvasTex('lbl_' + slot, cv) };
-    else { const gl = G.gl; gl.bindTexture(gl.TEXTURE_2D, r.rec.t); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, cv); gl.generateMipmap(gl.TEXTURE_2D); r.rec.w = w; r.rec.h = h; }
+    if (!r) r = LBL[slot] = { rec: G.canvasTex('lbl_' + slot, cv, { mip: false }) };          // drawn 1:1: no mipmaps
+    else G.updateTex(r.rec, cv);
     Object.assign(r, { key, pad, tw }); return r; };
   L.labelW = (slot, str, o = {}) => lblTex(slot, str, o).tw;
   L.label = (slot, str, x, y, o = {}) => { const r = lblTex(slot, str, o), size = o.size || 30, a = o.a === undefined ? 1 : o.a, x0 = Math.round(x - r.tw * (o.al || 0));

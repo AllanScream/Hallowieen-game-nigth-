@@ -1,0 +1,55 @@
+[
+ {
+  "name": "cg_peace1",
+  "prompt": "art/prompts/cg_peace1.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya",
+   "refs/kirill.png=character sheet: kirill",
+   "refs/raiva.png=character sheet: raiva",
+   "refs/elf.png=character sheet: elf"
+  ]
+ },
+ {
+  "name": "cg_peace2",
+  "prompt": "art/prompts/cg_peace2.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya",
+   "refs/kirill.png=character sheet: kirill",
+   "refs/raiva.png=character sheet: raiva",
+   "refs/elf.png=character sheet: elf"
+  ]
+ },
+ {
+  "name": "cg_peace3",
+  "prompt": "art/prompts/cg_peace3.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya",
+   "refs/kirill.png=character sheet: kirill",
+   "refs/raiva.png=character sheet: raiva",
+   "refs/elf.png=character sheet: elf"
+  ]
+ },
+ {
+  "name": "ach_sheet",
+  "prompt": "art/prompts/ach_sheet.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "high",
+  "ref": []
+ }
+]

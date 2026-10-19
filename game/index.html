@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><title>Сладость или гадость</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="lang_en.js"></script><script src="i18n.js"></script>
 <style>
 :root{--ar:1.7778;--or:#ff8a1e;--ink:#f6e7c8;--dim:#c9a27a;--panel:rgba(18,10,12,.92)}
 html,body{margin:0;background:#000;height:100%;overflow:hidden;font-family:"Trebuchet MS","Segoe UI","DejaVu Sans",Verdana,sans-serif}
@@ -14,7 +15,7 @@ canvas.dim{filter:blur(5px) brightness(.42) saturate(.8)}
 /* ---- main menu / pause ---- */
 #menu{position:absolute;inset:0;display:none;overflow:hidden;color:var(--ink);user-select:none;z-index:6}
 #menu.on{display:block}
-#menu .bg{position:absolute;inset:-5%;background:#0b0608 url(assets/menu_art.png) center/cover no-repeat;animation:kb 46s ease-in-out infinite alternate;image-rendering:auto}
+#menu .bg{position:absolute;inset:-5%;background:#0b0608 url(assets/menu_art.webp) center/cover no-repeat;animation:kb 46s ease-in-out infinite alternate;image-rendering:auto}
 #menu .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,4,6,.94) 0%,rgba(9,4,6,.8) 28%,rgba(9,4,6,.25) 55%,rgba(9,4,6,0) 72%),radial-gradient(ellipse at 72% 55%,transparent 45%,rgba(0,0,0,.65) 100%)}
 #menu .fog{position:absolute;left:-10%;right:-10%;bottom:-6%;height:34%;background:radial-gradient(ellipse at 30% 100%,rgba(255,160,90,.13),transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(190,170,220,.12),transparent 60%);animation:fog 14s ease-in-out infinite alternate;pointer-events:none}
 #menu.pause .bg,#menu.pause .fog{display:none}
@@ -73,6 +74,10 @@ input[type=range]{accent-color:var(--or);width:190px;cursor:pointer}
 .sbtn.small{padding:6px 11px;font-size:14px}
 #slotMsg{min-height:20px;font-size:14px;color:#9ad08a;margin-top:6px}
 .foot{position:absolute;right:18px;bottom:12px;font-size:13px;color:#a08a78;opacity:.85;text-shadow:0 1px 3px #000}
+.lang{display:flex;gap:4px;margin:2.2vh 0 0 .9em;flex-wrap:wrap}
+.lang button{background:rgba(255,255,255,.06);color:var(--dim);border:1px solid rgba(255,170,80,.25);border-radius:999px;padding:6px 14px;font:600 15px "Trebuchet MS","Segoe UI",sans-serif;cursor:pointer}
+.lang button.on{background:#e2701a;color:#fff;border-color:#ffb45a}
+.lang button:hover:not(.on){background:rgba(255,138,30,.18);color:#fff}
 @media (max-width:700px){.panel{right:4vw;left:4vw;width:auto}.col{left:5vw}}
 </style>
 </head><body><canvas id="c"></canvas>
@@ -100,6 +105,7 @@ input[type=range]{accent-color:var(--or);width:190px;cursor:pointer}
       <button class="btn" data-panel="p_keys"><span class="ic">⌨</span>Управление</button>
       <button class="btn" id="p_exit"><span class="ic">⌂</span>Сохранить и выйти в меню</button>
     </div>
+    <div class="lang" data-notr><button data-lang="ru">Русский</button><button data-lang="en">English</button></div>
     <div id="load">Загрузка…<div class="bar"><i id="loadBar"></i></div></div>
   </div>
   <div class="panel" id="p_set">
@@ -113,6 +119,7 @@ input[type=range]{accent-color:var(--or);width:190px;cursor:pointer}
     <div class="row">Тряска камеры<button class="sw" data-k="shake"></button></div>
     <div class="row">Подсказки к предметам<button class="sw" data-k="hints"></button></div>
     <div class="row">Во весь экран<button class="sbtn" id="s_full">Переключить</button></div>
+    <div class="row">Язык<span class="lang" style="margin:0" data-notr><button data-lang="ru">Русский</button><button data-lang="en">English</button></span></div>
     <h3>Сохранение</h3>
     <div class="row"><span id="saveInfo">Нет сохранений</span><button class="sbtn red" id="s_wipe">Стереть все</button></div>
     <button class="sbtn back">‹ Назад</button>
@@ -123,6 +130,7 @@ input[type=range]{accent-color:var(--or);width:190px;cursor:pointer}
     <p>Хэллоуин, 22:00. Коля выходит из дома с коробкой яиц и рулоном туалетной бумаги. В переулке живут три модера: Кирилл, Райва и Эльф.</p>
     <p>Постучи в дверь и попроси сладость. Отказали — устрой гадость и закидай дом на 100 %. Только учти, что каждый модер мстит по-своему.</p>
     <p>Подарок может всё исправить. Когда разберёшься со всеми тремя, возвращайся домой: там тебя кое-что ждёт.</p>
+    <p>Концовок две: вечеринка-сюрприз и добрая — если помириться со всеми подарками и не сделать им ни одной гадости. 15 достижений собираются в телефоне (Tab → Достижения).</p>
     <p style="color:#a88a70;font-size:14px">Пиксельная изометрия, звук синтезируется на лету. Консоль разработчика есть в телефоне (Tab → Консоль).</p>
     <button class="sbtn back">‹ Назад</button></div>
   <div class="foot" id="foot"></div>
@@ -136,13 +144,20 @@ const V = Date.now(), STATIC = !!window.__STATIC__;          // STATIC: packed b
 const load = (src) => new Promise((res, rej) => { const s = document.createElement('script'); s.src = src + '?v=' + V; s.onload = res; s.onerror = () => rej(new Error('failed ' + src)); document.head.appendChild(s); });
 const $ = (id) => document.getElementById(id), LS = { get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
 // ---- settings (applied before the game scripts read them) ----
-const DEF = { master: 80, music: 70, sfx: 90, dark: 60, shake: true, hints: true };
+const DEF = { master: 80, music: 70, sfx: 90, dark: 60, shake: true, hints: true, lang: /^(ru|uk|be|kk)/i.test(navigator.language || 'ru') ? 'ru' : 'en' };
 const SET = Object.assign({}, DEF, LS.get('sog_settings') || {});
+const TR = (s) => (window.TR ? window.TR(s) : s);
+function applyLang() { if (window.setLang) setLang(SET.lang); document.querySelectorAll('.lang button').forEach((b) => b.classList.toggle('on', b.dataset.lang === SET.lang)); }
+document.querySelectorAll('.lang button').forEach((b) => b.addEventListener('click', () => { SET.lang = b.dataset.lang; LS.set('sog_settings', SET); applyLang();
+  if ($('p_saves').classList.contains('on')) renderSlots(); refreshSave(); }));
+applyLang();
 window.SETTINGS = {};
 function applySet() { SETTINGS.night = 0.12 + 0.5 * SET.dark / 100; SETTINGS.shake = SET.shake; SETTINGS.hints = SET.hints;
   if (window.AUDIO && AUDIO.setVol) AUDIO.setVol({ master: SET.master / 100, music: SET.music / 100, sfx: SET.sfx / 100 }); }
 applySet();
 const render = new URLSearchParams(location.search).has('render');
+window.ACHG = LS.get('sog_ach') || {};                                                 // achievements collected in any game on this browser (id → when)
+window.ASSET_URL = (n) => 'assets/' + n + '.webp';
 // ---- menu ----
 const menu = $('menu'); let menuMode = null, ready = false;
 for (let i = 0; i < 18; i++) { const l = document.createElement('i'), s = 9 + Math.random() * 12; l.className = 'leaf';
@@ -165,7 +180,7 @@ function renderSlots(msg) {
   rows.forEach((r) => { const el = document.createElement('div'), has = okv(r.sv); el.className = 'slot' + (has ? '' : ' empty');
     el.innerHTML = '<div class="sl-main"><input class="sl-name" maxlength="40" spellcheck="false"><div class="sl-meta"></div></div><div class="sl-btns"></div>';
     const nm = el.querySelector('.sl-name'), bt = el.querySelector('.sl-btns');
-    nm.value = r.k === 'auto' ? 'Автосохранение' : has ? (r.sv.name || `Слот ${r.k + 1}`) : savesMode === 'save' ? `Сохранение ${r.k + 1}` : `Слот ${r.k + 1}`;
+    nm.value = r.k === 'auto' ? TR('Автосохранение') : has ? (r.sv.name || TR(`Слот ${r.k + 1}`)) : savesMode === 'save' ? TR(`Сохранение ${r.k + 1}`) : TR(`Слот ${r.k + 1}`);
     nm.readOnly = r.k === 'auto' || (!has && savesMode === 'load'); el.querySelector('.sl-meta').textContent = has ? slotMeta(r.sv) : r.sv && r.sv.play ? 'другая версия игры' : 'Пусто';
     nm.addEventListener('keydown', (e) => { if (e.key !== 'Escape') e.stopPropagation(); if (e.key === 'Enter') nm.blur(); });
     nm.addEventListener('change', () => { if (r.k === 'auto' || !has) return; const s2 = getSlots(); if (s2[r.k]) { s2[r.k].name = nm.value.trim() || `Слот ${r.k + 1}`; setSlots(s2); refreshSave(); } });
@@ -211,8 +226,10 @@ if (!render) openMenu('main');
     .map((s) => { const i = s.indexOf(' — '); return i < 0 ? `<li><span>${s}</span></li>` : `<li><b>${s.slice(0, i)}</b><span>${s.slice(i + 3)}</span></li>`; }).join('');
   G.init($('c'), VW, VH);
   const rep = new Set(SCENE.REPEAT || []), near = (n) => SCENE.NEAREST === true || (SCENE.NEAREST || []).includes(n);   // NEAREST: true = all
-  const names = Object.keys(ASSETS); let nDone = 0;
-  await Promise.all(names.map((n) => G.load(n, 'assets/' + n + '.png?v=' + V, { repeat: rep.has(n), nearest: near(n) }).then((r) => { nDone++; $('loadBar').style.width = (100 * nDone / names.length).toFixed(1) + '%'; return r; })));
+  // v9: the full-screen pictures (gift, party and kind-ending scenes) and the old 8-way fallback frames load after the menu is up
+  const lazy = (n) => /^(cg_|kf_)|^menu_art$/.test(n), names = Object.keys(ASSETS).filter((n) => !lazy(n)), later = Object.keys(ASSETS).filter(lazy); let nDone = 0;
+  await Promise.all(names.map((n) => G.load(n, ASSET_URL(n) + '?v=' + V, { repeat: rep.has(n), nearest: near(n) }).then((r) => { nDone++; $('loadBar').style.width = (100 * nDone / names.length).toFixed(1) + '%'; return r; })));
+  window.__lazy = (async () => { for (const n of later) { try { await G.load(n, ASSET_URL(n) + '?v=' + V, { repeat: rep.has(n), nearest: near(n) }); } catch (e) { console.warn(e.message); } } })();
   SCENE.programs();
   window.__duration = SIM.L;
   window.__renderAt = (t) => { SCENE.render(t); return $('c').toDataURL('image/png'); };
@@ -252,7 +269,7 @@ if (!render) openMenu('main');
   txt.addEventListener('pointerdown', (e) => e.stopPropagation());
   function placeTxt() { const ph = play && play.phone, app = ph && !menuMode && !play.finale && (ph.app === 'dev' || ph.app === 'dm') && play.t - ph.t > 0.2 ? ph.app + (ph.who || '') : null;
     if (app !== txtApp) { txtApp = app; txt.style.display = app ? 'block' : 'none'; txt.value = '';
-      if (app) { txt.placeholder = ph.app === 'dev' ? 'команда, например: money 5000 · help' : 'Напиши сообщение и нажми Enter…'; setTimeout(() => txt.focus({ preventScroll: true }), 0); } else txt.blur(); }
+      if (app) { txt.placeholder = TR(ph.app === 'dev' ? 'команда, например: money 5000 · help' : 'Напиши сообщение и нажми Enter…'); setTimeout(() => txt.focus({ preventScroll: true }), 0); } else txt.blur(); }
     window.__typing = !!app;
     if (app) { const r = cv.getBoundingClientRect(), P0 = SIM.HUD.phone, k = r.width / VW;
       Object.assign(txt.style, { left: r.left + (P0.x + 30) * k + 'px', top: r.top + (P0.y + P0.h - 128) * k + 'px', width: (P0.w - 60) * k + 'px', height: 46 * k + 'px', fontSize: Math.max(11, 16 * k) + 'px' }); } }
@@ -290,11 +307,12 @@ if (!render) openMenu('main');
     if (play) {
       if (run) { acc += dt;
         const inp = { left: keys.ArrowLeft || keys.KeyA, right: keys.ArrowRight || keys.KeyD, up: keys.ArrowUp || keys.KeyW, down: keys.ArrowDown || keys.KeyS,
-          jump: keys.Space, space: keys.Space, run: keys.ShiftLeft || keys.ShiftRight, act: keys.KeyX || keys.KeyJ || keys.Enter, e: keys.KeyE, tab: keys.Tab, esc: keys.Escape, f: keys.KeyF, enter: keys.Enter,
+          jump: keys.Space, space: keys.Space, run: keys.ShiftLeft || keys.ShiftRight, act: keys.KeyX || keys.KeyJ || keys.Enter, e: keys.KeyE, tab: keys.Tab, esc: keys.Escape, f: keys.KeyF, g: keys.KeyG, enter: keys.Enter,
           px: ptr.x, py: ptr.y, press: ptr.down, rpress: ptr.rdown || ptr.rclick, click: ptr.click, slot: pend.slot, wheel: pend.wheel, text: acc >= SIM.DT ? pend.texts.shift() || '' : '' };   // typed text only when a step will consume it (a frame can run no step at 144 Hz)
         while (acc >= SIM.DT) { if (SIM.snap) prevSnap = SIM.snap(play); SIM.step(play, inp); inp.click = ptr.click = 0; ptr.rclick = 0; inp.rpress = ptr.rdown;   // a quick right tap still lands (latched for one step)
           inp.slot = pend.slot = 0; inp.wheel = pend.wheel = 0; inp.text = ''; acc -= SIM.DT; }
         if (SIM.outOfPlay && SIM.outOfPlay(play)) { play = SIM.respawn ? SIM.respawn(play, simT) : SIM.spawn(simT); prevSnap = null; }
+        if (play.ach) { let dirty = false; for (const id in play.ach) if (!ACHG[id]) { ACHG[id] = Date.now(); dirty = true; } if (dirty) LS.set('sog_ach', ACHG); }
         if (play.finale && play.finale.over) { LS.del('sog_save'); play = null; SCENE.state = null; openMenu('main'); }
         else if (STATIC && now - lastSave > 10000) { lastSave = now; autosave(); } }
       if (play) SCENE.state = run && SIM.lerpState ? SIM.lerpState(prevSnap, play, acc / SIM.DT) : play;      // draw between the last two fixed steps: smooth at any refresh rate

@@ -11,7 +11,7 @@ const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftsha
 const p = await b.newPage({ viewport: { width: 1920, height: 1080 } });
 p.on('pageerror', (e) => console.log('PAGEERR', e.message)); p.on('console', (m) => { if (m.type() === 'error') console.log('CONSOLE', m.text()); });
 await p.goto(`http://127.0.0.1:${srv.address().port}/live/index.html?render=1`);
-await p.waitForFunction(() => window.__ready, null, { timeout: 30000 });
+await p.waitForFunction(() => window.__ready, null, { timeout: 30000 }); await p.evaluate(() => window.__lazy);
 // each shot: a function body run in the page with S (a fresh play state), step(n, inp), at(x, y) (put Kolya + camera there)
 const SHOTS = {
   elf_door: `at(SIM.HE.door[0], SIM.FACADE + 70); step(120); S.elf.st = 'door'; S.elf.refused = true; S.dlg = { who: 'elf', text: SIM.MODS && 'Опять ты. Прожектор с датчиком, если что, работает.', choices: [['Подарить подарок', 'gift'], ['Уйти', 'close']] };`,
@@ -54,7 +54,8 @@ const SHOTS = {
   endlot: `at(6450, -640); step(10);`,
   endlot2: `at(6450, -900); step(10);`,
 };
-for (const n of names) {
+for (const n0 of names) {
+  const [n, inl] = n0.includes('::') ? n0.split('::') : [n0, null]; if (inl) SHOTS[n] = inl;
   const r = await p.evaluate(([n, body]) => { try { const S = SIM.spawn(0); S.money = 500;
       const step = (k = 1, inp = {}) => { for (let i = 0; i < k; i++) SIM.step(S, inp); };
       const at = (x, y) => { S.x = x; S.y = y; S.vx = S.vy = 0; S.path = []; const hp = SIM.proj(x, y); S.cam = [hp[0] - 960, hp[1] - 590]; S.camV = [0, 0]; };

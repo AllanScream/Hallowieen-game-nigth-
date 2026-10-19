@@ -11,7 +11,7 @@ s = s.replace(':root{--ar:1.7778;', ':root{--ar:1.7778;--bg:#050304;--fg:#f6e7c8
 s = s.replace('html,body{margin:0;background:#000;height:100%;overflow:hidden;', 'html,body{margin:0;background:var(--bg);color:var(--fg);height:100%;overflow:hidden;')
 open('dist/artifact.html', 'w', encoding='utf-8').write(s)
 files = {}
-for f in sorted(glob.glob(g + '/*.js')) + sorted(glob.glob(g + '/assets/*.png')):
+for f in sorted(glob.glob(g + '/*.js')) + sorted(glob.glob(g + '/assets/*.png') + glob.glob(g + '/assets/*.webp')):
     files[os.path.relpath(f, g)] = f
 json.dump(files, open('dist/files.json', 'w'), indent=0)
 print(len(files), 'files'); print(s[:300])

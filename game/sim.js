@@ -2,14 +2,14 @@
 // World: x along the street (screen up-right), y across toward the viewer (screen down-right). Units ≈ 1/55 m.
 // Everything that happens lives here (movement, NPCs, Kirill, pranks, phone, quests, money, camera); the scene only draws.
 (function (root) {
-  const DT = 1 / 120, L = 26.0, VERSION = 'v8';
+  const DT = 1 / 120, L = 26.0, VERSION = 'v9';
   const VIEW = { W: 1920, H: 1080 };
   const C = 0.894, SN = 0.447;
   const proj = (x, y, z = 0) => [C * (x + y), SN * (y - x) - z];
   const unproj = (X, Y) => [(X / C - Y / SN) / 2, (X / C + Y / SN) / 2];
   const CLOCK = 6;                       // game seconds per real second (22:00 start)
   const K = { WALK: 150, RUN: 240, WALK_CARRY: 0.62, R: 18, TALK: 150, USE: 130, TURN: 7.5, TURNY: 13, NSTRIDE: 46, STRIDE: 78, RSTRIDE: 112 };
-  const HINT = 'ЛКМ — идти / говорить · WASD — ходьба · Shift — бег · ПКМ — гадость в цель · 1–0 — выбор · E — действие · Tab — телефон · Space — спрятаться · F — страйкбол · M — звук';
+  const HINT = 'ЛКМ — идти / говорить / взять · WASD — ходьба · Shift — бег · ПКМ — гадость в цель · 1–0 — выбор · E — действие · G — положить тыкву · Tab — телефон · Space — спрятаться · F — страйкбол · M — звук';
 
   // ---------------- level data ----------------
   const ROAD = [-200, 200], SWN = [-340, -200], SWS = [200, 340], X0 = -1400, X1 = 6700;
@@ -61,6 +61,32 @@
   const VPUMPKINS = [[4440, -1260], [3180, 300], [5640, -430]];   // Вера's missing pumpkins
   const ROTTENS = [[4300, -1120], [6600, -820]], ROTTEN = ROTTENS[0];                    // rotten pumpkins: the alley, the end lot
   const STRANGE = [6560, -950];
+  // v9 interactive bits: Vera's candy bowl on her path, the black cat's haunts, the lamp heads (BB targets: shoot a lamp out)
+  const BOWL = [HOUSES[0].door[0] + 62, FACADE + 42];
+  const CATSPOTS = [[300, -280], [900, 280], [1800, -300], [2600, 300], [3300, -290], [4100, 270], [4900, -300], [5600, 290], [6200, -290], [-500, -290], [-200, 300], [1300, -280], [3800, 290]];
+  const LAMPHEAD = (() => { const a = (root.ASSETS || {}).lamp, w = a ? 270 * a.w / a.h : 200; return [(0.81 - 0.336) * w, 216]; })();   // screen offset of the bulb from the pole's foot
+  const lampLit = (S, i) => !(S.lampOff && S.lampOff[i] !== undefined && S.t - S.lampOff[i] < 90);
+  // achievements, hardest first (tier 3 gold, 2 silver, 1 bronze); n: a counter to reach
+  const ACH = [
+    { id: 'saint', tier: 3, name: 'Святой Коля', desc: 'Помириться со всеми тремя модерами, не сделав им ни одной гадости' },
+    { id: 'apocalypse', tier: 3, name: 'Апокалипсис районного масштаба', desc: 'Закидать все три дома модеров на 100 %' },
+    { id: 'master', tier: 3, name: 'Мастер гадостей', desc: 'Применить все 10 гадостей', n: 10 },
+    { id: 'elusive', tier: 3, name: 'Неуловимый', desc: 'Трижды уйти от погони патруля', n: 3 },
+    { id: 'rotten_hunter', tier: 2, name: 'Тухлый охотник', desc: 'Попасть 10 яйцами в один дом', n: 10 },
+    { id: 'boom', tier: 2, name: 'Бабах-бабах', desc: 'Оглушить петардами троих', n: 3 },
+    { id: 'ninja', tier: 2, name: 'Ниндзя у двери', desc: 'Дважды позвонить модеру в дверь и убежать незамеченным', n: 2 },
+    { id: 'pizza', tier: 2, name: 'Пицца-террорист', desc: 'Отправить модеру 10 пицц' },
+    { id: 'mummy', tier: 2, name: 'Мумификатор', desc: 'Обмотать туалетной бумагой троих прохожих', n: 3 },
+    { id: 'picasso', tier: 1, name: 'Пикассо с района', desc: 'Нарисовать мелом с точностью 90 % и выше' },
+    { id: 'grandson', tier: 1, name: 'Внучок', desc: 'Вернуть Вере три тыквы' },
+    { id: 'payback', tier: 1, name: 'Получил сдачи', desc: 'Довести прохожего до мести' },
+    { id: 'sweet', tier: 1, name: 'Сладкоежка', desc: 'Получить конфеты от модера' },
+    { id: 'social', tier: 1, name: 'Душа компании', desc: 'Поговорить с пятью жителями', n: 5 },
+    { id: 'first_egg', tier: 1, name: 'Первый желток', desc: 'Бросить первое яйцо' }];
+  const ACHI = Object.fromEntries(ACH.map((a) => [a.id, a]));
+  function achieve(S, id) { S.ach = S.ach || {}; if (S.ach[id] || !ACHI[id]) return; S.ach[id] = Math.max(0.001, S.gt); ev(S, { k: 'ach', id, x: S.x, y: S.y }); }
+  function achAdd(S, id, n = 1, key = id) { S.achv = S.achv || {}; S.achv[key] = (S.achv[key] || 0) + n; const a = ACHI[id]; if (a && S.achv[key] >= (a.n || 1)) achieve(S, id); }
+  function achKind(S, kind) { S.achv = S.achv || {}; const k = S.achv.kinds = S.achv.kinds || []; if (!k.includes(kind)) { k.push(kind); S.achv.master = k.length; if (k.length >= 10) achieve(S, 'master'); } }
 
   // ---------------- shop & items ----------------
   const SHOP = [
@@ -123,6 +149,8 @@
   NORTH.forEach((b) => BOX.push(b));
   // the alley's tall side fences and back fence are solid (thick enough that Kolya never overlaps their sprites)
   BOX.push([ALLEY[0] - 14, ALLEY[1], ALLEY[0] + 16, FACADE], [ALLEY[2] - 16, ALLEY[1], ALLEY[2] + 14, FACADE], [ALLEY[0], ALLEY[1] - 6, ALLEY[2], ALLEY[1] + 16]);
+  // the garage in the end lot (its sprite's footprint: front corner by the strange lights, walls along +x and −y) is solid
+  const GARAGE = [6585, -1199, 6852, -940]; BOX.push([GARAGE[0], GARAGE[1], X1, GARAGE[3]]);
   const CIRC = [...LAMPS.map(([x, y]) => [x, y, 14]), ...TREES.filter((t) => t[1] < 0).map(([x, y, s]) => [x, y, 30 * s]), ...BINS.map(([x, y]) => [x, y, 26]),
     ...BENCHES.map(([x, y]) => [x, y, 0]), ...PROPS.map(([, x, y, r]) => [x, y, r])];
   const inBox = (x, y, b, m = 0) => x > b[0] - m && x < b[2] + m && y > b[1] - m && y < b[3] + m;
@@ -206,8 +234,8 @@
   const modNear = (S) => { let best = null, bd = 1e9; for (const id of MODIDS) { const h = MODH[id], d = Math.abs(S.x - h.door[0]);
     if (S.x > h.yard[0] - 150 && S.x < h.yard[2] + 150 && S.y < ROAD[0] + 160 && d < bd) { bd = d; best = id; } } return best; };
   const inYard = (x, y, h = HK) => x > h.yard[0] && x < h.yard[2] && y > h.yard[1] - 10 && y < h.yard[3] + 40;
-  const nearHidingSpot = (x, y) => { for (const [bx, by] of BUSHES) if (Math.hypot(x - bx, y - by) < 85) return ['bush', bx, by];
-    for (const [bx, by] of BINS) if (Math.hypot(x - bx, y - by) < 75) return ['bin', bx, by]; return null; };
+  const nearHidingSpot = (x, y, S) => { for (const [bx, by] of BUSHES) if (Math.hypot(x - bx, y - by) < 85) return ['bush', bx, by];
+    for (let i = 0; i < BINS.length; i++) { const [bx, by] = BINS[i]; if (S && S.binsDown && S.t - (S.binsDown[i] ?? -99) < 60) continue; if (Math.hypot(x - bx, y - by) < 75) return ['bin', bx, by]; } return null; };
   const lampNear = (x, y) => LAMPS.findIndex(([lx, ly]) => Math.hypot(x - lx, y - ly) < 110);
 
   const newMod = (extra) => Object.assign({ st: 'inside', t0: 0, refused: false, done: -1, sweet: false, p: 0, pr: {}, bell: null, alarm: null, fire: null, slime: 0,
@@ -226,10 +254,15 @@
         { from: 'Модерская', text: 'Коля, с Хэллоуином! Сегодня обходим всех модеров за конфетами 🎃 Кирилл, Райва и Эльф уже дома.', gt: 0, read: false },
         { from: 'Эльф', text: 'Только попробуй закидать мой дом. Я серьёзно.', gt: 0, read: false }],
       npc: NPCS.map((n, i) => ({ id: n.id, x: n.stat ? n.stat[0] : n.route[0][0], y: n.stat ? n.stat[1] : n.route[0][1], k: 0, face: [1, 1], ang: 0.46, walk: 0, talkT: -9, line: '', pause: 0, i })),
-      courier: null, kids: null, charge: -1, slimeHold: 0, prev: {} };
+      courier: null, kids: null, charge: -1, slimeHold: 0, prev: {},
+      // v9: pumpkins put down, firecrackers / alarm clocks / chalk drawings anywhere, neighbours' doors, lamps shot out, kicked bins, the cat, achievements
+      drops: [], fires: [], decoys: [], drawings: [], hslime: {}, hbell: {}, flyers2: [], lampOff: {}, binsDown: {}, bowl: { n: 0, t: -99 }, sugarT: -99, wrapT: -99, eggd: -99,
+      cat: { x: CATSPOTS[0][0], y: CATSPOTS[0][1], ang: 0.46, k: 0, st: 'walk', pause: 2, follow: -99, purr: -99, hiss: -99, gph: 0, mv: 0 }, ach: {}, achv: {} };
   }
   const spawn = (worldT) => { const S = Object.assign(create(), { wt0: worldT }), hp = proj(S.x, S.y); S.cam = [hp[0] - VIEW.W / 2, hp[1] - VIEW.H / 2 - 50]; return S; };   // camera on Kolya from the first frame
-  const respawn = (S, worldT) => { const R = spawn(worldT); Object.assign(R, { money: Math.floor(S.money * 0.8), inv: S.inv, kir: S.kir, rai: S.rai, elf: S.elf, raid: S.raid, hasGun: S.hasGun, dm: S.dm, loans: S.loans, boost: S.boost, stats: S.stats, devLog: S.devLog, target: S.target, q: S.q, talked: S.talked, got: S.got, piles: S.piles, vp: S.vp, msgs: S.msgs, marks: S.marks, rottenGot: S.rottenGot, gt: S.gt });
+  const respawn = (S, worldT) => { const R = spawn(worldT); Object.assign(R, { money: Math.floor(S.money * 0.8), inv: S.inv, kir: S.kir, rai: S.rai, elf: S.elf, raid: S.raid, hasGun: S.hasGun, dm: S.dm, loans: S.loans, boost: S.boost, stats: S.stats, devLog: S.devLog, target: S.target, q: S.q, talked: S.talked, got: S.got, piles: S.piles, vp: S.vp, msgs: S.msgs, marks: S.marks, rottenGot: S.rottenGot, gt: S.gt,
+      drops: S.drops || [], drawings: S.drawings || [], flyers2: S.flyers2 || [], ach: S.ach || {}, achv: S.achv || {}, bowl: S.bowl || { n: 0, t: -99 } });
+    if (S.carry === 'rotten') R.drops.push({ x: S.x, y: S.y, kind: 'rotten', t: 0 });                           // the pumpkin stays where he fell
     R.toasts = [{ text: 'Коля сходил домой, выпил чаю и вернулся (−20 % денег)', t: 0 }]; R.ang = 0.46; return R; };
   const outOfPlay = (S) => S.hp <= 0 && S.t - (S.koT || S.t) > 2.5;
 
@@ -243,9 +276,10 @@
     if (!k.refused) { toast(S, `Сначала постучи к ${md.dat}: вдруг будет сладость?`); return false; }
     const [amt, cap] = PRANK[kind], had = k.pr[kind] || 0, add = Math.max(0, Math.min(amt, cap - had));
     if (add <= 0) { toast(S, `«${SLOT_NAME[kind]}» больше не действует на ${md.acc}`); return false; }
-    k.pr[kind] = had + add; k.p = Math.min(100, k.p + add); if (S.gacc) gnote(S, id, kind);
+    k.pr[kind] = had + add; k.p = Math.min(100, k.p + add); if (S.gacc) gnote(S, id, kind); if (kind !== 'airsoft') achKind(S, kind);
     ev(S, { k: 'prank', id, kind, add, x: S.x, y: S.y, label });
     if (k.p >= 100 && k.done < 0) { k.done = S.t; k.revengeAt = S.gt + (id === 'elf' ? 180 : 60); ev(S, { k: 'housedone', id, x: h.door[0], y: h.door[1] });
+      if (MODIDS.every((m) => M(S, m).done >= 0)) achieve(S, 'apocalypse');
       toast(S, `Дом ${md.gen} закидан на 100 %!`, 'big'); if (S.gq) { delete S.gacc[id]; gthread(S, id, { kirill: 'Всё. Мой дом закидан полностью. Коля, готовься к аукциону 😏', raiva: 'Мой дом закидан на 100 %. Коля, проверь телефон. Скоро 😺', elf: 'Мой дом. Полностью. Коля, тебе конец. Я уже звоню.' }[id]); } }
     return true;
   }
@@ -298,12 +332,12 @@
       if (n === MODS[id].fav) { k.sweet = true; S.dlg = { who: id, text: D.gift[n], cg: 'cg_gift_' + id, cgT: S.t, choices: [['Спасибо!', 'close']] };
         if (S.gq) gthread(S, id, { kirill: 'Коля принёс мне «Бан-хаммер». Ладно. Прощаю. Почти 😌', raiva: 'Коля подарил паяльник «Огонёк». Я растроган. Он прощён 🔥', elf: 'Коля принёс карамельный латте. …Я его простила. Не смейтесь.' }[id]);
         if (S.target === id) S.target = MODIDS.find((m) => m !== id && M(S, m).refused && M(S, m).done < 0 && !M(S, m).sweet) || null;
-        ev(S, { k: 'candy', x: h.door[0], y: h.door[1] }); toast(S, `Сладость! ${MODS[id].name} — конфеты 🍬`, 'big'); return; }
+        ev(S, { k: 'candy', x: h.door[0], y: h.door[1] }); toast(S, `Сладость! ${MODS[id].name} — конфеты 🍬`, 'big'); achieve(S, 'sweet'); return; }
       k.refused = true; S.target = S.target || id; S.dlg = { who: id, text: D.gift[n], choices: [['Ну всё…', 'close']] }; return; }
     if (c === 'vera_take') { S.q.vera = 1; S.dlg = { who: 'vera', text: 'Спасибо! Одна укатилась в переулок, одна у лавки, а одну утащили к Эльфу во двор.', choices: [['Найду!', 'close']] }; return; }
     if (c === 'vera_give') { S.q.vera = 2; S.money += 150; S.hasGun = true; S.inv.bb += 300;
       S.dlg = { who: 'vera', text: 'Все три! Держи 150 ₽ и… вот, внук оставил: страйкбольный автомат и 300 шариков. В окна не стреляй. Ну… разве что модерам. (F — достать)', choices: [['Ура!', 'close']] };
-      ev(S, { k: 'coin', amt: 150, x: S.x, y: S.y }); ev(S, { k: 'gunon', x: S.x, y: S.y }); toast(S, 'Получен страйкбольный автомат! F — достать, ПКМ — стрелять', 'big'); return; }
+      ev(S, { k: 'coin', amt: 150, x: S.x, y: S.y }); ev(S, { k: 'gunon', x: S.x, y: S.y }); toast(S, 'Получен страйкбольный автомат! F — достать, ПКМ — стрелять', 'big'); achieve(S, 'grandson'); return; }
     if (c === 'vera_take' || c === 'vera_give') return;
   }
   function talkNpc(S, n) {
@@ -318,6 +352,7 @@
     const k = (S.talked[def.id] || 0); const line = def.lines[k % def.lines.length];
     n.talkT = S.t; n.line = line; n.pause = 3.4; S.talked[def.id] = k + 1;
     if (!def.silent && k === 0) { S.q.talk++; if (S.q.talk === 5) { S.money += 50; toast(S, 'Квест: поговорил с 5 жителями (+50 ₽)', 'big'); } }
+    if (S.q.talk >= 5) achieve(S, 'social');
     ev(S, { k: 'talk', id: def.id, x: n.x, y: n.y });
   }
 
@@ -332,7 +367,7 @@
   function phoneLayout(S) { const p = HUD.phone, out = [{ id: 'close', x: p.x + p.w - 84, y: p.y + 64, w: 52, h: 46 }];
     if (!S.phone) return [];
     if (S.phone.app !== 'home') out.push({ id: 'home', x: p.x + 32, y: p.y + 64, w: 120, h: 46 });
-    if (S.phone.app === 'home') { const apps = ['map', 'chats', 'light', 'shop', 'pizza', 'orders', 'contacts', 'dev'];
+    if (S.phone.app === 'home') { const apps = ['map', 'chats', 'light', 'shop', 'pizza', 'orders', 'contacts', 'ach', 'dev'];
       apps.forEach((a, i) => out.push({ id: a, x: p.x + 40 + (i % 3) * 126, y: p.y + 230 + Math.floor(i / 3) * 170, w: 110, h: 150 })); }
     if (S.phone.app === 'shop') SHOP.forEach((it, i) => out.push({ id: 'buy_' + it.id, x: p.x + p.w - 152, y: p.y + 182 + i * 47, w: 112, h: 38 }));
     if (S.phone.app === 'contacts') CONTACTS.forEach((n, i) => out.push({ id: 'dm_' + n, x: p.x + 30, y: p.y + 166 + i * 92, w: p.w - 60, h: 82 }));
@@ -351,7 +386,55 @@
     n.hitT = S.t; n.hitK = kind; n.talkT = S.t; n.pause = Math.max(n.pause || 0, 2.6); n.line = pool[Math.floor(h1(S.steps * 0.13 + (n.i || 0)) * pool.length) % pool.length];
     S.stats.hits++; ev(S, { k: 'ouch', x: n.x, y: n.y });
     if (S.raid && S.raid.st === 'search' && /Полиция/.test(n.line)) raidTip(S, n.x, n.y);
+    if (kind === 'tp') { S.achv = S.achv || {}; const m = S.achv.mumIds = S.achv.mumIds || []; if (!m.includes(n.id)) { m.push(n.id); achAdd(S, 'mummy'); } }
+    anger(S, n, kind === 'bb' ? 0.6 : 1);
   }
+  // ---- passers-by remember: hit one three times and he takes revenge (chases you, throws eggs back, grabs money or wraps you in TP) ----
+  const REV = { start: ['Ну всё, Коля! Сейчас получишь!', 'Ах так?! Держись!', 'Сам напросился!', 'Я тебе сейчас устрою гадость!', 'Стой! Моя очередь!'],
+    throw: ['Лови!', 'Получай!', 'Это тебе за костюм!', 'Сладость или гадость? ГАДОСТЬ!'], hit: ['Попал! Ха!', 'Вкусно, да?', 'Теперь мы квиты… почти.'],
+    miss: ['Мимо…', 'Вёрткий!', 'Стой ровно!'], quit: ['Ладно… В следующий раз!', 'Убежал… Ну и ладно.', 'Я тебя запомнил!'],
+    grab: ['Это за моральный ущерб!', 'Деньги на химчистку!', 'Компенсация!'], wrap: ['Теперь ты мумия!', 'Посмотрим, как тебе!', 'Бумага у меня тоже есть!'],
+    vera: ['Ну, Коля, держи тапок!', 'Я тебе покажу, как старших обижать!'] };
+  function anger(S, n, amt) { const def = NPCS[n.i]; if (!def || n.rev || (n.calmT || 0) > S.t) return;
+    n.anger = Math.max(0, (n.anger || 0) - 0.06 * (S.t - (n.angerT || S.t))) + amt; n.angerT = S.t;
+    if (n.anger < 2.8 || S.hp <= 0) return;
+    n.rev = { st: def.stat ? 'vera' : 'chase', t0: S.t, n: 0, next: S.t + 0.6, path: [], replan: 0, hit: 0 }; n.pause = 0; n.anger = 0;
+    npcSay(S, n, def.id === 'vera' ? pickL(REV.vera, S.steps * 0.31) : pickL(REV.start, S.steps * 0.31 + n.i)); ev(S, { k: 'angry', id: n.id, x: n.x, y: n.y });
+    toast(S, `${def.name} в ярости и идёт мстить!`); }
+  const npcSay = (S, n, text) => { n.talkT = S.t; n.line = text; };
+  // walk a passer-by toward g around walls (A* when no straight line), true on arrival
+  function npcMove(S, n, g, v) { const t = S.t;
+    if (!n.mpath || !n.mpath.length || t > (n.mrep || 0) || !n.mgoal || Math.hypot(n.mgoal[0] - g[0], n.mgoal[1] - g[1]) > 120) { n.mgoal = g.slice(); n.mpath = los([n.x, n.y], g) ? [g] : findPath([n.x, n.y], g); if (!n.mpath.length) n.mpath = [g]; n.mrep = t + 0.8; }
+    if (n.mpath.length === 1) n.mpath[0] = g;
+    let tg = n.mpath[0], dx = tg[0] - n.x, dy = tg[1] - n.y, d = Math.hypot(dx, dy);
+    if (d < 12 && n.mpath.length > 1) { n.mpath.shift(); tg = n.mpath[0]; dx = tg[0] - n.x; dy = tg[1] - n.y; d = Math.hypot(dx, dy); }
+    if (d < 6) return n.mpath.length <= 1;
+    const st = Math.min(d, v * DT), nx = n.x + dx / d * st, ny = n.y + dy / d * st;
+    if (!blocked(nx, ny, 8)) { n.x = nx; n.y = ny; } else n.mrep = 0;
+    n.ang = turnTo(n.ang, scrAng(dx, dy), 9 * DT); n.face = [Math.cos(n.ang) >= 0 ? 1 : -1, Math.sin(n.ang) >= 0 ? 1 : -1]; n.gph = (n.gph || 0) + st / K.NSTRIDE; n.walk = (n.walk || 0) + st; n.mv = 1;
+    return false; }
+  function npcRevenge(S, n, def) {
+    const R = n.rev, t = S.t, dK = Math.hypot(S.x - n.x, S.y - n.y), nm = def.name;
+    const faceK = () => { const hp = proj(n.x, n.y), kp = proj(S.x, S.y); n.ang = turnTo(n.ang, Math.atan2(kp[1] - hp[1], kp[0] - hp[0]), 8 * DT); n.face = [Math.cos(n.ang) >= 0 ? 1 : -1, Math.sin(n.ang) >= 0 ? 1 : -1]; };
+    const calm = (line) => { if (line) npcSay(S, n, line); n.rev = null; n.calmT = t + 30; n.pause = 1.4; n.anger = 0; if (!def.stat) n.back = 1; };
+    if (S.finale || S.hp <= 0) { calm(); return; }
+    if (R.st === 'vera') { faceK(); if (dK > 700) { if (t - R.t0 > 6) calm(pickL(REV.quit, t)); return; }
+      if (t >= R.next && R.n < 2) { R.n++; R.next = t + 1.3; S.proj.push({ kind: 'slipper', x0: n.x, y0: n.y, z0: 80, x1: S.x + S.vx * 0.45, y1: S.y + S.vy * 0.45, z1: 20, t0: t, dur: 0.6, arc: 80, seed: S.steps, from: n.id }); }
+      if (R.n >= 2 && t > R.next) calm(); return; }
+    if (S.hidden) { R.lostT = R.lostT || t; if (t - R.lostT > 3) { calm(pickL(REV.quit, t * 1.3)); return; } } else R.lostT = 0;
+    if (t - R.t0 > 18 || dK > 1700) { calm(pickL(REV.quit, t * 1.7)); return; }
+    if (R.st === 'chase') {
+      if (dK < 52 && !S.hidden) {                                                             // caught him: money or a TP mummy
+        if (S.money > 0 && h1(S.steps * 0.61 + n.i) < 0.5) { const amt = Math.min(S.money, 40 + Math.floor(h1(S.steps * 0.37) * 9) * 10); S.money -= amt; npcSay(S, n, pickL(REV.grab, t)); toast(S, `${nm} отжал${def.id === 'ghost' || def.id === 'devil' || def.id === 'pumpkinhood' || def.id === 'shy' ? 'а' : ''} ${amt} ₽ «за моральный ущерб»`); ev(S, { k: 'buy', x: S.x, y: S.y }); }
+        else { S.wrapT = t + 1.6; npcSay(S, n, pickL(REV.wrap, t)); toast(S, `${nm}: «Теперь ты мумия!» — Коля обмотан бумагой`); ev(S, { k: 'tpland', x: S.x, y: S.y, sx: proj(S.x, S.y, 60)[0], sy: proj(S.x, S.y, 60)[1] }); }
+        achieve(S, 'payback'); calm(); return; }
+      if (dK < 380 && R.n < 3 && !S.hidden && seeLine([n.x, n.y], [S.x, S.y])) { R.st = 'throw'; R.next = Math.max(R.next, t + 0.35); }
+      else npcMove(S, n, [S.x, S.y], 205); return; }
+    if (R.st === 'throw') { faceK();
+      if (dK > 520 || !seeLine([n.x, n.y], [S.x, S.y])) { R.st = 'chase'; return; }
+      if (t >= R.next && R.n < 3) { R.n++; R.next = t + 1.15; const x1 = S.x + S.vx * 0.5, y1 = S.y + S.vy * 0.5, d = Math.hypot(x1 - n.x, y1 - n.y);
+        S.proj.push({ kind: 'negg', x0: n.x, y0: n.y, z0: 95, x1, y1, z1: 40, t0: t, dur: 0.45 + d / 1400, arc: 50 + d * 0.12, seed: S.steps, from: n.id }); npcSay(S, n, pickL(REV.throw, t + n.i)); ev(S, { k: 'nthrow', x: n.x, y: n.y }); }
+      if (R.n >= 3 && t > R.next) { if (dK < 220) { R.st = 'chase'; R.n = 99; } else calm(R.hit ? pickL(REV.hit, t) : pickL(REV.miss, t)); } } }
   // what a thrown egg / TP roll / BB does to whatever it hit (houses are handled by the caller)
   function hitTarget(S, tg, kind) {
     if (tg.kind === 'npc') { const n = S.npc.find((q) => q.id === tg.id); if (n) personHit(S, n, kind); }
@@ -377,6 +460,8 @@
   function landBB(S, p) {
     const tg = p.tg; ev(S, { k: 'bbhit', x: p.gx1, y: p.gy1, sx: p.sx1, sy: p.sy1, on: tg.kind });
     if (tg.far) return;
+    if (tg.kind === 'lamp') { if (lampLit(S, tg.i)) { S.lampOff = S.lampOff || {}; S.lampOff[tg.i] = S.t; ev(S, { k: 'lampbreak', i: tg.i, x: LAMPS[tg.i][0], y: LAMPS[tg.i][1] });
+        toast(S, 'Дзынь! Фонарь погас — здесь теперь темно (патруль видит хуже)'); } return; }
     if (tg.kind === 'house') { if (MODS[tg.id]) addPrank(S, tg.id, 'airsoft');
       else { S.yell = S.yell || {}; if (!(S.t - (S.yell[tg.id] || -99) < 12) && tg.id !== 'kolya') { S.yell[tg.id] = S.t; say(S, 'house:' + tg.id, ['Кто стреляет по окнам?!', 'Ай! Стекло!', 'Я вызываю полицию!'][Math.floor(h1(S.steps) * 3)], 2.4); } } }
     else hitTarget(S, tg, 'bb');
@@ -462,12 +547,12 @@
   const DEVHELP = ['help — этот список', 'money 5000 — деньги (или +500)', 'give eggs 20 — предмет: eggs tp alarm fire slime chalk flyers energy candle hoodie solder latte bb',
     'all — всё по 20, 99999 ₽ и автомат', 'done kirill|raiva|elf|all — дом закидан на 100 %', 'p elf 80 — процент закиданности', 'sweet elf — помириться (конфеты)', 'refuse all — модеры отказали',
     'revenge elf — месть прямо сейчас', 'raid / noraid — облава вкл/выкл', 'ghost — патруль тебя не видит (вкл/выкл)', 'tp home|vera|kirill|raiva|elf|alley|garage или x y — телепорт',
-    'time 30 — +30 игровых минут', 'hp 100 — здоровье', 'gun — страйкбольный автомат', 'quests — побочные задания выполнены', 'debt — сбросить долги', 'finale — финал (вечеринка)'];
+    'time 30 — +30 игровых минут', 'hp 100 — здоровье', 'gun — страйкбольный автомат', 'quests — побочные задания выполнены', 'debt — сбросить долги', 'finale — финал (вечеринка)', 'peace — мирный путь со всеми (для мирной концовки)', 'ach — список достижений (ach all — открыть все)'];
   const DEVA = { 'помощь': 'help', 'деньги': 'money', 'дать': 'give', 'всё': 'all', 'все': 'all', 'закидать': 'done', 'месть': 'revenge', 'облава': 'raid', 'телепорт': 'tp', 'время': 'time',
     'здоровье': 'hp', 'автомат': 'gun', 'финал': 'finale', 'призрак': 'ghost', 'сладость': 'sweet', 'отказ': 'refuse', 'задания': 'quests', 'долги': 'debt' };
   const DEVID = { kirill: 'kirill', 'кирилл': 'kirill', raiva: 'raiva', 'райва': 'raiva', elf: 'elf', 'эльф': 'elf' };
   function forceDone(S, id) { const k = M(S, id); k.refused = true; k.sweet = false; k.p = 100; if (k.done < 0) { k.done = S.t; k.revengeAt = S.gt + (id === 'elf' ? 180 : 60); ev(S, { k: 'housedone', id, x: MODH[id].door[0], y: MODH[id].door[1] }); } S.target = S.target || id; }
-  const DEVCMDS = ['help', 'money', 'give', 'all', 'done', 'p', 'sweet', 'refuse', 'revenge', 'raid', 'noraid', 'ghost', 'tp', 'time', 'hp', 'gun', 'quests', 'debt', 'finale'];
+  const DEVCMDS = ['help', 'money', 'give', 'all', 'done', 'p', 'sweet', 'refuse', 'revenge', 'raid', 'noraid', 'ghost', 'tp', 'time', 'hp', 'gun', 'quests', 'debt', 'finale', 'peace', 'ach'];
   const RUEN = { 'й': 'q', 'ц': 'w', 'у': 'e', 'к': 'r', 'е': 't', 'н': 'y', 'г': 'u', 'ш': 'i', 'щ': 'o', 'з': 'p', 'х': '[', 'ъ': ']', 'ф': 'a', 'ы': 's', 'в': 'd', 'а': 'f', 'п': 'g', 'р': 'h', 'о': 'j',
     'л': 'k', 'д': 'l', 'ж': ';', 'э': "'", 'я': 'z', 'ч': 'x', 'с': 'c', 'м': 'v', 'и': 'b', 'т': 'n', 'ь': 'm', 'б': ',', 'ю': '.', 'ё': '`' };
   const devCmd = (line) => { const w0 = line.trim().toLowerCase().replace(/^\//, '').split(/\s+/)[0]; return DEVCMDS.includes(DEVA[w0] || w0); };
@@ -498,6 +583,9 @@
     else if (cmd === 'quests') { S.q.vera = 2; S.vp = S.vp.map(() => S.t); S.q.talk = 5; S.q.strange = 1; S.strange = S.t; S.hasGun = true; S.inv.bb += 300; out('Побочные задания выполнены (и автомат от Веры).'); }
     else if (cmd === 'debt') { S.loans = {}; S.boost = {}; out('Долги сброшены.'); }
     else if (cmd === 'finale') { startFinale(S); out('Финал.'); }
+    else if (cmd === 'peace') { MODIDS.forEach((id) => { const k = M(S, id); k.sweet = true; k.done = -1; k.revengeAt = -1; k.p = 0; k.pr = {}; }); S.raid = null; out('Мир со всеми, гадостей не было. Иди домой — мирная концовка.'); }
+    else if (cmd === 'ach') { if (w[1] === 'all') { ACH.forEach((a) => achieve(S, a.id)); out('Все достижения открыты.'); }
+      else ACH.forEach((a) => out((S.ach && S.ach[a.id] ? '✓ ' : '· ') + a.name)); }
     else out('Не знаю такую команду. help — список.');
     if (S.devLog.length > 60) S.devLog.splice(0, S.devLog.length - 60);
   }
@@ -511,7 +599,26 @@
     else toast(S, `Дома тихо. Рано возвращаться: ещё не разобрался с ${left}`);
   }
   const timesWord = (n) => (n % 10 === 1 && n % 100 !== 11 ? 'раз' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'раза' : 'раз');
+  // the kind ending: all three forgiven (gifts) and not a single prank on any of them
+  const peaceful = (S) => MODIDS.every((id) => { const k = M(S, id); return k.sweet && k.done < 0 && (k.p || 0) <= 0 && !Object.keys(k.pr || {}).length; });
+  function peaceScript(S) { const L = [], add = (cg, who, text) => L.push({ cg, who, text });
+    add('cg_peace1', 'Коля', '…Почему у моего порога все трое? И… с пирогом?');
+    add('cg_peace1', 'Кирилл', 'Ты единственный, кто сегодня ничего не закидал. Мы проверили по камерам. Даже по Райвиным.');
+    add('cg_peace1', 'Райва', 'Логи чистые. Ни одного яйца. Я три раза перезапустил систему — думал, это баг.');
+    add('cg_peace1', 'Эльф', 'Полицию я сегодня не вызывала. Впервые за пять лет. Непривычно.');
+    add('cg_peace2', 'Кирилл', 'Короче. Совет модераторов постановил: ты — почётный модератор района. Вот корона.');
+    add('cg_peace2', 'Райва', 'Права я тебе выдал. Только на чтение. Не радуйся.');
+    add('cg_peace2', 'Эльф', 'И латте по пятницам. Если не начнёшь спамить.');
+    add('cg_peace2', 'Коля', 'А… вечеринка? С полицией, пиццей, аукционом?');
+    add('cg_peace2', 'Кирилл', 'Какой аукцион? Твои трусы в безопасности. Пока.');
+    if (S.hasGun) add('cg_peace3', 'Вера', 'Коля, автомат-то внуку верни. И спасибо за тыквы!');
+    if ((S.ach || {}).payback) add('cg_peace3', 'Райва', 'Правда, прохожие на тебя жаловались. Но это не к нам, это к Тимофею.');
+    add('cg_peace3', 'Эльф', 'Пошли раздавать конфеты детям. Теперь это твоя работа, модератор.');
+    add('cg_peace3', 'Коля', 'Самый странный Хэллоуин в моей жизни. И, кажется, самый лучший.');
+    add('cg_peace3', 'Все', '«На следующий год — опять без гадостей!»');
+    return L; }
   function finaleScript(S) {
+    if (peaceful(S)) return peaceScript(S);
     const K = S.kir, Rv = S.rai, E = S.elf, RD = S.raid, L = [], add = (cg, who, text) => L.push({ cg, who, text });
     add('menu_art', 'Коля', '…Почему у меня дома горит свет? И… музыка?');
     add('cg_party1', 'Все', '«СЮРПРИЗ!!!»');
@@ -533,7 +640,8 @@
     add('cg_party5', 'Все', '«На следующий год — мы к тебе!»');
     return L;
   }
-  function startFinale(S) { S.finale = { t0: S.t, i: 0, lines: finaleScript(S), end: false, over: false }; S.dlg = null; S.phone = null; S.chalk = null; S.path = []; S.act = null; S.vx = S.vy = 0; S.gun = false; ev(S, { k: 'party', x: S.x, y: S.y }); }
+  function startFinale(S) { const kind = peaceful(S) ? 'peace' : 'party'; if (kind === 'peace') achieve(S, 'saint');
+    S.finale = { t0: S.t, i: 0, lines: finaleScript(S), end: false, over: false, kind }; S.dlg = null; S.phone = null; S.chalk = null; S.path = []; S.act = null; S.vx = S.vy = 0; S.gun = false; ev(S, { k: 'party', x: S.x, y: S.y }); }
 
   // ---------------- step ----------------
   function step(S, inp) {
@@ -545,10 +653,10 @@
     const cur = inp.px !== undefined ? unproj(inp.px + S.cam[0], inp.py + S.cam[1]) : null;
     const curS = inp.px !== undefined ? [inp.px + S.cam[0], inp.py + S.cam[1]] : null;     // cursor in projected (screen+cam) space
     if (S.finale) { const F = S.finale; if (edge('click') || edge('space') || edge('e') || edge('enter')) { if (F.end) F.over = true; else if (++F.i >= F.lines.length) F.end = true; ev(S, { k: 'page' }); }
-      for (const kk of ['tab', 'esc', 'space', 'e', 'rpress', 'click', 'f', 'enter']) P[kk] = inp[kk]; return S; }
+      for (const kk of ['tab', 'esc', 'space', 'e', 'rpress', 'click', 'f', 'enter', 'g']) P[kk] = inp[kk]; return S; }
     const k = S.kir;                                    // Kirill (the auction revenge below)
     if (inp.slot) S.slot = inp.slot;
-    if (inp.wheel) S.slot = ((S.slot - 1 + inp.wheel + 10) % 10) + 1;
+    if (inp.wheel) { if (S.phone && S.phone.app === 'ach') S.phone.scroll = Math.max(0, Math.min(ACH.length - 7, (S.phone.scroll || 0) + inp.wheel)); else S.slot = ((S.slot - 1 + inp.wheel + 10) % 10) + 1; }
     const ko = S.hp <= 0;
 
     // ---- UI layers: dialog, phone, chalk minigame swallow the pointer ----
@@ -568,11 +676,18 @@
         else if (inp.text && S.phone && S.phone.app === 'dm') dmSend(S, S.phone.who, String(inp.text).slice(0, 200)); }
       else if (inp.click) { const si = HUD.slots.findIndex(inR); if (si >= 0) { S.slot = si + 1; pointerFree = false; } }
     }
+    if (S.phone) { const ph = S.phone; if (ph.app === 'chats') { for (const m of S.msgs) m.read = true; }
+      else if (ph.app === 'dm') { const w = ph.who; for (const m of S.msgs) if (w === GROUP ? m.group : (m.from === w && !m.group)) m.read = true; } }
     if (S.chalk) { pointerFree = false; const c = S.chalk;
       if (inp.press && curS) c.pts.forEach((p, i) => { const q = proj(p[0], p[1]); if (!c.hit[i] && Math.hypot(q[0] - curS[0], q[1] - curS[1]) < 26) c.hit[i] = 1; });
-      if (t - c.t0 > 12 || c.hit.every((v) => v) || edge('esc')) { const acc = c.hit.filter(Boolean).length / c.hit.length; S.chalk = null; M(S, c.mod).chalk = Math.max(M(S, c.mod).chalk, acc);
-        if (acc > 0.15) { PRANK.chalk[0] = Math.round(4 + 6 * acc); addPrank(S, c.mod, 'chalk'); toast(S, `Рисунок мелом: точность ${Math.round(acc * 100)} %`); }
-        else toast(S, 'Рисунок не получился'); } }
+      if (t - c.t0 > 12 || c.hit.every((v) => v) || edge('esc')) { const acc = c.hit.filter(Boolean).length / c.hit.length; S.chalk = null;
+        if (c.mod) { M(S, c.mod).chalk = Math.max(M(S, c.mod).chalk, acc);
+          if (acc > 0.15) { PRANK.chalk[0] = Math.round(4 + 6 * acc); addPrank(S, c.mod, 'chalk'); toast(S, `Рисунок мелом: точность ${Math.round(acc * 100)} %`); }
+          else toast(S, 'Рисунок не получился'); }
+        else if (acc > 0.15) { S.drawings = S.drawings || []; S.drawings.push({ x: c.at[0], y: c.at[1], kind: c.kind, acc, t }); if (S.drawings.length > 12) S.drawings.shift(); achKind(S, 'chalk');
+          toast(S, `Рисунок мелом: точность ${Math.round(acc * 100)} %. Прохожие оценят`); }
+        else toast(S, 'Рисунок не получился');
+        if (acc >= 0.9) achieve(S, 'picasso'); } }
 
     // ---- input → intent ----
     const ix = (inp.right ? 1 : 0) - (inp.left ? 1 : 0), iy = (inp.down ? 1 : 0) - (inp.up ? 1 : 0);
@@ -588,6 +703,7 @@
     if (edge('f') && !ko && !S.dlg && !S.phone && !S.chalk) { if (!S.hasGun) toast(S, 'Автомата нет. Говорят, Вера что-то дарит за найденные тыквы…');
       else if (S.carry) toast(S, 'Руки заняты тыквой'); else { S.gun = !S.gun; ev(S, { k: S.gun ? 'gunon' : 'gunoff', x: S.x, y: S.y }); toast(S, S.gun ? 'Автомат в руках: ПКМ — стрелять, F — убрать' : 'Автомат убран'); } }
     if (S.carry) S.gun = false;
+    if (edge('g') && !ko && !S.dlg && !S.phone && !S.chalk) { if (S.carry) dropCarry(S); else toast(S, 'G — положить гнилую тыкву (сейчас в руках ничего нет)'); }
     // ---- RMB / E: use the active slot ----
     const slotName = SLOTS[S.slot - 1];
     if (pointerFree && !S.chalk) {
@@ -599,17 +715,19 @@
       if (edge('e')) useSlot(S, slotName, (slotName === 'eggs' || slotName === 'tp') ? cur : null, (slotName === 'eggs' || slotName === 'tp') ? curS : null);   // E throws at the cursor too
     }
     // slime: hold E / RMB at the door
-    if (S.slimeHold > 0) { const sid = S.slimeMod || 'kirill', sh = MODH[sid], near = Math.hypot(S.x - sh.door[0], S.y - sh.door[1]) < K.USE;
-      if ((inp.e || inp.rpress) && near) { const watched = watchOn(S, sid) && inYard(S.x, S.y, MODH[sid]);
+    if (S.slimeHold > 0) { const sid = S.slimeHouse || S.slimeMod || 'kirill', sh = HOUSES.find((q) => q.id === sid) || HK, isMod = !!MODS[sid], near = Math.hypot(S.x - sh.door[0], S.y - sh.door[1]) < K.USE;
+      if ((inp.e || inp.rpress) && near) { const watched = isMod && watchOn(S, sid) && inYard(S.x, S.y, MODH[sid]);
         if (watched) { S.slimeWait = 1; if (!(t - (S.slimeWarnT || -9) < 3)) { S.slimeWarnT = t; toast(S, { kirill: 'Кирилл в окне — держи E и жди, пока отойдёт', raiva: 'Камера пишет — держи E и жди, пока погаснет красный', elf: 'Прожектор горит — замри и держи E, пока не погаснет' }[sid]); } }
         else { S.slimeWait = 0; S.slimeHold += DT; }
-        if (S.slimeHold > 2.5) { S.slimeHold = 0; S.inv.slime--; M(S, sid).slime = 1; M(S, sid).slimeAt = t + 7 + 5 * h1(S.steps * 0.41); addPrank(S, sid, 'slime'); ev(S, { k: 'slime', id: sid, x: sh.door[0], y: sh.door[1] }); toast(S, 'Ручка двери в слайме 🟢'); } }
+        if (S.slimeHold > 2.5) { S.slimeHold = 0; S.inv.slime--; achKind(S, 'slime'); ev(S, { k: 'slime', id: sid, x: sh.door[0], y: sh.door[1] }); toast(S, 'Ручка двери в слайме 🟢');
+          if (isMod) { M(S, sid).slime = 1; M(S, sid).slimeAt = t + 7 + 5 * h1(S.steps * 0.41); addPrank(S, sid, 'slime'); }
+          else { S.hslime = S.hslime || {}; S.hslime[sid] = 1; hsay(S, sid, NB.slime[sid] || 'Фу! Ручка липкая!', t + 6 + 4 * h1(S.steps * 0.41), 'slimetouch'); } } }
       else { S.slimeHold = 0; S.slimeWait = 0; } }
-    if (edge('space') && !ko) { const hs = nearHidingSpot(S.x, S.y); if (hs) { S.hidden = !S.hidden; S.hideAt = [hs[1], hs[2], hs[0]]; ev(S, { k: S.hidden ? 'hide' : 'unhide', x: hs[1], y: hs[2] }); if (S.hidden) { S.path = []; } } else toast(S, 'Спрятаться можно в кустах или за мусорным баком'); }
+    if (edge('space') && !ko) { const hs = nearHidingSpot(S.x, S.y, S); if (hs) { S.hidden = !S.hidden; S.hideAt = [hs[1], hs[2], hs[0]]; ev(S, { k: S.hidden ? 'hide' : 'unhide', x: hs[1], y: hs[2] }); if (S.hidden) { S.path = []; } } else toast(S, 'Спрятаться можно в кустах или за мусорным баком'); }
 
     // ---- movement ----
-    let mvx = 0, mvy = 0; S.runA += ((inp.run && !S.carry ? 1 : 0) - S.runA) * Math.min(1, 6 * DT); const sp = (K.WALK + (K.RUN - K.WALK) * S.runA) * (S.carry === 'rotten' ? K.WALK_CARRY : 1);
-    if (ko || S.dlg) { S.path = []; }
+    let mvx = 0, mvy = 0; S.runA += ((inp.run && !S.carry ? 1 : 0) - S.runA) * Math.min(1, 6 * DT); const sp = (K.WALK + (K.RUN - K.WALK) * S.runA) * (S.carry === 'rotten' ? K.WALK_CARRY : 1) * ((S.sugarT || -99) > t ? 1.25 : 1);
+    if (ko || S.dlg || (S.wrapT || -99) > t) { S.path = []; wx = wy = 0; }                                // wrapped in TP by an angry passer-by: stuck for a moment
     if (wx || wy) { mvx = wx * sp; mvy = wy * sp; S.hidden = false; }
     else if (S.path.length) { const [gx, gy] = S.path[0], dx = gx - S.x, dy = gy - S.y, d = Math.hypot(dx, dy);
       if (d < 8) S.path.shift(); else { mvx = dx / d * sp; mvy = dy / d * sp; S.hidden = false; } }
@@ -656,11 +774,14 @@
     // ---- NPCs ----
     S.npc.forEach((n) => { const def = NPCS[n.i];
       n.gA = (n.gA || 0) + ((n.mv ? 1 : 0) - (n.gA || 0)) * Math.min(1, 7 * DT); n.mv = 0;                 // gait amount eases in/out (no pops)
+      if ((n.stunT || -99) > t) { n.ang += DT * 7 * Math.sin(t * 8 + n.i); n.face = [Math.cos(n.ang) >= 0 ? 1 : -1, Math.sin(n.ang) >= 0 ? 1 : -1]; return; }   // deafened by a firecracker
+      if (n.rev) { npcRevenge(S, n, def); return; }
       if (def.stat) { const hp = proj(n.x, n.y), kp = proj(S.x, S.y); n.ang = turnTo(n.ang, Math.atan2(kp[1] - hp[1], kp[0] - hp[0]), 3 * DT); n.face = [Math.cos(n.ang) >= 0 ? 1 : -1, Math.sin(n.ang) >= 0 ? 1 : -1]; return; }
       if (S.act && S.act.k === 'npc' && S.act.id === n.id) { n.pause = Math.max(n.pause, 0.6); if (S.path.length) S.path[S.path.length - 1] = [n.x, n.y + 50]; }
       const setFace = () => { n.face = [Math.cos(n.ang) >= 0 ? 1 : -1, Math.sin(n.ang) >= 0 ? 1 : -1]; };
       if (n.pause > 0) { n.pause -= DT; if (t - n.talkT < 3.4) { const hp = proj(n.x, n.y), kp = proj(S.x, S.y); n.ang = turnTo(n.ang, Math.atan2(kp[1] - hp[1], kp[0] - hp[0]), 6 * DT); }
         else { const r = def.route, g = r[n.k]; n.ang = turnTo(n.ang, scrAng(g[0] - n.x, g[1] - n.y), 4 * DT); } setFace(); return; }
+      if (n.back) { if (npcMove(S, n, def.route[n.k], def.v * 1.4)) n.back = 0; return; }                 // back to the route after a revenge (around walls)
       const r = def.route, g = r[n.k], dx = g[0] - n.x, dy = g[1] - n.y, d = Math.hypot(dx, dy);
       if (d < 6) { n.k = (n.k + 1) % r.length; n.pause = 1.2 + 2 * h1(n.i + n.k + Math.floor(t / 9)); return; }
       const want = scrAng(dx, dy), da = Math.abs(((want - n.ang + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI);
@@ -677,11 +798,12 @@
       toast(S, 'Месть Эльфа началась…', 'big'); S.raid = newRaid(S); }
     if (!S.raid) DYN.length = 0; raidStep(S);
     contactsStep(S);
-    if (!S.q.home && allMods(S)) { S.q.home = 1; msg(S, 'Неизвестный номер', 'Коля, зайди домой. Срочно. 🎃'); toast(S, 'Все модеры обойдены! Возвращайся домой', 'big'); }
+    if (!S.q.home && allMods(S)) { S.q.home = 1; if (peaceful(S)) msg(S, 'Эльф', 'Коля, зайди домой. Мы тебя ждём. Без подвоха, честно 🙂'); else msg(S, 'Неизвестный номер', 'Коля, зайди домой. Срочно. 🎃'); toast(S, 'Все модеры обойдены! Возвращайся домой', 'big'); }
     // ---- projectiles ----
     S.proj = S.proj.filter((p) => { const u = (t - p.t0) / p.dur; if (u < 1) return true; landProj(S, p); return false; });
     // ---- courier (pizza) and kids (flyers) ----
-    courierStep(S); kidsStep(S);
+    courierStep(S); kidsStep(S); fireStep(S); decoyStep(S); houseStep(S); catStep(S);
+    if (S.q.talk >= 5) achieve(S, 'social'); if (S.q.vera === 2) achieve(S, 'grandson');
     // ---- revenge: Kirill's auction ----
     if (k.revengeAt >= 0 && S.gt >= k.revengeAt) { k.revengeAt = -1; msg(S, 'Кирилл', 'Я украл ВСЕ твои трусы 🩲 и запускаю онлайн-аукцион среди своих подписчиков. Ставки открыты 😏'); k.nextAuction = S.gt + 600; toast(S, 'Месть Кирилла началась…', 'big'); }
     if (k.nextAuction >= 0 && S.gt >= k.nextAuction) { k.auction++; k.nextAuction = S.gt + 600; const lot = ['с черепами', 'в горошек', 'с котиками', 'любимые, счастливые', 'новогодние', 'с надписью «Пятница»', 'дырявые'][k.auction % 7];
@@ -705,7 +827,7 @@
     S.camV[0] += (28 * (tx - S.cam[0]) - 10.5 * S.camV[0]) * DT; S.cam[0] += S.camV[0] * DT;
     S.camV[1] += (28 * (ty - S.cam[1]) - 10.5 * S.camV[1]) * DT; S.cam[1] += S.camV[1] * DT;
     S.toasts = S.toasts.filter((q) => t - q.t < (q.kind === 'big' ? 5 : 4));
-    for (const kk of ['tab', 'esc', 'space', 'e', 'rpress', 'click', 'f', 'enter']) P[kk] = inp[kk];
+    for (const kk of ['tab', 'esc', 'space', 'e', 'rpress', 'click', 'f', 'enter', 'g']) P[kk] = inp[kk];
     return S;
   }
 
@@ -735,6 +857,10 @@
     for (let i = 0; i < MONEY.length; i++) { const [mx, my, , w] = MONEY[i]; if (S.got[i] < 0 && w !== 'pile' && hitPt(mx, my, 70, 60)) return { k: 'money', i, at: [mx, my], r: 40 }; }
     for (let i = 0; i < VPUMPKINS.length; i++) if (S.vp[i] < 0 && S.q.vera >= 1 && hitPt(VPUMPKINS[i][0], VPUMPKINS[i][1], 70, 70)) return { k: 'vp', i, at: VPUMPKINS[i], r: 50 };
     for (let i = 0; i < ROTTENS.length; i++) if (!S.rottenGot[i] && hitPt(ROTTENS[i][0], ROTTENS[i][1], 80, 70)) return { k: 'rotten', i, at: ROTTENS[i], r: 70 };
+    for (let i = 0; i < (S.drops || []).length; i++) { const d = S.drops[i]; if (hitPt(d.x, d.y, 80, 70)) return { k: 'drop', i, at: [d.x, d.y], r: 70 }; }
+    if (S.cat && hitPt(S.cat.x, S.cat.y, 70, 60)) return { k: 'cat', at: [S.cat.x, S.cat.y], r: 80 };
+    if (hitPt(BOWL[0], BOWL[1], 70, 60)) return { k: 'bowl', at: [BOWL[0], BOWL[1] + 40], r: 90 };
+    for (let i = 0; i < BINS.length; i++) { const [bx, by] = BINS[i]; if (bx > ALLEY[0] && bx < ALLEY[2] && by < -1000) continue; if (hitPt(bx, by, 70, 90)) return { k: 'bin', i, at: [bx, by + 45], r: 85 }; }
     return null;
   }
   function doAct(S) {
@@ -749,8 +875,40 @@
     else if (a.k === 'money') { if (S.got[a.i] < 0) { S.got[a.i] = S.t; S.money += MONEY[a.i][2]; ev(S, { k: 'coin', amt: MONEY[a.i][2], x: a.at[0], y: a.at[1] }); } }
     else if (a.k === 'vp') { if (S.vp[a.i] < 0) { S.vp[a.i] = S.t; ev(S, { k: 'pickup', x: a.at[0], y: a.at[1] }); } }
     else if (a.k === 'rotten') { if (S.carry) { toast(S, 'Руки заняты: одна гнилая тыква за раз'); return; } S.rottenGot[a.i || 0] = true; S.carry = 'rotten'; S.slot = 4; ev(S, { k: 'pickup', x: a.at[0], y: a.at[1] });
-      toast(S, 'Гнилая тыква в руках. Тяжёлая и вонючая. Неси на крыльцо модеру.'); }
+      toast(S, 'Гнилая тыква в руках. Тяжёлая и вонючая. Неси на крыльцо модеру. (G — положить)'); }
+    else if (a.k === 'drop') { const d = (S.drops || [])[a.i]; if (!d) return; if (S.carry) { toast(S, 'Руки заняты: одна гнилая тыква за раз'); return; }
+      S.drops.splice(a.i, 1); S.carry = 'rotten'; S.slot = 4; S.gun = false; ev(S, { k: 'pickup', x: d.x, y: d.y }); toast(S, 'Снова гнилая тыква в руках (G — положить)'); }
+    else if (a.k === 'cat') petCat(S);
+    else if (a.k === 'bowl') takeCandy(S);
+    else if (a.k === 'bin') kickBin(S, a.i);
   }
+  // ---- Vera's candy bowl: a sweet takes the edge off (+8 HP, 15 s of a sugar rush); greed annoys Vera ----
+  function takeCandy(S) { const b = S.bowl = S.bowl || { n: 0, t: -99 }, t = S.t, vera = S.npc.find((q) => q.id === 'vera'); if (t - b.t > 120) b.n = 0; b.n++; b.t = t;
+    if (b.n <= 2) { S.hp = Math.min(100, S.hp + 8); S.sugarT = t + 15; ev(S, { k: 'candy', x: BOWL[0], y: BOWL[1] }); toast(S, 'Конфета из миски Веры: +8 HP и сахарный разгон на 15 с 🍬');
+      if (vera) npcSay(S, vera, b.n === 1 ? 'Бери-бери, Коля! Только одну.' : 'Ещё одну? Ну ладно, праздник же…'); return; }
+    if (vera) { npcSay(S, vera, b.n === 3 ? 'Коля! Совесть есть? Это для детей!' : 'Миска пустая. И это всё ты!'); anger(S, vera, 1.5); }
+    toast(S, b.n === 3 ? 'Вера смотрит очень строго…' : 'Миска пуста. Вера в гневе'); }
+  // ---- kick a garbage bin over: a crash the patrol hears (and you can't hide in it for a while) ----
+  function kickBin(S, i) { S.binsDown = S.binsDown || {}; const t = S.t, [bx, by] = BINS[i];
+    if (t - (S.binsDown[i] ?? -99) < 60) { toast(S, 'Бак и так лежит'); return; }
+    S.binsDown[i] = t; ev(S, { k: 'binkick', i, x: bx, y: by }); toast(S, 'БАБАМ! Бак с грохотом опрокинут');
+    S.npc.forEach((n) => { if (Math.hypot(n.x - bx, n.y - by) < 520 && !NPCS[n.i].stat) npcSay(S, n, pickL(['Кто мусорку уронил?!', 'Фу, ну и запах!', 'Хулиганьё!'], t + n.i)); });
+    if (S.raid && S.raid.st === 'search') S.raid.units.forEach((u) => { if (u.st !== 'chase' && Math.hypot(u.x - bx, u.y - by) < 1000) { u.st = 'alert'; u.alertAt = [bx, by + 40]; u.goal = null; } });
+    if (S.cat && Math.hypot(S.cat.x - bx, S.cat.y - by) < 500) catScare(S, bx, by); }
+  // ---- the black cat: wanders between its haunts; pet it and it follows you for 40 s, hissing when the patrol comes near ----
+  function petCat(S) { const c = S.cat; if (!c) return; c.purr = S.t; c.follow = S.t + 40; c.st = 'follow'; ev(S, { k: 'purr', x: c.x, y: c.y }); toast(S, 'Кот мурлычет и идёт за тобой. Он чует патруль раньше тебя 🐈‍⬛'); }
+  function catScare(S, x, y) { const c = S.cat; c.st = 'flee'; c.fx = x; c.fy = y; c.t0 = S.t; c.follow = -99; ev(S, { k: 'meow', x: c.x, y: c.y }); }
+  function catStep(S) { const c = S.cat; if (!c) return; const t = S.t; c.mv = 0;
+    const go = (g, v) => { const dx = g[0] - c.x, dy = g[1] - c.y, d = Math.hypot(dx, dy); if (d < 6) return true; const st = Math.min(d, v * DT); c.x += dx / d * st; c.y += dy / d * st;
+      c.ang = turnTo(c.ang, scrAng(dx, dy), 10 * DT); c.gph += st / 34; c.mv = v > 150 ? 2 : 1; return false; };
+    if (c.st === 'flee') { const dx = c.x - c.fx, dy = c.y - c.fy, d = Math.hypot(dx, dy) || 1; go([c.x + dx / d * 80, Math.max(-330, Math.min(330, c.y + dy / d * 80))], 300); if (t - c.t0 > 1.8) { c.st = 'walk'; c.pause = 0; } return; }
+    if (c.follow > t) { c.st = 'follow'; const back = fwd(S, -60), d = Math.hypot(back[0] - c.x, back[1] - c.y);
+      if (d > 50) go(back, Math.min(260, 60 + d * 1.6)); else { const hp = proj(c.x, c.y), kp = proj(S.x, S.y); c.ang = turnTo(c.ang, Math.atan2(kp[1] - hp[1], kp[0] - hp[0]), 4 * DT); }
+      if (S.raid && S.raid.st === 'search' && t - c.hiss > 7 && S.raid.units.some((u) => u.st !== 'chase' && Math.hypot(u.x - S.x, u.y - S.y) < 650)) { c.hiss = t; ev(S, { k: 'hiss', x: c.x, y: c.y }); toast(S, 'Кот шипит: патруль где-то рядом!'); }
+      return; }
+    if (c.st === 'follow') { c.st = 'walk'; c.pause = 1; ev(S, { k: 'meow', x: c.x, y: c.y }); }
+    if (c.pause > 0) { c.pause -= DT; return; }
+    if (go(CATSPOTS[c.k % CATSPOTS.length], 95)) { c.k = (c.k * 7 + 3) % CATSPOTS.length; c.pause = 2 + 5 * h1(t * 0.13 + c.k); } }
   // ---- aiming: houses and trees are hit-tested on their sprites' coarse alpha masks (anchors.js), else the ground ----
   if (typeof module !== 'undefined' && !root.ANCH) { try { require('./anchors.js'); } catch (e) {} }
   const AN = () => root.ANCH || {};
@@ -774,6 +932,7 @@
     const vcar = (kind, id, x, y) => { const q = proj(x, y); if (c[0] > q[0] - 175 && c[0] < q[0] + 175 && c[1] > q[1] - 140 && c[1] < q[1] + 55)
       take({ kind, id, box: [x - 150, y - 62, x + 150, y + 62], ground: [x, y], u: (c[0] - q[0] + 175) / 350, v: (c[1] - q[1] + 140) / 195 }); };
     CARS.forEach(([x, y], i) => vcar('scar', i, x, y));
+    if (S.gun) LAMPS.forEach(([x, y], i) => { const q = proj(x, y); if (Math.hypot(c[0] - q[0] - LAMPHEAD[0], c[1] - q[1] + LAMPHEAD[1]) < 26) take({ kind: 'lamp', i, box: [x - 14, y - 14, x + 14, y + 14], ground: [x, y] }); });   // shoot a lamp out
     if (S.raid && S.raid.st !== 'wait') { S.raid.units.forEach((u) => person('unit', u.i, u.x, u.y, 132)); S.raid.crowd.forEach((q, i) => person('crowd', i, q.x, q.y)); S.raid.cars.forEach((cr, i) => vcar('rcar', i, cr.x, cr.y)); }
     if (!best) best = { kind: 'ground', ground: unproj(c[0], c[1]) };
     best.c = c; best.dist = Math.hypot(best.ground[0] - S.x, best.ground[1] - S.y); best.ok = best.dist <= THROW_R; return best;
@@ -783,7 +942,7 @@
     if (kind === 'eggs' && S.inv.eggs <= 0) { toast(S, 'Яйца закончились. Магазин в телефоне (Tab)'); return; }
     if (kind === 'tp' && S.inv.tp <= 0) { toast(S, 'Нет туалетной бумаги. Магазин в телефоне (Tab)'); return; }
     const tg = aimTarget(S, c); if (!tg.ok) { toast(S, 'Слишком далеко — подойди ближе'); return; }
-    const h0 = proj(S.x, S.y, 95); S.inv[kind]--; S.stats[kind] = (S.stats[kind] || 0) + 1;
+    const h0 = proj(S.x, S.y, 95); S.inv[kind]--; S.stats[kind] = (S.stats[kind] || 0) + 1; achKind(S, kind); if (kind === 'eggs') achieve(S, 'first_egg');
     S.lockAng = Math.atan2(c[1] - h0[1], c[0] - h0[0]); S.faceLock = S.t + 0.7;
     const d = tg.dist, dur = kind === 'tp' ? 0.7 + 0.15 * pw + d / 4000 : 0.4 + d / 2000;
     S.proj.push({ kind, sx0: h0[0], sy0: h0[1], sx1: c[0], sy1: c[1], gx0: S.x, gy0: S.y, gx1: tg.ground[0], gy1: tg.ground[1], t0: S.t + 0.2, dur,
@@ -793,56 +952,131 @@
   }
   function landProj(S, p) {
     if (p.kind === 'bb') { landBB(S, p); return; }
-    if (p.kind === 'slipper') { if (Math.hypot(S.x - p.x1, S.y - p.y1) < 70) hurt(S, 10, 'Тапок Кирилла'); ev(S, { k: 'splat2', x: p.x1, y: p.y1 }); return; }
+    if (p.kind === 'slipper') { if (Math.hypot(S.x - p.x1, S.y - p.y1) < 70) { hurt(S, 10, p.from ? 'Тапок Веры' : 'Тапок Кирилла'); if (p.from) achieve(S, 'payback'); } ev(S, { k: 'splat2', x: p.x1, y: p.y1 }); return; }
+    if (p.kind === 'negg') { const n = S.npc.find((q) => q.id === p.from), q = proj(p.x1, p.y1);
+      if (Math.hypot(S.x - p.x1, S.y - p.y1) < 62 && !S.hidden) { hurt(S, 5, 'Ответное яйцо — ' + (n ? NPCS[n.i].name : 'прохожий')); S.eggd = S.t; if (n && n.rev) n.rev.hit = 1; achieve(S, 'payback'); ev(S, { k: 'splat', x: S.x, y: S.y, sx: q[0], sy: q[1] - 80 }); }
+      else { S.marks.push({ k: 'egg', on: 'ground', x: p.x1, y: p.y1, sx: q[0], sy: q[1], t: S.t, s: p.seed }); if (S.marks.length > 90) S.marks.shift(); ev(S, { k: 'splat', x: p.x1, y: p.y1, sx: q[0], sy: q[1] }); } return; }
+    if (p.kind === 'firec') { S.fires = S.fires || []; S.fires.push({ x: p.gx1, y: p.gy1, t0: S.t, fuse: 1.4 }); ev(S, { k: 'fuse', x: p.gx1, y: p.gy1 }); return; }
     if (p.kind === 'arrow') { if (Math.hypot(S.x - p.x1, S.y - p.y1) < 70 && !S.hidden) { hurt(S, 8, 'Стрела-присоска Эльфа'); S.stuck = S.t; } ev(S, { k: 'thwack', x: p.x1, y: p.y1 }); return; }
     const tg = p.tg, m = { k: p.kind === 'eggs' ? 'egg' : 'tp', on: tg.kind, id: tg.id, i: tg.i, u: tg.u, v: tg.v, x: p.gx1, y: p.gy1, sx: p.sx1, sy: p.sy1, t: S.t, s: p.seed };
     if (!['npc', 'courier', 'unit', 'crowd'].includes(tg.kind)) { S.marks.push(m); if (S.marks.length > 90) S.marks.splice(0, S.marks.length - 90); }
     hitTarget(S, tg, p.kind);
     ev(S, { k: p.kind === 'eggs' ? 'splat' : 'tpland', x: p.gx1, y: p.gy1, sx: p.sx1, sy: p.sy1 });
-    if (tg.kind === 'house') { if (MODS[tg.id]) addPrank(S, tg.id, p.kind);
+    if (tg.kind === 'house') { if (p.kind === 'eggs') achAdd(S, 'rotten_hunter', 1, 'eggs_' + tg.id);
+      if (MODS[tg.id]) addPrank(S, tg.id, p.kind);
       else { S.yell = S.yell || {}; if (!(S.t - (S.yell[tg.id] || -99) < 10)) { S.yell[tg.id] = S.t; const L1 = ['Эй! Хулиганьё!', 'Я всё вижу! Я позвоню твоей маме!', 'Это что, яйцо?!', 'Иди к модерам, их закидывай!'];
         if (tg.id === 'kolya') toast(S, 'Это же твой собственный дом… Зачем?'); else say(S, 'house:' + tg.id, L1[Math.floor(h1(S.steps) * L1.length)], 2.6); } } }
   }
+  // the house whose door Kolya stands at (any house: moderators for pranks that count, neighbours just for fun)
+  function houseNear(S, r = K.USE + 20) { let best = null, bd = r; for (const h of HOUSES) { const d = Math.hypot(S.x - h.door[0], S.y - h.door[1]); if (d < bd) { bd = d; best = h; } } return best; }
+  // the neighbours (not moderators) answer pranks at their doors; the moderators' lines are in LN
+  const NB = { bell: { vera: 'Коля, я же тут, на крыльце стою! Чего звонишь?', a: 'Кто там?.. Никого. Опять дети балуются!', b: 'Мы СПИМ!!! Третий звонок за вечер!', kolya: 'Дома никого. Только кот, а он не открывает.' },
+    slime: { vera: 'Ой! Ручка липкая… Коля, это ты?!', a: 'Фу-у! Кто намазал ручку?! Петров, это ты?', b: 'Что за гадость на ручке?! Спать не дают!' },
+    alarm: { vera: 'Кукареку?! В почтовом ящике?! Ну дети…', a: 'КУКАРЕКУ?! Петров, выключи петуха!', b: 'Будильник?! В полночь?! Мы же спим!', kolya: 'Будильник в твоём же ящике. Сам себе подложил, молодец.' },
+    rotten: { vera: 'Кто подкинул мне гнилую тыкву?! Фу, мухи!', a: 'Петров, у нас на крыльце гнилая тыква. Опять твои шутки?', b: 'Гнилая тыква… Ну хоть не яйца.', kolya: 'Гнилая тыква у твоего собственного крыльца. Смело.' },
+    fire: ['Кто тут взрывает?!', 'Я звоню в полицию!', 'Дети, прекратите!', 'У меня собака спала!'] };
+  const hsay = (S, id, text, at = S.t, fx = null) => { S.hq = S.hq || []; S.hq.push({ id, text, at, fx }); };
+  const fwd = (S, d = 40) => { const X = Math.cos(S.ang || 0), Y = Math.sin(S.ang || 0), w = [(X / C - Y / SN) / 2, (X / C + Y / SN) / 2], l = Math.hypot(w[0], w[1]) || 1;
+    const p = [S.x + w[0] / l * d, S.y + w[1] / l * d]; return blocked(p[0], p[1], 6) ? [S.x, S.y] : p; };
+  // put the rotten pumpkin down at his feet (G, or E away from a moderator's porch); a click picks it up again
+  function dropCarry(S) { if (S.carry !== 'rotten') return; const p = fwd(S, 38); S.drops = S.drops || []; S.drops.push({ x: p[0], y: p[1], kind: 'rotten', t: S.t }); S.carry = null;
+    ev(S, { k: 'putdown', x: p[0], y: p[1] }); const hn = houseNear(S, 200);
+    if (hn && !MODS[hn.id] && NB.rotten[hn.id]) { hsay(S, hn.id, NB.rotten[hn.id], S.t + 4); achKind(S, 'rotten'); toast(S, 'Гнилая тыква подкинута соседям'); }
+    else toast(S, 'Гнилая тыква на земле. Клик по ней — поднять снова'); }
   function useSlot(S, name, cur, curS) {
     const id = modNear(S), k = id ? M(S, id) : null, h = id ? MODH[id] : null, md = id ? MODS[id] : null, dDoor = h ? Math.hypot(S.x - h.door[0], S.y - h.door[1]) : 1e9;
     const tgtId = S.target && M(S, S.target).done < 0 && !M(S, S.target).sweet ? S.target : (id || 'kirill');
-    const ready = () => { if (!id) { toast(S, 'Подойди к дому модера (Кирилл, Райва, Эльф)'); return false; } if (!k.refused) { toast(S, `Сначала постучи к ${md.dat}: вдруг будет сладость?`); return false; }
-      if (k.done >= 0) { toast(S, `Дом ${md.gen} уже закидан на 100 %`); return false; } if (k.sweet) { toast(S, 'Тут уже мир: конфеты получены 🍬'); return false; } return true; };
+    const readyM = (mid) => { const kk = M(S, mid), dd = MODS[mid]; if (!kk.refused) { toast(S, `Сначала постучи к ${dd.dat}: вдруг будет сладость?`); return false; }
+      if (kk.done >= 0) { toast(S, `Дом ${dd.gen} уже закидан на 100 %`); return false; } if (kk.sweet) { toast(S, 'Тут уже мир: конфеты получены 🍬'); return false; } return true; };
+    const ready = () => readyM(id);
+    const canMod = (mid) => { const kk = M(S, mid); return kk.refused && kk.done < 0 && !kk.sweet; };
     if (name === 'eggs') { throwAt(S, 'eggs', curS || proj(MODH[tgtId].door[0] + 60, FACADE, 120)); return; }
     if (name === 'tp') { if (!curS) throwAt(S, 'tp', proj(MODH[tgtId].door[0], FACADE, 220), 0.8); else if (S.charge < 0) throwAt(S, 'tp', curS, 0.8); return; }
-    if (name === 'bell') { if (!id || dDoor > K.USE + 20) { toast(S, 'Подойди к двери модера (Кирилл, Райва, Эльф)'); return; }
-      if (!ready()) return; if (k.bell && S.t - k.bell.t0 < 20) { toast(S, 'Слишком часто — подожди'); return; }
-      k.bell = { t0: S.t, done: false }; ev(S, { k: 'bell', id, x: h.door[0], y: h.door[1] }); toast(S, 'ДИНЬ-ДОН! Беги или прячься! (Space в кустах)'); return; }
-    if (name === 'rotten') { if (S.carry !== 'rotten') { toast(S, S.rottenGot.every(Boolean) ? 'Гнилых тыкв больше нет' : 'Гнилую тыкву ещё надо найти (говорят, в переулке и у гаража)'); return; }
-      if (!id || Math.hypot(S.x - h.door[0] - 60, S.y - h.door[1]) > K.USE + 40) { toast(S, 'Неси тыкву к крыльцу модера'); return; }
+    if (name === 'bell') { const hn = houseNear(S); if (!hn) { toast(S, 'Подойди к любой двери: модеру — гадость, соседям — просто так'); return; }
+      if (MODS[hn.id]) { const mid = hn.id, kk = M(S, mid); if (!readyM(mid)) return; if (kk.bell && S.t - kk.bell.t0 < 20) { toast(S, 'Слишком часто — подожди'); return; }
+        kk.bell = { t0: S.t, done: false }; ev(S, { k: 'bell', id: mid, x: hn.door[0], y: hn.door[1] }); toast(S, 'ДИНЬ-ДОН! Беги или прячься! (Space в кустах)'); return; }
+      S.hbell = S.hbell || {}; if (S.t - (S.hbell[hn.id] ?? -99) < 15) { toast(S, 'Слишком часто — подожди'); return; }
+      S.hbell[hn.id] = S.t; ev(S, { k: 'bell', id: hn.id, x: hn.door[0], y: hn.door[1] }); achKind(S, 'bell'); hsay(S, hn.id, NB.bell[hn.id], S.t + 3); toast(S, 'ДИНЬ-ДОН! Это соседи, не модер — просто шалость'); return; }
+    if (name === 'rotten') { if (S.carry !== 'rotten') { toast(S, (S.drops || []).length ? 'Гнилая тыква лежит там, где ты её оставил — подними кликом' : S.rottenGot.every(Boolean) ? 'Гнилых тыкв больше нет' : 'Гнилую тыкву ещё надо найти (говорят, в переулке и у гаража)'); return; }
+      if (!id || Math.hypot(S.x - h.door[0] - 60, S.y - h.door[1]) > K.USE + 40) { dropCarry(S); return; }
       if (!ready()) return; if (k.swapped) { toast(S, 'Тут тыква уже подменена'); return; }
       if (spotted(S, id)) return; S.carry = null; k.swapped = true; addPrank(S, id, 'rotten'); ev(S, { k: 'swap', id, x: h.door[0] + 60, y: h.door[1] }); toast(S, 'Тыква подменена. Пахнет победой.'); return; }
     if (name === 'alarm') { if (S.inv.alarm <= 0) { toast(S, 'Нет будильника. Магазин в телефоне (Tab)'); return; }
-      if (!id || Math.hypot(S.x - h.mail[0], S.y - h.mail[1]) > K.USE) { toast(S, 'Подойди к почтовому ящику модера'); return; }
-      if (!ready()) return; if (k.alarm) { toast(S, 'В этом ящике уже был будильник'); return; }
-      S.inv.alarm--; k.alarm = { t0: S.t, ring: S.t + 8, done: false }; ev(S, { k: 'mailbox', id, x: h.mail[0], y: h.mail[1] }); toast(S, 'Будильник в почтовом ящике. Зазвонит через несколько секунд…'); return; }
+      if (id && Math.hypot(S.x - h.mail[0], S.y - h.mail[1]) <= K.USE) { if (!ready()) return; if (k.alarm) { toast(S, 'В этом ящике уже был будильник'); return; }
+        S.inv.alarm--; k.alarm = { t0: S.t, ring: S.t + 8, done: false }; ev(S, { k: 'mailbox', id, x: h.mail[0], y: h.mail[1] }); toast(S, 'Будильник в почтовом ящике. Зазвонит через несколько секунд…'); return; }
+      const hm = HOUSES.find((q) => !MODS[q.id] && Math.hypot(S.x - q.mail[0], S.y - q.mail[1]) <= K.USE);
+      S.inv.alarm--; achKind(S, 'alarm'); S.decoys = S.decoys || [];
+      if (hm) { S.decoys.push({ x: hm.mail[0], y: hm.mail[1], ring: S.t + 8, end: S.t + 12, house: hm.id }); ev(S, { k: 'mailbox', id: hm.id, x: hm.mail[0], y: hm.mail[1] }); toast(S, 'Будильник у соседей в ящике. Зазвонит через несколько секунд…'); return; }
+      const p = fwd(S, 30); S.decoys.push({ x: p[0], y: p[1], ring: S.t + 6, end: S.t + 12 }); ev(S, { k: 'putdown', x: p[0], y: p[1] });
+      toast(S, 'Будильник на земле: зазвонит через 6 с и отвлечёт всех вокруг'); return; }
     if (name === 'chalk') { if (S.inv.chalk <= 0) { toast(S, 'Нет мелков. Магазин в телефоне (Tab)'); return; }
-      if (!id || !(Math.abs(S.x - h.gate) < 320 && S.y > SWN[0] - 30 && S.y < ROAD[0] + 140)) { toast(S, 'Рисовать — на тротуаре у калитки модера'); return; }
-      if (!ready()) return;
-      S.inv.chalk--; S.chalk = { t0: S.t, mod: id, pts: chalkShape(h), hit: [] }; S.chalk.hit = S.chalk.pts.map(() => 0); S.path = []; toast(S, 'Обведи рисунок: зажми ЛКМ и веди по точкам (12 с)'); return; }
+      if (id && Math.abs(S.x - h.gate) < 320 && S.y > SWN[0] - 30 && S.y < ROAD[0] + 140 && canMod(id)) {
+        S.inv.chalk--; S.chalk = { t0: S.t, mod: id, pts: chalkShape(h), hit: [] }; S.chalk.hit = S.chalk.pts.map(() => 0); S.path = []; toast(S, 'Обведи рисунок: зажми ЛКМ и веди по точкам (12 с)'); return; }
+      const kinds = ['ghost', 'cat', 'pumpkin', 'heart'], kind = kinds[Math.floor(h1(S.steps * 0.29) * kinds.length) % kinds.length], c = fwd(S, 120), pts = chalkPts(kind, c[0], c[1]);
+      S.inv.chalk--; S.chalk = { t0: S.t, mod: null, kind, at: c, pts, hit: pts.map(() => 0) }; S.path = []; toast(S, 'Рисуем где угодно: зажми ЛКМ и веди по точкам (12 с)'); return; }
     if (name === 'fire') { if (S.inv.fire <= 0) { toast(S, 'Нет петард. Магазин в телефоне (Tab)'); return; }
-      if (!id || dDoor > K.USE + 40) { toast(S, 'Положи петарды у крыльца модера'); return; }
-      if (!ready()) return; if (k.fire && !k.fire.done) return;
-      S.inv.fire--; k.fire = { t0: S.t, x: h.door[0] - 40, y: h.door[1] + 30, done: false }; ev(S, { k: 'fuse', id, x: k.fire.x, y: k.fire.y }); toast(S, 'Фитиль горит! БЕГИ!'); return; }
+      if (curS) { throwFire(S, curS); return; }
+      const p = fwd(S, 30); S.inv.fire--; S.fires = S.fires || []; S.fires.push({ x: p[0], y: p[1], t0: S.t, fuse: 3.0 }); ev(S, { k: 'fuse', x: p[0], y: p[1] }); toast(S, 'Фитиль горит! БЕГИ! (3 с)'); return; }
     if (name === 'slime') { if (S.inv.slime <= 0) { toast(S, 'Нет слайма. Магазин в телефоне (Tab)'); return; }
-      if (!id || dDoor > K.USE) { toast(S, 'Подойди к двери модера'); return; }
-      if (!ready()) return; if (k.slime) { toast(S, 'Ручка уже в слайме'); return; }
-      S.slimeMod = id; S.slimeHold = 0.0001; toast(S, `Держи E (или ПКМ) 2.5 с, пока ${LN[id].slime}`); return; }
+      const hn = houseNear(S, K.USE); if (!hn) { toast(S, 'Слайм — на дверную ручку: подойди к любой двери'); return; }
+      if (MODS[hn.id]) { const mid = hn.id, kk = M(S, mid); if (!readyM(mid)) return; if (kk.slime) { toast(S, 'Ручка уже в слайме'); return; }
+        S.slimeMod = mid; S.slimeHouse = mid; S.slimeHold = 0.0001; toast(S, `Держи E (или ПКМ) 2.5 с, пока ${LN[mid].slime}`); return; }
+      if (hn.id === 'kolya') { toast(S, 'Это твоя же дверь… Не надо.'); return; }
+      S.hslime = S.hslime || {}; if (S.hslime[hn.id]) { toast(S, 'Ручка уже в слайме'); return; }
+      S.slimeMod = null; S.slimeHouse = hn.id; S.slimeHold = 0.0001; toast(S, 'Держи E (или ПКМ) 2.5 с: слайм на ручку соседям'); return; }
     if (name === 'pizza') { S.phone = { app: 'pizza', t: S.t, at: S.t, scroll: 0 }; return; }
     if (name === 'flyers') { if (S.inv.flyers <= 0) { toast(S, 'Нет флаеров. Магазин в телефоне (Tab)'); return; }
       const li = lampNear(S.x, S.y); if (li < 0) { toast(S, 'Флаер клеится на фонарный столб'); return; }
-      if (MODIDS.some((m) => M(S, m).lamps.includes(li))) { toast(S, 'Тут уже висит флаер'); return; }
+      if (MODIDS.some((m) => M(S, m).lamps.includes(li)) || (S.flyers2 || []).includes(li)) { toast(S, 'Тут уже висит флаер'); return; }
       const fid = S.target && M(S, S.target).done < 0 && !M(S, S.target).sweet ? S.target : null;
-      if (!fid) { toast(S, 'Сначала постучи к модеру: про кого флаер-то?'); return; }
+      if (!fid) { S.inv.flyers--; S.flyers2 = S.flyers2 || []; S.flyers2.push(li); achKind(S, 'flyers'); ev(S, { k: 'flyer', id: null, i: li, x: LAMPS[li][0], y: LAMPS[li][1] });
+        toast(S, 'Флаер «Пропал кот. Откликается на „Модератор“» приклеен'); return; }
       const fk = M(S, fid); S.inv.flyers--; fk.lamps.push(li); addPrank(S, fid, 'flyers'); ev(S, { k: 'flyer', id: fid, i: li, x: LAMPS[li][0], y: LAMPS[li][1] });
       toast(S, `Флаер «${MODS[fid].name} раздаёт конфеты БЕСПЛАТНО!» (${fk.lamps.length}/5)`);
       if (fk.lamps.length >= 5 && !S.kids) S.kids = { t0: S.t, st: 'come', mod: fid }; return; }
   }
+  // a firecracker thrown at the cursor (RMB): it lands, the fuse burns 1.4 s
+  function throwFire(S, c) { const tg = aimTarget(S, c); if (tg.dist > 760) { toast(S, 'Слишком далеко — петарду так не докинуть'); return; }
+    const h0 = proj(S.x, S.y, 95); S.inv.fire--; S.lockAng = Math.atan2(c[1] - h0[1], c[0] - h0[0]); S.faceLock = S.t + 0.7;
+    S.proj.push({ kind: 'firec', sx0: h0[0], sy0: h0[1], sx1: c[0], sy1: c[1], gx0: S.x, gy0: S.y, gx1: tg.ground[0], gy1: tg.ground[1], t0: S.t + 0.2, dur: 0.45 + tg.dist / 1800, arc: 70 + tg.dist * 0.12, tg: { kind: 'ground' }, seed: S.steps });
+    ev(S, { k: 'throw', kind: 'fire', x: S.x, y: S.y }); }
+  // firecrackers anywhere: the bang stuns passers-by and the patrol within 260 for 1.5 s, sets off car alarms; at a moderator's porch it counts as the prank
+  function fireStep(S) { const t = S.t; if (!S.fires || !S.fires.length) return;
+    S.fires = S.fires.filter((f) => { if (t - f.t0 < f.fuse) return true; bang(S, f); return false; }); }
+  function bang(S, f) { const t = S.t, near = (x, y, r) => Math.hypot(x - f.x, y - f.y) < r; let stun = 0; achKind(S, 'fire');
+    ev(S, { k: 'bang', x: f.x, y: f.y });
+    if (near(S.x, S.y, 170)) hurt(S, 15, 'Петарды рядом');
+    S.npc.forEach((n) => { if (!near(n.x, n.y, 260)) return; n.stunT = t + 1.5; n.pause = Math.max(n.pause || 0, 1.6); stun++; npcSay(S, n, pickL(['Ай! Мои уши!', 'Что это было?!', 'А-а-а! Бомба!', 'Я ничего не слышу!'], t * 3.1 + n.i)); anger(S, n, 1); });
+    if (S.raid && S.raid.st !== 'wait') { S.raid.units.forEach((u) => { if (near(u.x, u.y, 260)) { u.stunT = t + 1.5; stun++; say(S, 'raid' + u.i, pickL(['Контузия! Ничего не вижу!', 'Ай! Петарды!', 'Уши!..'], t + u.i), 1.8); }
+        else if (near(u.x, u.y, 1500) && u.st !== 'chase') { u.st = 'alert'; u.alertAt = [f.x, f.y]; u.goal = null; } });
+      S.raid.crowd.forEach((q, i) => { if (near(q.x, q.y, 260)) { q.hitT = t; q.hitK = 'bang'; say(S, 'crowd:' + i, 'Ай! Мои уши!', 1.8); } }); }
+    if (S.courier && near(S.courier.x, S.courier.y, 260)) say(S, 'courier', 'Пиццу чуть не уронил!', 2);
+    if (stun) achAdd(S, 'boom', stun);
+    for (const id of MODIDS) { const h = MODH[id], k = M(S, id); if (!near(h.door[0], h.door[1], 240)) continue;
+      if (k.refused && k.done < 0 && !k.sweet && !k.pr.fire) addPrank(S, id, 'fire'); k.st = 'out'; k.t0 = t + 0.6; say(S, id, LN[id].fire, 2.6); }
+    HOUSES.forEach((h) => { if (MODS[h.id] || !near(h.door[0], h.door[1], 300)) return; S.yell = S.yell || {}; if (S.t - (S.yell[h.id] || -99) < 8) return; S.yell[h.id] = S.t; say(S, 'house:' + h.id, pickL(NB.fire, t * 1.7), 2.4); });
+    CARS.forEach(([cx, cy], i) => { if (near(cx, cy, 1200)) ev(S, { k: 'caralarm', i, x: cx, y: cy }); });
+    if (S.cat && near(S.cat.x, S.cat.y, 500)) catScare(S, f.x, f.y); }
+  // alarm clocks: in a moderator's mailbox (the prank), in a neighbour's, or on the ground as a decoy that draws the patrol and passers-by
+  function decoyStep(S) { if (!S.decoys || !S.decoys.length) return; const t = S.t;
+    S.decoys = S.decoys.filter((d) => { if (!d.rang && t >= d.ring) { d.rang = true; ev(S, { k: 'alarm', id: d.house || null, x: d.x, y: d.y });
+        if (d.house) say(S, 'house:' + d.house, NB.alarm[d.house] || 'КУКАРЕКУ?!', 3);
+        S.npc.forEach((n) => { if (!n.rev && !NPCS[n.i].stat && Math.hypot(n.x - d.x, n.y - d.y) < 600) { npcSay(S, n, pickL(['Чей это будильник?!', 'Кукареку?! Ночью?!', 'Выключите петуха!'], t + n.i)); n.pause = Math.max(n.pause || 0, 2.5); } });
+        if (S.raid && S.raid.st === 'search') S.raid.units.forEach((u) => { if (u.st !== 'chase' && Math.hypot(u.x - d.x, u.y - d.y) < 1500) { u.st = 'alert'; u.alertAt = [d.x, d.y + 30]; u.goal = null; } });
+        if (S.cat && Math.hypot(S.cat.x - d.x, S.cat.y - d.y) < 500) catScare(S, d.x, d.y); }
+      return t < d.end + 6; }); }
+  // the neighbours answer a moment later (bells, slime on the handle, a rotten pumpkin on the porch)
+  function houseStep(S) { if (!S.hq || !S.hq.length) return; const t = S.t;
+    S.hq = S.hq.filter((q) => { if (t < q.at) return true; say(S, 'house:' + q.id, q.text, 2.8); const h = HOUSES.find((x) => x.id === q.id); if (q.fx && h) ev(S, { k: q.fx, id: q.id, x: h.door[0], y: h.door[1] }); return false; }); }
+  // free chalk drawings (screen-upright shapes in px around a ground point)
+  function chalkPts(kind, cx, cy) { const pts = [], add = (u, v) => pts.push([cx + (u / C - v / SN) / 2, cy + (u / C + v / SN) / 2]);
+    const arc = (x0, y0, r, a0, a1, n, ry = r) => { for (let i = 0; i <= n; i++) { const a = a0 + (a1 - a0) * i / n; add(x0 + r * Math.cos(a), y0 + ry * Math.sin(a)); } };
+    if (kind === 'ghost') { arc(0, -20, 55, Math.PI, 2 * Math.PI, 9); for (let i = 1; i <= 3; i++) { add(55, -20 + i * 22); add(-55, -20 + i * 22); }
+      for (let i = 0; i <= 6; i++) add(55 - i * 110 / 6, 50 + (i % 2 ? -14 : 0)); add(-20, -25); add(20, -25); add(0, 10); }
+    else if (kind === 'cat') { arc(0, 0, 55, 0, 2 * Math.PI, 16); add(-48, -40); add(-40, -75); add(-20, -55); add(20, -55); add(40, -75); add(48, -40); add(-20, -10); add(20, -10); add(0, 10); add(-70, 8); add(70, 8); add(-68, 22); add(68, 22); }
+    else if (kind === 'pumpkin') { arc(0, 0, 75, 0, 2 * Math.PI, 18, 52); add(0, -58); add(6, -76); add(-30, -15); add(-18, -28); add(-8, -12); add(8, -12); add(18, -28); add(30, -15); for (let i = 0; i <= 6; i++) add(-36 + i * 12, 22 + (i % 2 ? 8 : 0)); }
+    else { for (let i = 0; i <= 18; i++) { const a = i / 18 * 2 * Math.PI, x = 16 * Math.sin(a) ** 3, y = -(13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a)); add(x * 4, y * 4); } }
+    return pts; }
   function chalkShape(h = HK) {   // a crude grinning face with horns on the sidewalk in front of a moderator's gate (world points)
     const cx = h.gate - 40, cy = -265, pts = [];
     for (let i = 0; i <= 20; i++) { const a = i / 20 * Math.PI * 2; pts.push([cx + 95 * Math.cos(a), cy + 50 * Math.sin(a)]); }
@@ -863,7 +1097,7 @@
       if (seen && id === 'kirill') { say(S, who, ln.bellSeen, 2.4); S.proj.push({ kind: 'slipper', x0: h.door[0], y0: h.door[1], z0: 80, x1: S.x, y1: S.y, z1: 20, t0: t, dur: 0.55, arc: 70, seed: S.steps }); }
       else if (seen && id === 'elf') { say(S, who, ln.bellSeen, 2.4); S.proj.push({ kind: 'arrow', x0: h.door[0], y0: h.door[1], z0: 95, x1: S.x, y1: S.y, z1: 60, t0: t + 0.5, dur: 0.35, arc: 25, seed: S.steps }); }
       else if (seen) { say(S, who, ln.bellSeen, 2.4); ev(S, { k: 'flash', id, x: h.door[0], y: h.door[1] }); hurt(S, 10, 'Вспышка прожектора камеры Райвы'); }
-      else { say(S, who, ln.bellMiss, 2.4); addPrank(S, id, 'bell'); } }
+      else { say(S, who, ln.bellMiss, 2.4); addPrank(S, id, 'bell'); achAdd(S, 'ninja'); } }
     if (k.alarm && !k.alarm.done && t > k.alarm.ring) { k.alarm.done = true; k.st = 'out'; k.t0 = t; ev(S, { k: 'alarm', id, x: h.mail[0], y: h.mail[1] });
       say(S, who, ln.alarm, 3); addPrank(S, id, 'alarm'); }
     if (k.fire && !k.fire.done && t - k.fire.t0 > 3.0) { k.fire.done = true; ev(S, { k: 'bang', id, x: k.fire.x, y: k.fire.y });
@@ -955,10 +1189,12 @@
     let lit = beamLit(u, S.x, S.y);
     if (inCrowd && d > 70) lit = 0;                                                          // blending in with passers-by
     if (S.light && d < 480 && Math.abs(angW(Math.atan2(S.y - u.y, S.x - u.x) - u.wa)) < 1.1) lit = Math.max(lit, 0.6);   // his own phone light gives him away
+    if (!inCrowd && d < 700 && Math.abs(angW(Math.atan2(S.y - u.y, S.x - u.x) - u.wa)) < 1.0 && inLampLight(S)) lit = Math.max(lit, 0.45);   // standing in a street lamp's pool
     if (lit < 0.12) return 0;
     if (!seeLine([u.x, u.y], [S.x, S.y])) return 0;
     return lit;
   }
+  const inLampLight = (S) => LAMPS.some(([x, y], i) => lampLit(S, i) && Math.hypot(S.x - x - (y < 0 ? 40 : -40), S.y - y - (y < 0 ? 40 : -40)) < 190);
   const raidCrowd = (S) => { let n = 0; S.npc.forEach((q) => { if (!NPCS[q.i].stat && Math.hypot(q.x - S.x, q.y - S.y) < 105) n++; });
     if (S.raid) S.raid.crowd.forEach((q) => { if (Math.hypot(q.x - S.x, q.y - S.y) < 95) n++; }); return n; };
   function raidChase(S, u) { const R = S.raid; if (u.st === 'chase') return; u.st = 'chase'; u.lost = 0; u.chT = 0; u.goal = null; R.lastSeen = [S.x, S.y]; R.seenT = S.t;
@@ -979,9 +1215,10 @@
   function raidArrest(S, u) {
     const R = S.raid; R.arrests++; const fine = Math.max(100, Math.round(Math.max(0, S.money) * 0.3)); S.money -= fine;
     ev(S, { k: 'arrest', x: S.x, y: S.y }); say(S, 'raid' + u.i, pickL(RAID.quips, S.steps * 0.29 + R.arrests), 2.8);
-    toast(S, `Колю задержали! Штраф ${fine} ₽. ${pickL(RAID.released, S.steps * 0.71)}`, 'big');
+    toast(S, `Колю задержали! Штраф ${fine} ₽. ${pickL(RAID.released, S.steps * 0.71)} — у дома Эльфа`, 'big');
     msg(S, 'Эльф', pickL(RAID.elfMsg, R.arrests * 1.7 + S.steps * 0.01).replace('{n}', R.arrests));
-    S.x = HKO.door[0]; S.y = FACADE + 110; S.vx = S.vy = 0; S.path = []; S.act = null; S.hidden = false; S.carry = null; S.dlg = null; S.phone = null; S.gun = false; R.grace = S.t + 15; R.lastSeen = null;   // released at home
+    if (S.carry === 'rotten') { S.drops = S.drops || []; S.drops.push({ x: S.x, y: S.y, kind: 'rotten', t: S.t }); }        // the pumpkin stays where he was caught
+    S.x = HE.door[0] + 170; S.y = -270; S.vx = S.vy = 0; S.path = []; S.act = null; S.hidden = false; S.carry = null; S.dlg = null; S.phone = null; S.gun = false; R.grace = S.t + 15; R.lastSeen = null; R.wasChase = false;   // released by Elf's house
     const hp = proj(S.x, S.y); S.cam = [hp[0] - VIEW.W / 2, hp[1] - VIEW.H / 2 - 50]; S.camV = [0, 0];
     R.units.forEach((q) => { q.st = 'patrol'; q.sus = 0; q.lost = 0; q.goal = null; });
   }
@@ -1000,7 +1237,9 @@
       R.cars.push({ x: X0 - 1500, y: 0, tx: freeSpot(S, lx - 350), dir: 1, tex: 'car_police', v: 0, park: false, vmax: 1100, extra: true });
       ev(S, { k: 'raidsiren', x: X0, y: 0 }); toast(S, '🚨 Подкрепление! Ещё одна машина едет мстить за яйца', 'big'); }
     R.units.forEach((u) => {
-      u.mv = 0; u.run = 0; const sp = RAID.say[u.kind], vis = raidSees(S, u), dK = Math.hypot(S.x - u.x, S.y - u.y);
+      u.mv = 0; u.run = 0;
+      if ((u.stunT || -99) > t) { u.v = 0; u.wa += DT * 6 * Math.sin(t * 7 + u.i); u.ang = scrAng(Math.cos(u.wa), Math.sin(u.wa)); u.moving = 0; u.gA = (u.gA || 0) * (1 - Math.min(1, 8 * DT)); return; }   // deafened by a firecracker
+      const sp = RAID.say[u.kind], vis = raidSees(S, u), dK = Math.hypot(S.x - u.x, S.y - u.y);
       if (u.st !== 'chase') { u.sus = Math.max(0, Math.min(1, u.sus + (vis > 0 ? DT * (0.8 + 2.5 * vis) : -DT * 0.35)));
         if (vis > 0 && dK < 75) u.sus = 1;
         if (u.sus >= 1) raidChase(S, u);
@@ -1013,7 +1252,7 @@
         u.chT += DT; uGo(S, u, tgt, u.chT > 6 ? RAID.TIRED : RAID.RUN[u.kind]);                         // out of breath after 6 s
         if (R.grace <= t && S.hp > 0 && !S.finale && (dK < RAID.CATCH || (S.hidden && S.hideAt && Math.hypot(u.x - S.hideAt[0], u.y - S.hideAt[1] - 40) < 60 && u.lost < 1.2))) { raidArrest(S, u); return; }
         if (u.lost > 2.6) { u.st = 'search'; u.t1 = t; u.goal = null; u.sus = 0.3; } }
-      else if (u.st === 'alert') { if (!R.lastSeen || uGo(S, u, R.lastSeen, RAID.ALERT)) { u.st = 'search'; u.t1 = t; } }
+      else if (u.st === 'alert') { const g = u.alertAt || R.lastSeen; if (!g || uGo(S, u, g, RAID.ALERT)) { u.st = 'search'; u.t1 = t; u.alertAt = null; } }
       else if (u.st === 'search') { const g = R.lastSeen;
         if (g && Math.hypot(g[0] - u.x, g[1] - u.y) > 30 && t - u.t1 < 6) uGo(S, u, g, RAID.ALERT);
         else { if (!u.look) u.look = t; u.wa += DT * 1.5 * Math.cos((t - u.look) * 0.9); }
@@ -1041,6 +1280,8 @@
       { const ph = Math.atan2(2 * Math.sin(u.ang), Math.cos(u.ang)), s8 = Math.PI / 4, nb = ((Math.round(ph / s8) % 8) + 8) % 8;
         if (u.d8 === undefined) u.d8 = nb; else if (nb !== u.d8 && Math.abs(angW(ph - u.d8 * s8)) > s8 / 2 + 0.12) u.d8 = nb; }
       { const sb = Math.floor(u.gph * 2); if (u.stepB !== undefined && sb !== u.stepB && dK < 900) ev(S, { k: 'step', x: u.x, y: u.y, foot: sb & 1, npc: 1, boots: 1 }); u.stepB = sb; } });
+    // a chase that ends without an arrest counts as an escape (the «Неуловимый» achievement)
+    if (R.units.some((u) => u.st === 'chase')) R.wasChase = true; else if (R.wasChase) { R.wasChase = false; achAdd(S, 'elusive'); toast(S, 'Ушёл от погони!'); }
     // they don't walk through each other: pairs closer than 46 are pushed apart (never into a wall or a car)
     const U = R.units; U.forEach((u) => pushOut(u, 22)); for (let a = 0; a < U.length; a++) for (let b = a + 1; b < U.length; b++) { const p = U[a], q = U[b], dx = q.x - p.x, dy = q.y - p.y, d = Math.hypot(dx, dy);
       if (d >= 46) continue; const nx = d > 0.01 ? dx / d : 1, ny = d > 0.01 ? dy / d : 0, k = (46 - d) / 2;
@@ -1062,7 +1303,7 @@
       if (a < 0.02) { mk.st = 'out'; mk.t0 = t; }
       for (const [tt, who, text] of lines) if (a >= tt && a - DT < tt) say(S, who, text, 2.5);
       if (a > 3) { mk.st = 'out'; mk.t0 = t - 1; }
-      if (a > 10.4) { c.st = 'leave'; addPrank(S, id, 'pizza'); } }
+      if (a > 10.4) { c.st = 'leave'; addPrank(S, id, 'pizza'); achieve(S, 'pizza'); } }
     if (c.st === 'leave') { if (go([h.gate - 1600, 120], 190)) S.courier = null; }
   }
   function kidsStep(S) {
@@ -1085,10 +1326,10 @@
     const p = S.phone;
     if (a === 'home') { p.app = p.app === 'dm' ? 'contacts' : 'home'; p.at = S.t; return; }
     if (a === 'close') { S.phone = null; return; }
-    if (a.startsWith('dm_')) { p.app = 'dm'; p.who = a.slice(3); p.at = S.t; S.dm[p.who] = S.dm[p.who] || []; S.msgs.forEach((m) => { if (m.from === p.who) m.read = true; }); return; }
+    if (a.startsWith('dm_')) { p.app = 'dm'; p.who = a.slice(3); p.at = S.t; S.dm[p.who] = S.dm[p.who] || []; S.msgs.forEach((m) => { if (p.who === GROUP ? m.group : (m.from === p.who && !m.group)) m.read = true; }); return; }
     if (a === 'loan') { takeLoan(S, p.who); return; }
     if (a === 'repay') { repayLoan(S, p.who); return; }
-    if (['map', 'chats', 'shop', 'pizza', 'light', 'orders', 'contacts', 'dev'].includes(a)) {
+    if (['map', 'chats', 'shop', 'pizza', 'light', 'orders', 'contacts', 'dev', 'ach'].includes(a)) {
       if (a === 'chats' && S.rai.virus && S.rai.virus.st === 'pending') { S.rai.virus = { st: 'download', t0: S.t }; ev(S, { k: 'download', x: S.x, y: S.y }); } if (a === 'light') { S.light = !S.light; ev(S, { k: S.light ? 'lighton' : 'lightoff', x: S.x, y: S.y }); return; } p.app = a; p.at = S.t; p.scroll = 0; if (a === 'chats') S.msgs.forEach((m) => (m.read = true)); return; }
     if (a.startsWith('buy_')) { const it = SHOP.find((s) => s.id === a.slice(4)); if (!it) return; if (S.money < it.price) { toast(S, 'Не хватает денег'); return; }
       S.money -= it.price; S.inv[it.give[0]] += it.give[1]; ev(S, { k: 'buy', id: it.id, x: S.x, y: S.y }); toast(S, `Куплено: ${it.name}`); return; }
@@ -1125,7 +1366,12 @@
     [HK.door, HR.door, HR.mail, HE.door, HE.mail, HKO.door, ...RAID.units.flatMap((u) => u.route), ...ROTTENS, STRANGE, VPUMPKINS[0], VPUMPKINS[2], [6560, -1000]].forEach((p) => { if (!findPath([1900, -40], p).length) out.push('unreachable ' + p); });
     return out; }
 
-  root.SIM = { VERSION, HKO, CONTACTS, LOANS, LOAN_DUE, allMods, raidBeam, runDev, DEVHELP, kirillWinT, DT, L, K, VIEW, HINT, C, SN, proj, unproj, ROAD, SWN, SWS, X0, X1, FACADE, HOUSES, HK, ALLEY, ENDLOT, DARK, LAMPS, TREES, CARS, BINS, BENCHES, BUSHES, PILES, FENCES,
+  function achProgress(S, id) { const v = S.achv || {}, n = (ACHI[id] || {}).n;
+    if (id === 'social') return [Math.min(5, S.q.talk), 5]; if (id === 'grandson') return [S.vp.filter((x) => x >= 0).length, 3];
+    if (id === 'master') return [(v.kinds || []).length, 10];
+    if (id === 'rotten_hunter') return [Math.min(10, Math.max(0, ...Object.keys(v).filter((k) => k.startsWith('eggs_')).map((k) => v[k]))), 10];
+    return n ? [Math.min(n, v[id] || 0), n] : null; }
+  root.SIM = { VERSION, ACH, ACHI, achProgress, chalkPts, BOWL, CATSPOTS, LAMPHEAD, lampLit, GARAGE, peaceful, inLampLight, houseNear, HKO, CONTACTS, LOANS, LOAN_DUE, allMods, raidBeam, runDev, DEVHELP, kirillWinT, DT, L, K, VIEW, HINT, C, SN, proj, unproj, ROAD, SWN, SWS, X0, X1, FACADE, HOUSES, HK, ALLEY, ENDLOT, DARK, LAMPS, TREES, CARS, BINS, BENCHES, BUSHES, PILES, FENCES,
     FENCE_Y, MONEY, VPUMPKINS, ROTTEN, ROTTENS, STRANGE, HR, HE, RAID, raidSees, raidCrowd, newRaid, MODS, MODIDS, MODH, GIFTS, JUNK, raivaCamT, watchOn, boosted, modNear, SHOP, SLOTS, SLOT_NAME, PRANK, NPCS, BOX, windAt, gustAt, clockStr, kirillWindow, KVIEWS, inYard, nearHidingSpot, lampNear,
     create, spawn, respawn, outOfPlay, step, at, pick, snap, lerpState, PROPS, NDECOR, NFENCE, NDIV, NTREES, HUD, houseRect, treeRect, aimTarget, THROW_R, dlgLayout, phoneLayout, scriptInput, demoCheck, selfCheck, findPath, chalkShape, toast };
   if (typeof module !== 'undefined') module.exports = root.SIM;

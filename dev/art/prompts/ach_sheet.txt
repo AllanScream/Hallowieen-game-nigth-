@@ -1,0 +1,17 @@
+A game UI sheet of exactly 15 separate square achievement badge icons arranged in a neat grid of 5 columns and 3 rows, each icon centred in its own cell with wide empty gaps between cells. Every badge is the same size: a rounded square tile with a deep purple-black background, a thin glowing orange rim and a chunky readable pixel-art emblem in the middle, dark outlines, warm Halloween night lighting, all in one consistent style. Read left to right, top row first:
+1. a pumpkin with a golden halo floating above it and small white angel wings, soft holy glow
+2. a little house totally covered in egg yolk splats and long white toilet-paper streamers hanging from the roof
+3. a golden trophy cup with devil horns, overflowing with eggs, a toilet-paper roll and a red firecracker
+4. a black sneaker running fast with motion lines, a police flashlight beam just missing it
+5. a rotten grey-green cracked egg with green stink lines, inside a red target crosshair
+6. a red firecracker exploding in an orange burst with spinning yellow dizzy stars
+7. a round brass doorbell button wearing a black ninja headband with fluttering tails
+8. a tall leaning stack of ten pizza boxes with steam rising
+9. a cartoon mummy face wrapped in white toilet paper with two round eyes peeking out
+10. a stick of white sidewalk chalk next to a chalk drawing of a grinning pumpkin face on dark asphalt
+11. three small orange pumpkins in a little wicker basket with a witch's broom handle
+12. a black hoodie with a big yellow egg yolk splat on its chest
+13. a wrapped candy with a twisted orange wrapper and a small pink heart
+14. two overlapping round speech bubbles, one orange and one purple, with a small smiling face (no text)
+15. a single white egg cracked open with a bright yellow yolk splash
+No text, no letters, no numbers anywhere. Transparent background between the tiles.

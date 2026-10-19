@@ -5,7 +5,7 @@
   const S = (window.SCENE = {}), A = window.ASSETS, AN = window.ANCH || {}, L = LIB, M = L.M, W = SIM.VIEW.W, H = SIM.VIEW.H;
   const C = SIM.C, SN = SIM.SN;
   S.REPEAT = ['asphalt_tex', 'sidewalk_tex', 'lawn_tex', 'alley_tex'];
-  const has = (n) => !!A[n];
+  const has = (n) => !!A[n] && G.has(n);
   const FONT = '"Trebuchet MS", "Segoe UI", "DejaVu Sans", Verdana, sans-serif', SERIF = 'Georgia, "Times New Roman", "DejaVu Serif", serif';
   const DARK_FS = `uniform vec2 u_o, u_d; uniform float u_on, u_amt;
 void main(){ float a = u_amt;
@@ -52,15 +52,20 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
   const bulbF = (i) => { const n = Math.sin(T * 1.7 + i) + 0.6 * Math.sin(T * 6.1 + 2 * i); return n < -1.15 ? 0.2 : 0.85 + 0.15 * Math.sin(T * 40 + i); };
   // ---------- 2D canvases re-uploaded as textures (minimap, phone) ----------
   const CV = {};
-  function cvTex(name, w, h, draw) { let r = CV[name]; if (!r) { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; r = CV[name] = { cv, g: cv.getContext('2d'), tex: null }; }
+  // hz: redraw at most this often (the minimap at 20 Hz, the phone at 30 Hz); drawn 1:1, so no mipmaps (v9)
+  function cvTex(name, w, h, draw, hz = 0) { let r = CV[name]; if (!r) { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; r = CV[name] = { cv, g: cv.getContext('2d'), tex: null, at: -9 }; }
+    const now = performance.now() / 1000; if (r.tex && hz && now - r.at < 1 / hz && now >= r.at) return; r.at = now;
     r.g.setTransform(1, 0, 0, 1, 0, 0); r.g.clearRect(0, 0, w, h); draw(r.g);
-    if (!r.tex) r.tex = G.canvasTex(name, r.cv); else { const gl = G.gl; gl.bindTexture(gl.TEXTURE_2D, r.tex.t); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, r.cv); gl.generateMipmap(gl.TEXTURE_2D); } }
+    if (!r.tex) r.tex = G.canvasTex(name, r.cv, { mip: false }); else G.updateTex(r.tex, r.cv); }
   const MEAS = document.createElement('canvas').getContext('2d');
-  const wrap = (str, size, maxW, weight = 'bold') => { MEAS.font = `${weight} ${size}px ${FONT}`; const out = []; let line = '';
+  const TR = (s) => (window.TR ? window.TR(s) : s);                                     // i18n.js: translate whole strings before splitting them into lines
+  const WRAPC = new Map(), TWC = new Map();                                             // v9: text layout memo (cleared when it grows)
+  const wrap = (str, size, maxW, weight = 'bold') => { str = TR(String(str)); const key = size + '|' + maxW + '|' + weight + '|' + str, c = WRAPC.get(key); if (c) return c;
+    MEAS.font = `${weight} ${size}px ${FONT}`; const out = []; let line = '';
     for (const w of String(str).split(' ')) { const tryL = line ? line + ' ' + w : w; if (MEAS.measureText(tryL).width > maxW && line) { out.push(line); line = w; } else line = tryL; }
-    if (line) out.push(line); return out; };
-  const textW = (str, size, weight = 'bold') => { MEAS.font = `${weight} ${size}px ${FONT}`; return MEAS.measureText(str).width; };
+    if (line) out.push(line); if (WRAPC.size > 3000) WRAPC.clear(); WRAPC.set(key, out); return out; };
+  const textW = (str, size, weight = 'bold') => { str = TR(String(str)); const key = size + '|' + weight + '|' + str, c = TWC.get(key); if (c !== undefined) return c;
+    MEAS.font = `${weight} ${size}px ${FONT}`; const w = MEAS.measureText(str).width; if (TWC.size > 3000) TWC.clear(); TWC.set(key, w); return w; };
 
   // ---------- characters ----------
   const CH = { kolya: ['kolya_se', 'kolya_ne', 122], kirill: ['kirill_se', 'kirill_se', 124], npc_ghost: ['npc_ghost_se', 'npc_ghost_ne', 112], npc_witch2: ['npc_witch2_se', 'npc_witch2_ne', 116],
@@ -197,7 +202,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     const hset = ST.gun && has('k16r_p0w') ? 'k16r' : ST.light && has('k16t_p0w') ? 'k16t' : 'k16';                // what his hands hold
     if (ST.gun && hset !== 'k16r' && !ST.hidden && Math.sin(ST.ang || 0) < -0.2) drawRifle(X, Y);   // fallback without the rifle atlases
     const ev = (ks, dur) => [...ST.ev].reverse().find((e) => ks.includes(e.k) && GT - e.t < dur && GT >= e.t);
-    const th = ev(['throw'], 0.48), use = ev(['bell', 'mailbox', 'flyer', 'swap', 'fuse', 'slime'], 0.55), pick = ev(['pickup'], 0.5);
+    const th = ev(['throw'], 0.48), use = ev(['bell', 'mailbox', 'flyer', 'swap', 'fuse', 'slime'], 0.55), pick = ev(['pickup', 'putdown'], 0.5);
     let kind = 'act', i = 0, sy = 1;
     if (th) { const t = GT - th.t; i = t < 0.16 ? 1 : t < 0.3 ? 2 : 3; }
     else if (ST.hidden || pick) i = 5;
@@ -294,7 +299,9 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     else { isoBox(x0, y0, x1, y1, 18, 70, [0.1, 0.1, 0.12], [0.16, 0.14, 0.16], [0.08, 0.08, 0.09]); isoBox(x0 + 70, y0 + 10, x1 - 60, y1 - 10, 70, 112, [0.12, 0.12, 0.15], [0.22, 0.25, 0.3], [0.12, 0.13, 0.16]); }
     const on = alarm && Math.floor(GT * 4) % 2 === 0, tl = P(x0 + 5, y1 - 25, 50), hl = P(x1 - 5, y1 - 25, 50);
     glowE(tl[0], tl[1], 22, 12, [1, 0.12, 0.05], 0.7 + (on ? 0.8 : 0)); if (on) { glowE(hl[0], hl[1], 40, 20, [1, 0.7, 0.2], 1.2); glowE(tl[0], tl[1], 60, 30, [1, 0.5, 0.1], 0.8); } }
-  function bin(x, y) { if (has('bins')) { const q = P(x, y), h = 86, w = L.hsz('bins', h); L.shadow(q[0], q[1], 40, 14, 0.4); L.sprite('bins', q[0] - w / 2, q[1] - h + 6, { w, h }); return; }
+  function bin(x, y, down = 0) { if (has('bins')) { const q = P(x, y), h = 86, w = L.hsz('bins', h); L.shadow(q[0] - 20 * down, q[1], 40 + 20 * down, 14, 0.4);
+      if (down > 0) { L.sprite('bins', q[0] - w / 2, q[1] - h + 6, { w, h, rot: -1.45 * down, pivot: [w * 0.15, h * 0.95] }); return; }
+      L.sprite('bins', q[0] - w / 2, q[1] - h + 6, { w, h }); return; }
     isoBox(x - 22, y - 22, x + 22, y + 22, 0, 58, [0.12, 0.16, 0.12], [0.1, 0.14, 0.1], [0.07, 0.1, 0.07]); }
   function bench(x, y) { const bn = y > 0 && has('bench_back') ? 'bench_back' : 'bench'; if (has(bn)) { const q = P(x, y), w = 150, h = w * A[bn].h / A[bn].w; L.sprite(bn, q[0] - w / 2, q[1] - h * 0.82, { w, h }); return; }
     isoBox(x - 70, y - 18, x + 70, y + 8, 22, 30, [0.3, 0.18, 0.1], [0.22, 0.13, 0.08], [0.18, 0.1, 0.06]); wallSolid(x - 70, x + 70, y + 8, 30, 60, [0.25, 0.15, 0.09]); }
@@ -306,9 +313,17 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     if (has('probe_prop')) { const w = L.hsz('probe_prop', h); L.sprite('probe_prop', q[0] - w / 2, q[1] - h + 4, { w, h });
       if (lit && !rot) { L.glow(q[0], q[1] - h * 0.45, 46 * k, WARM, 0.35 * flick(i), 3); pool(x, y, 70 * k, WARM, 0.18 * flick(i)); } return; }
     L.rrect(q[0] - 20 * k, q[1] - 36 * k, 40 * k, 34 * k, 16 * k, [0.9, 0.42, 0.08], [0.6, 0.22, 0.04]); }
+  // v9: the pickets come from one strip texture of 16 posts sheared along the street (one draw per 16 posts instead of 16)
+  const FP = { n: 16, step: 26, made: false }; FP.px = C * FP.step; FP.w = Math.ceil(FP.n * FP.px + 8);
+  function fenceStrip() { if (FP.made) return; FP.made = true; const cv = document.createElement('canvas'); cv.width = FP.w; cv.height = 46; const g = cv.getContext('2d');
+    for (let k = 0; k < FP.n; k++) { const x = k * FP.px, gr = g.createLinearGradient(0, 1, 0, 45); gr.addColorStop(0, 'rgb(61,41,31)'); gr.addColorStop(1, 'rgb(33,23,18)'); g.fillStyle = gr;
+      g.beginPath(); if (g.roundRect) g.roundRect(x, 1, 8, 44, 2); else g.rect(x, 1, 8, 44); g.fill(); }
+    G.canvasTex('fencestrip', cv, { mip: false }); }
   function fence(a, b, y) { // picket fence along x at y, from a to b
-    const step = 26; for (let x = Math.ceil(a / step) * step; x < b; x += step) { const q = P(x, y); if (!onScreen(q, 60)) continue;   // posts on a fixed world grid (no sliding with the camera)
-      L.rrect(q[0] - 4, q[1] - 42, 8, 44, 2, [0.24, 0.16, 0.12], [0.13, 0.09, 0.07]); }
+    fenceStrip(); const step = FP.step, span = FP.n * step;
+    for (let xs = Math.ceil(a / step) * step; xs < b; xs += span) { const q = P(xs, y), q2 = P(xs + span, y); if (!onScreen(q, 80) && !onScreen(q2, 80) && !(q[0] < 0 && q2[0] > W)) continue;   // posts on a fixed world grid
+      const nPost = Math.min(FP.n, Math.ceil((b - xs) / step)), fr = (nPost * FP.px - (FP.px - 8)) / FP.w;
+      L.sprite('fencestrip', 0, 0, { m: [1, -SN / C, 0, 1, q[0] - 4, q[1] - 43], w: FP.w * fr, h: 46, src: [0, 0, fr, 1] }); }
     const o1 = P(a, y, 30), w = b - a; G.draw(L.P.solid, { u_col: [0.2, 0.13, 0.1], u_a: 1 }, mat3([C * w, -SN * w, 0, 5, o1[0], o1[1]]));
     const o2 = P(a, y, 14); G.draw(L.P.solid, { u_col: [0.17, 0.11, 0.08], u_a: 1 }, mat3([C * w, -SN * w, 0, 5, o2[0], o2[1]])); }
 
@@ -352,10 +367,17 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     MD.forEach(([id, k, h]) => { const live = ST.chalk && ST.chalk.mod === id; if (!(k.chalk > 0) && !live) return;
       const pts = SIM.chalkShape(h), hit = live ? ST.chalk.hit : pts.map(() => 1), a = live ? 0.9 : 0.25 + 0.6 * k.chalk;
       pts.forEach((p, i) => { if (!hit[i]) return; const q = P(p[0], p[1]); L.puff(q[0], q[1], 9, [0.92, 0.9, 0.95], a, i); }); });
+    // chalk drawings anywhere (v9) and the one being drawn
+    (ST.drawings || []).forEach((d, j) => { if (!vis0(d.x, d.y)) return; const a = 0.25 + 0.6 * d.acc; SIM.chalkPts(d.kind, d.x, d.y).forEach((p, i) => { if (L.rnd(j * 31 + i, 3) > d.acc + 0.15) return; const q = P(p[0], p[1]); L.puff(q[0], q[1], 9, [0.92, 0.9, 0.95], a, i + j * 50); }); });
+    if (ST.chalk && !ST.chalk.mod) ST.chalk.pts.forEach((p, i) => { if (!ST.chalk.hit[i]) return; const q = P(p[0], p[1]); L.puff(q[0], q[1], 9, [0.92, 0.9, 0.95], 0.9, i); });
+    // trash spilled from kicked bins
+    SIM.BINS.forEach(([x, y], i) => { const dn = ST.binsDown && ST.binsDown[i] !== undefined ? GT - ST.binsDown[i] : 99; if (dn > 60 || !vis0(x, y)) return;
+      for (let j = 0; j < 9; j++) { const q = P(x - 30 - 70 * L.rnd(i, j), y + 20 + 60 * (L.rnd(j, i) - 0.3)), f = Math.min(1, dn / 0.4);
+        L.rrect(q[0] - 6, q[1] - 4, 12 * f, 8 * f, 3, [[0.85, 0.82, 0.75], [0.35, 0.5, 0.3], [0.6, 0.35, 0.2], [0.8, 0.75, 0.3]][j % 4], [0.3, 0.28, 0.25], 0.9); } });
     // ground marks (eggs, TP rolls)
     ST.marks.forEach((m) => { if (m.on === 'ground') groundMark(m); });
     // light pools on the ground
-    SIM.LAMPS.forEach(([x, y], i) => pool(x + (y < 0 ? 40 : -40), y + (y < 0 ? 40 : -40), 230, LAMPC, 0.42 * flick(i, 0.3)));
+    SIM.LAMPS.forEach(([x, y], i) => { if (SIM.lampLit(ST, i)) pool(x + (y < 0 ? 40 : -40), y + (y < 0 ? 40 : -40), 230, LAMPC, 0.42 * flick(i, 0.3) * relight(i)); });
     ALLEYBULBS.forEach(([x, y], i) => pool(x - 70, y, 190, [0.75, 0.9, 0.7], 0.3 * bulbF(i)));
     // Elf's motion-sensor floodlight on her yard; the raid cars' flashing light bars on the asphalt
     if (ST.elf.lit >= 0) { const k = Math.min(1, (GT - ST.elf.lit) / 0.12) * (0.92 + 0.08 * Math.sin(GT * 50)); pool(SIM.HE.door[0] - 30, SIM.FACADE + 165, 410, [0.9, 0.95, 1], 0.6 * k); }
@@ -380,17 +402,23 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     (SIM.NDECOR || []).forEach(([n, x, y, w]) => { if (vis(x, y, 600)) add([x - 70, y - 50, x + 70, y + 50], () => propSprite(n, x, y, w)); });
     (SIM.NFENCE || []).forEach(([a, b, y]) => { for (let x = a; x < b; x += 900) { const x2 = Math.min(b, x + 900); if (vis(x, y, 1200) || vis(x2, y, 1200)) add([x, y - 8, x2, y + 8], () => fence(x, x2, y)); } });
     (SIM.NDIV || []).forEach((x) => { if (!vis(x, -1200, 1200)) return; const Lw = 250 * 0.96 / C * 0.96, y0 = SIM.FACADE - 430; for (let y = -1420; y < y0 - 4; y += Lw) { const y2 = Math.min(y0, y + Lw); add([x - 4, y, x + 4, y2], () => sideFence(x, y, y2)); } });
-    (SIM.NTREES || []).forEach(([x, y, s], i) => { if (vis(x, y, 900)) add([x - 30 * s, y - 30 * s, x + 30 * s, y + 30 * s], () => ntree(x, y, s, i)); });
+    (SIM.NTREES || []).forEach(([x, y, s], i) => { if (visTree(x, y, s)) add([x - 30 * s, y - 30 * s, x + 30 * s, y + 30 * s], () => ntree(x, y, s, i)); });
     MD.forEach(([id, k, h]) => { if (!((ST.courier && (ST.courier.mod || 'kirill') === id && !['wait', 'come'].includes(ST.courier.st)) || k.pr.pizza)) return;
       const x = h.door[0] + 95, y = SIM.FACADE + 46; add([x - 14, y - 14, x + 14, y + 14], () => { const q = P(x, y); L.shadow(q[0], q[1], 20, 7, 0.45); pizzaStack(q[0], q[1] + 2, 48); }); });
     SIM.FENCES.forEach(([a, b]) => { if (vis(a, SIM.FENCE_Y, 1400) || vis(b, SIM.FENCE_Y, 1400)) add([a, SIM.FENCE_Y - 8, b, SIM.FENCE_Y + 8], () => fence(a, b, SIM.FENCE_Y)); });
     { const a = Math.max(SIM.X0, (cx / C) - 400), b = Math.min(SIM.X1, (cx + W) / C + 2600); add([SIM.X0, 390, SIM.X1, 410], () => fence(Math.max(SIM.X0, a - 1400), b, 400)); }
-    SIM.LAMPS.forEach(([x, y], i) => { if (vis(x, y)) add([x - 14, y - 14, x + 14, y + 14], () => lamp(x, y, i, MD.some((m) => m[1].lamps.includes(i)))); });
-    SIM.TREES.forEach(([x, y, s], i) => { if (vis(x, y, 700)) add([x - 30 * s, y - 30 * s, x + 30 * s, y + 30 * s], () => tree(x, y, s, i)); });
+    SIM.LAMPS.forEach(([x, y], i) => { if (vis(x, y)) add([x - 14, y - 14, x + 14, y + 14], () => lamp(x, y, i, MD.some((m) => m[1].lamps.includes(i)) || (ST.flyers2 || []).includes(i))); });
+    SIM.TREES.forEach(([x, y, s], i) => { if (visTree(x, y, s)) add([x - 30 * s, y - 30 * s, x + 30 * s, y + 30 * s], () => tree(x, y, s, i)); });
     SIM.BUSHES.forEach(([x, y], i) => { if (vis(x, y)) { const hid = ST.hidden && ST.hideAt && Math.hypot(ST.hideAt[0] - x, ST.hideAt[1] - y) < 5; add([x - 40, y - 30, x + 40, y + 30], () => bush(x, y, i, hid)); } });
     SIM.CARS.forEach(([x, y], i) => { if (vis(x, y, 700)) { const al = ev.some((e) => e.k === 'caralarm' && e.i === i && GT - e.t < 4.5); add([x - 150, y - 62, x + 150, y + 62], () => car(x, y, i, al)); } });
-    SIM.BINS.forEach(([x, y]) => { if (!vis(x, y)) return; const big = x > SIM.ALLEY[0] && x < SIM.ALLEY[2] && y < -1000 && has('dumpster');
-      add(big ? [x - 40, y - 30, x + 40, y + 30] : [x - 24, y - 24, x + 24, y + 24], () => { if (big) { const hid = ST.hidden && ST.hideAt && Math.hypot(ST.hideAt[0] - x, ST.hideAt[1] - y) < 5; propSprite('dumpster', x, y, 150, 0.8); if (hid) { const q = P(x, y, 96); L.label('dumpeyes', '• •', q[0] + 6, q[1], { size: 18, col: '#ffe9a0', out: null, al: 0.5, a: 0.5 + 0.5 * Math.sin(T * 2.3) }); } } else bin(x, y); }); });
+    SIM.BINS.forEach(([x, y], i) => { if (!vis(x, y)) return; const big = x > SIM.ALLEY[0] && x < SIM.ALLEY[2] && y < -1000 && has('dumpster');
+      add(big ? [x - 40, y - 30, x + 40, y + 30] : [x - 24, y - 24, x + 24, y + 24], () => { if (big) { const hid = ST.hidden && ST.hideAt && Math.hypot(ST.hideAt[0] - x, ST.hideAt[1] - y) < 5; propSprite('dumpster', x, y, 150, 0.8); if (hid) { const q = P(x, y, 96); L.label('dumpeyes', '• •', q[0] + 6, q[1], { size: 18, col: '#ffe9a0', out: null, al: 0.5, a: 0.5 + 0.5 * Math.sin(T * 2.3) }); } }
+        else { const dn = ST.binsDown && ST.binsDown[i] !== undefined ? GT - ST.binsDown[i] : 99; bin(x, y, dn < 60 ? Math.min(1, dn / 0.25) : 0); } }); });
+    // v9: rotten pumpkins put down, alarm clocks on the ground, Vera's candy bowl, the black cat
+    (ST.drops || []).forEach((d) => { if (vis(d.x, d.y)) add([d.x - 22, d.y - 22, d.x + 22, d.y + 22], () => pumpkin(d.x, d.y, 1.0, true, false)); });
+    (ST.decoys || []).forEach((d) => { if (!d.house && vis(d.x, d.y)) add([d.x - 10, d.y - 10, d.x + 10, d.y + 10], () => alarmClock(d)); });
+    if (vis(SIM.BOWL[0], SIM.BOWL[1])) add([SIM.BOWL[0] - 20, SIM.BOWL[1] - 20, SIM.BOWL[0] + 20, SIM.BOWL[1] + 20], () => candyBowl());
+    if (ST.cat && vis(ST.cat.x, ST.cat.y)) add([ST.cat.x - 12, ST.cat.y - 12, ST.cat.x + 12, ST.cat.y + 12], () => drawCat(ST.cat));
     SIM.BENCHES.forEach(([x, y]) => { if (vis(x, y)) add([x - 70, y - 18, x + 70, y + 8], () => bench(x, y)); });
     SIM.HOUSES.forEach((h) => { const mk = SIM.MODS[h.id] ? ST[SIM.MODS[h.id].key] : null, [x, y] = h.mail, ring = mk && mk.alarm && mk.alarm.done && GT - mk.alarm.ring < 4; if (vis(x, y)) add([x - 10, y - 10, x + 10, y + 10], () => mailbox(x, y, !!mk, ring)); });
     // porch jack-o'-lanterns: Kirill's sad one (or the rotten swap)
@@ -403,13 +431,13 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       if (dark) return; const tw = 0.5 + 0.5 * Math.sin(T * 3 + i * 2); if (has('coin')) L.sprite('coin', q[0] - 13, q[1] - 22, { w: 26, h: 26 }); L.star(q[0] + 6, q[1] - 16, 16, [1, 0.95, 0.6], 0.6 * tw); }); });
     SIM.VPUMPKINS.forEach(([x, y], i) => { if (ST.vp[i] >= 0 || !vis(x, y)) return; add([x - 20, y - 20, x + 20, y + 20], () => { pumpkin(x, y, 0.85, false, true, 20 + i); if (ST.q.vera >= 1) { const q = P(x, y); L.star(q[0], q[1] - 60 - 6 * Math.sin(T * 3), 22, [1, 0.8, 0.3], 0.7); } }); });
     SIM.ROTTENS.forEach(([x, y], i) => { if (Array.isArray(ST.rottenGot) ? ST.rottenGot[i] : ST.rottenGot) return; add([x - 22, y - 22, x + 22, y + 22], () => { if (litBy(x, y) || Math.hypot(ST.x - x, ST.y - y) < 260) pumpkin(x, y, 1.0, true, false); }); });
-    { const [x, y] = SIM.STRANGE; add([x - 60, y - 60, x + 60, y + 60], () => { const q = P(x, y), f = Math.max(0, Math.sin(T * 23) * Math.sin(T * 7.1) + 0.3);
+    { const [x, y] = SIM.STRANGE; add(has('garage') && SIM.GARAGE ? SIM.GARAGE : [x - 60, y - 60, x + 60, y + 60], () => { const q = P(x, y), f = Math.max(0, Math.sin(T * 23) * Math.sin(T * 7.1) + 0.3);
       if (has('garage')) { const ww = 520, hh = ww * A.garage.h / A.garage.w, gx = q[0] - ww * 0.43, gy = q[1] - hh + 30; L.sprite('garage', gx, gy, { w: ww, h: hh }); L.glow(gx + ww * 0.65, gy + hh * 0.48, 110, [0.55, 0.85, 1.0], 0.7 * f, 3); L.star(gx + ww * 0.65, gy + hh * 0.46, 34, [0.7, 0.9, 1], f); }
       else { isoBox(x - 60, y - 70, x + 60, y + 40, 0, 90, [0.1, 0.1, 0.12], [0.17, 0.16, 0.18], [0.11, 0.1, 0.12]); L.glow(q[0] + 10, q[1] - 70, 90, [0.55, 0.85, 1.0], 0.6 * f, 3); } }); }
     // NPCs, Kirill, courier, kids, Kolya
     ST.npc.forEach((n) => { if (!vis(n.x, n.y)) return; const def = SIM.NPCS[n.i]; add([n.x - 15, n.y - 15, n.x + 15, n.y + 15], () => {
-      n.head = drawPerson(def.tex, n.x, n.y, { k: def.id === 'vera' ? 1 : 0.95, ang: n.ang, gph: n.gph || 0, g: def.stat ? 0 : (n.gA || 0), stride: SIM.K.NSTRIDE, id: 'npc' + n.i, seed: n.i });
-      hitOverlay(n, P(n.x, n.y), 112, 40 + n.i * 7); }); });
+      n.head = drawPerson(def.tex, n.x, n.y, { k: def.id === 'vera' ? 1 : 0.95, ang: n.ang, gph: n.gph || 0, g: def.stat ? 0 : (n.gA || 0), stride: SIM.K.NSTRIDE, id: 'npc' + n.i, seed: n.i, tint: n.rev ? [1, 0.45, 0.4, 0.22] : undefined });
+      hitOverlay(n, P(n.x, n.y), 112, 40 + n.i * 7); if ((n.stunT || -99) > GT) dizzy(n.head, n.i); if (n.rev) L.label('nang' + n.i, '!', n.head[0], n.head[1] - 24 - 4 * Math.sin(GT * 12), { size: 40, col: '#ff4a3a', out: '#300000', al: 0.5 }); }); });
     if (K.st === 'door' || K.st === 'out') { const x = HK.door[0], y = HK.y1 + 30; add([x - 15, y - 15, x + 15, y + 15], () => { S.kirHead = drawPerson('kirill', x, y, { ang: KA, id: 'kirill', arm: SCENE_KIR_ARMS() }); }); } else S.kirHead = null;
     { const R = ST.rai, HRr = SIM.HR; if (R.st === 'door' || R.st === 'out') { const x = HRr.door[0], y = HRr.y1 + 30; add([x - 15, y - 15, x + 15, y + 15], () => { S.raiHead = drawRaiva(x, y); }); } else S.raiHead = null; }
     { const E = ST.elf, he = SIM.HE; if (E.st === 'door' || E.st === 'out') { const x = he.door[0], y = he.y1 + 30; add([x - 15, y - 15, x + 15, y + 15], () => { S.elfHead = drawElf(x, y); }); } else S.elfHead = null; }
@@ -423,7 +451,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
         carry, holdBehind: back, hold: carry ? (p) => pizzaStack(p[0], p[1] + 10, 46) : null }); }); } else S.courHead = null;
     if (ST.kids && ST.kids.list) ST.kids.list.forEach((q, i) => add([q.x - 12, q.y - 12, q.x + 12, q.y + 12], () => { const hd = drawPerson('kid', q.x, q.y, { k: 0.72, ang: q.ang, gph: q.gph || 0, g: q.gA || 0, stride: 62, id: 'kid' + i, seed: i }); if (i === 0) S.kidHead = hd; }));
     add([ST.x - 16, ST.y - 16, ST.x + 16, ST.y + 16], () => { const a = ST.hidden ? 0.45 : (ST.hp <= 0 ? Math.max(0, 1 - (GT - (ST.koT || GT)) / 2) : 1);
-      const q = P(ST.x, ST.y), r = drawKolya(q[0], q[1] + 4, a); S.kolHead = r.head; S.kolLed = r.led; S.kolFace = r.face; });
+      const q = P(ST.x, ST.y), r = drawKolya(q[0], q[1] + 4, a); S.kolHead = r.head; S.kolLed = r.led; S.kolFace = r.face; kolyaOverlays(q, r.head); });
     // separating-axis depth sort (smaller x or larger y = nearer the camera = drawn later)
     const cmp = (p, q) => { const a = p.b, b = q.b; if (a[2] <= b[0]) return 1; if (b[2] <= a[0]) return -1; if (a[3] <= b[1]) return -1; if (b[3] <= a[1]) return 1;
       return ((a[1] + a[3]) - (a[0] + a[2])) - ((b[1] + b[3]) - (b[0] + b[2])); };
@@ -444,18 +472,20 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     // night: darker everywhere (settings → brightness), the phone flashlight cuts through; lamps re-light their pools below
     { const ho0 = S.kolLed || P(ST.x, ST.y, 62), d0 = [Math.cos(ST.ang || 0), Math.sin(ST.ang || 0)], nAmt = (window.SETTINGS && SETTINGS.night !== undefined) ? SETTINGS.night : 0.4;
       if (nAmt > 0.01) { G.draw(L.P.night, { u_o: ho0, u_d: d0, u_on: ST.light ? 1 : 0, u_amt: nAmt }, G.xf(0, 0, W, H));
-        SIM.LAMPS.forEach(([x, y], i) => { const q = P(x, y); if (onScreen(q)) pool(x + (y < 0 ? 40 : -40), y + (y < 0 ? 40 : -40), 210, LAMPC, 0.5 * nAmt * flick(i, 0.3)); });
+        SIM.LAMPS.forEach(([x, y], i) => { const q = P(x, y); if (onScreen(q) && SIM.lampLit(ST, i)) pool(x + (y < 0 ? 40 : -40), y + (y < 0 ? 40 : -40), 210, LAMPC, 0.5 * nAmt * flick(i, 0.3) * relight(i)); });
         (SIM.NDECOR || []).forEach(([n, x, y], i) => { if ((n === 'greenhouse' || n === 'shed') && onScreen(P(x, y))) { pool(x, y + 30, n === 'greenhouse' ? 170 : 110, LAMPC, 0.42 * nAmt * flick(i + 7, 0.2)); const g2 = P(x, y, n === 'greenhouse' ? 60 : 70); L.glow(g2[0], g2[1], 60, [1, 0.75, 0.4], 0.35, 2.5); } }); } }
 
     // ===== lights =====
-    SIM.LAMPS.forEach(([x, y], i) => { const q = P(x, y); if (!onScreen(q)) return; const [hx, hy] = lampHead(q);
-      L.glow(hx, hy, 70, LAMPC, 0.9 * flick(i, 0.3), 3); L.glow(hx, hy + 60, 190, LAMPC, 0.18 * flick(i, 0.3), 2.2); });
+    SIM.LAMPS.forEach(([x, y], i) => { const q = P(x, y); if (!onScreen(q) || !SIM.lampLit(ST, i)) return; const [hx, hy] = lampHead(q), k = relight(i);
+      L.glow(hx, hy, 70, LAMPC, 0.9 * flick(i, 0.3) * k, 3); L.glow(hx, hy + 60, 190, LAMPC, 0.18 * flick(i, 0.3) * k, 2.2); });
     ALLEYBULBS.forEach(([x, y], i) => { const q = P(x, y, 100); if (!onScreen(q)) return; const f = bulbF(i); L.glow(q[0], q[1], 40, [0.85, 1, 0.75], 0.9 * f, 3); L.glow(q[0] - 40, q[1] + 60, 170, [0.6, 0.8, 0.6], 0.12 * f, 2.2); });
-    SIM.HOUSES.forEach((h, i) => { const q = P(h.door[0], h.y1); if (onScreen(q, 900)) houseLights(h, hsInfo[h.id], i); });
+    SIM.HOUSES.forEach((h, i) => { const hs = hsInfo[h.id]; if (hs && !(hs.x > W || hs.x + hs.w < 0 || hs.y > H || hs.y + hs.h < 0)) houseLights(h, hs, i); });
     // projectiles in flight: screen-space arc from the hand to the aimed point (exactly where the cursor was), shadow on the ground track
     ST.proj.forEach((p) => { if (GT < p.t0) return; const u = Math.min(1, (GT - p.t0) / p.dur);
       if (p.kind === 'slipper') { const x = p.x0 + (p.x1 - p.x0) * u, y = p.y0 + (p.y1 - p.y0) * u, z = p.z0 + (p.z1 - p.z0) * u + p.arc * 4 * u * (1 - u), q = P(x, y, z), g = P(x, y);
         L.shadow(g[0], g[1], 10, 4, 0.35); L.solid(q[0] - 14, q[1] - 6, 28, 12, [0.55, 0.15, 0.4], GT * 14, 14, 6); return; }
+      if (p.kind === 'negg') { const x = p.x0 + (p.x1 - p.x0) * u, y = p.y0 + (p.y1 - p.y0) * u, z = p.z0 + (p.z1 - p.z0) * u + p.arc * 4 * u * (1 - u), q = P(x, y, z), g = P(x, y);
+        L.shadow(g[0], g[1], 9, 3.5, 0.3); L.solid(q[0] - 6, q[1] - 8, 12, 16, [0.97, 0.94, 0.86], GT * 9 + p.seed, 6, 8); return; }
       if (p.kind === 'bb') { if (!MZ.has(p)) MZ.set(p, S.kolLed && ST.gun ? [S.kolLed[0] + cx, S.kolLed[1] + cy] : [p.sx0, p.sy0]); const mz = MZ.get(p);   // from the rifle's muzzle
         const q = [mz[0] + (p.sx1 - mz[0]) * u - cx, mz[1] + (p.sy1 - mz[1]) * u - cy]; L.rrect(q[0] - 3, q[1] - 3, 6, 6, 3, [1, 1, 0.95], [0.85, 0.85, 0.8]); L.glow(q[0], q[1], 10, [1, 1, 0.9], 0.6, 3); return; }
       if (p.kind === 'arrow') { const at3 = (uu) => P(p.x0 + (p.x1 - p.x0) * uu, p.y0 + (p.y1 - p.y0) * uu, p.z0 + (p.z1 - p.z0) * uu + p.arc * 4 * uu * (1 - uu)), q = at3(u), q0 = at3(Math.max(0, u - 0.08)), an = Math.atan2(q[1] - q0[1], q[0] - q0[0]), g = P(p.x0 + (p.x1 - p.x0) * u, p.y0 + (p.y1 - p.y0) * u);
@@ -464,9 +494,12 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       const at = (uu) => [p.sx0 + (p.sx1 - p.sx0) * uu - cx, p.sy0 + (p.sy1 - p.sy0) * uu - p.arc * 4 * uu * (1 - uu) - cy], q = at(u), g = P(p.gx0 + (p.gx1 - p.gx0) * u, p.gy0 + (p.gy1 - p.gy0) * u);
       L.shadow(g[0], g[1], 10, 4, 0.3);
       if (p.kind === 'eggs') { L.solid(q[0] - 6, q[1] - 8, 12, 16, [0.97, 0.94, 0.86], GT * 9 + p.seed, 6, 8); L.rrect(q[0] - 2, q[1] - 5, 4, 4, 2, [1, 1, 1], [1, 1, 1], 0.8); }
+      if (p.kind === 'firec') { L.solid(q[0] - 12, q[1] - 4, 24, 8, [0.85, 0.1, 0.08], GT * 11 + p.seed, 12, 4); L.star(q[0] + 10 * Math.cos(GT * 11), q[1] + 10 * Math.sin(GT * 11), 14, [1, 0.85, 0.3], 0.9); }
       if (p.kind === 'tp') { for (let j = 1; j < 10; j++) { const uu = Math.max(0, u - j * 0.028), qq = at(uu); L.rrect(qq[0] - 4, qq[1] - 4 + Math.sin(T * 20 + j) * 3, 8, 8, 3, [0.96, 0.95, 0.92], [0.85, 0.85, 0.8], 1 - j / 11); }
         L.solid(q[0] - 10, q[1] - 10, 20, 20, [1, 1, 0.97], GT * 12, 10, 10); L.rrect(q[0] - 3, q[1] - 3, 6, 6, 3, [0.5, 0.45, 0.4], [0.4, 0.35, 0.3]); } });
-    // firecracker fuse
+    // firecracker fuse (v9: anywhere)
+    (ST.fires || []).forEach((F) => { const q = P(F.x, F.y, 6); L.rrect(q[0] - 14, q[1] - 10, 28, 12, 3, [0.8, 0.1, 0.08], [0.5, 0.05, 0.04]); for (let j = 0; j < 4; j++) L.star(q[0] + 10 + 8 * L.rnd(GT * 30 | 0, j) - 4, q[1] - 14 - 10 * L.rnd(j, GT * 30 | 0), 14, [1, 0.8, 0.3], 0.9);
+      const left = Math.max(0, F.fuse - (GT - F.t0)); if (left < 1.2) L.glow(q[0], q[1] - 8, 30 + 20 * Math.sin(GT * 30), [1, 0.5, 0.1], 0.6, 3); });
     MD.forEach(([id, k]) => { const F = k.fire; if (!F || F.done) return; const q = P(F.x, F.y, 6); L.rrect(q[0] - 14, q[1] - 10, 28, 12, 3, [0.8, 0.1, 0.08], [0.5, 0.05, 0.04]); for (let j = 0; j < 4; j++) L.star(q[0] + 10 + 8 * L.rnd(GT * 30 | 0, j) - 4, q[1] - 14 - 10 * L.rnd(j, GT * 30 | 0), 14, [1, 0.8, 0.3], 0.9); });
     // event FX
     for (const e of ev) { const a = GT - e.t; if (a < 0) continue;
@@ -489,7 +522,15 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       if (e.k === 'housedone' && a < 4) { const q = P(e.x, e.y, 200); for (let j = 0; j < 30; j++) { const s = L.rnd(e.t, j), X = q[0] + (s - 0.5) * 900, Y = q[1] - 200 + 500 * a * (0.5 + L.rnd(j, 2)) - 120 * a; L.rrect(X, Y, 10, 6, 2, [1, 0.5 + 0.4 * s, 0.15], [0.8, 0.3, 0.1], 1 - a / 4); } }
       if (e.k === 'candy' && a < 2) { const q = P(e.x, e.y, 120); for (let j = 0; j < 10; j++) L.star(q[0] + Math.cos(j + a * 3) * 80 * a, q[1] - 60 * a + Math.sin(j) * 40, 20, [1, 0.6, 0.9], 1 - a / 2); }
       if (e.k === 'alarm' && a < 4) { const q = P(e.x, e.y, 90); L.ring(q[0], q[1], 30 + 60 * (a % 0.5) * 2, 18 + 36 * (a % 0.5) * 2, [1, 0.9, 0.6], 0.8 * (1 - (a % 0.5) * 2)); L.label('dzyn', 'ДЗЫНЬ!!', q[0] + 40, q[1] - 30 + 4 * Math.sin(a * 40), { size: 30, col: '#fff1c0', out: '#401500', al: 0, a: 1 - a / 4 }); }
+      if (e.k === 'lampbreak' && a < 1.2) { const q = P(e.x, e.y), hd = lampHead(q); if (a < 0.15) L.glow(hd[0], hd[1], 120, [1, 0.9, 0.7], 2 * (1 - a / 0.15), 2.5);
+        for (let j = 0; j < 10; j++) { const vx = (L.rnd(e.i, j) - 0.5) * 160, X = hd[0] + vx * a, Y = hd[1] + 40 * a + 520 * a * a * (0.6 + 0.4 * L.rnd(j, e.i)); if (Y < q[1] + 6) L.rrect(X - 2, Y - 2, 4, 4, 1, [0.85, 0.95, 1], [0.6, 0.7, 0.8], 1 - a / 1.2); } }
+      if (e.k === 'binkick' && a < 1) { const q = P(e.x, e.y), u = a; for (let j = 0; j < 8; j++) L.puff(q[0] - 20 + (L.rnd(e.i, j) - 0.5) * 120 * (0.4 + u), q[1] - 20 - 50 * u * L.rnd(j, 3), 20 + 30 * u, [0.35, 0.3, 0.28], 0.5 * (1 - u), j); }
+      if (e.k === 'purr' && a < 2.2) { const q = P(e.x, e.y, 40); for (let j = 0; j < 4; j++) { const aa = a - j * 0.35; if (aa < 0 || aa > 1.4) continue; L.label('heart' + j, '♥', q[0] + 18 * Math.sin(aa * 5 + j), q[1] - 60 * aa, { size: 22, col: '#ff7aa8', out: '#300010', al: 0.5, a: 1 - aa / 1.4 }); } }
+      if (e.k === 'hiss' && a < 1.4) { const q = P(e.x, e.y, 50); L.label('hiss', 'Ш-Ш-Ш!', q[0], q[1] - 10 * a, { size: 22, col: '#c8ff8a', out: '#102000', al: 0.5, a: 1 - a / 1.4 }); }
+      if (e.k === 'angry' && a < 0.8) { const q = P(e.x, e.y, 120); L.puff(q[0], q[1], 30 + 30 * a, [0.9, 0.2, 0.15], 0.5 * (1 - a / 0.8), 7); }
+      if (e.k === 'putdown' && a < 0.5) { const q = P(e.x, e.y), u = a / 0.5; for (let j = 0; j < 5; j++) L.puff(q[0] + (j - 2) * 12 * (1 + u), q[1] - 4 - 10 * u, 8 + 10 * u, [0.35, 0.28, 0.24], 0.35 * (1 - u), j); }
       if (e.k === 'slime' && a < 1) { const q = P(e.x + 20, SIM.FACADE, 60); L.glow(q[0], q[1], 60, [0.3, 1, 0.3], 0.8 * (1 - a), 3); } }
+    Object.keys(ST.hslime || {}).forEach((id) => { const h = SIM.HOUSES.find((q2) => q2.id === id); if (!h) return; const q = P(h.door[0] + 22, SIM.FACADE + 2, 58); ell(L.P.puff, q[0], q[1], 12, 16, { u_col: [0.35, 0.95, 0.3], u_amt: 0.95, u_seed: 5 }); });
     MD.forEach(([id, k, h]) => { if (!k.slime) return; const q = P(h.door[0] + 22, SIM.FACADE + 2, 58); ell(L.P.puff, q[0], q[1], 12, 16, { u_col: [0.35, 0.95, 0.3], u_amt: 0.95, u_seed: 4 }); L.glow(q[0], q[1], 30, [0.3, 1, 0.3], 0.25, 3); });
     // the flash of Raiva's ring light blinds the whole screen for a moment
     { const fl = ev.find((e) => e.k === 'flash' && GT - e.t < 0.45 && GT >= e.t); if (fl) S.flashA = 1 - (GT - fl.t) / 0.45; else S.flashA = 0; }
@@ -499,10 +540,10 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     S.light = { o: ho, d: dir };
     SIM.DARK.forEach((r) => { const o = P(r[0] - 150, r[1] - 120), w = r[2] - r[0] + 300, h = r[3] - r[1] + 200;
       G.draw(L.P.dark, { u_o: ho, u_d: dir, u_on: ST.light ? 1 : 0, u_amt: 0.6 }, mat3([C * w, -SN * w, C * h, SN * h, o[0], o[1]])); });
-    if (ST.light) { G.blend('add'); G.full(L.P.cone, { u_o: ho, u_d: dir, u_amt: 0.45, u_col: [1, 0.93, 0.78] }); G.blend(); }
+    if (ST.light) { G.blend('add'); G.draw(L.P.cone, { u_o: ho, u_d: dir, u_amt: 0.45, u_col: [1, 0.93, 0.78] }, G.xf(ho[0] - 680, ho[1] - 680, 1360, 1360)); G.blend(); }   // only the cone's reach, not the whole screen
     // the raid: flashlight beams (police torches, soldiers' weapon lights) — what they light up is what they see
-    if (ST.raid && ST.raid.units.length) { G.blend('add'); ST.raid.units.forEach((u) => { if (!S.raidHeads[u.i]) return; const b = SIM.raidBeam(u);
-      G.full(L.P.beam, { u_o: [b.o[0] - cx, b.o[1] - cy], u_d: b.d, u_amt: u.st === 'chase' ? 0.55 : 0.36, u_len: SIM.RAID.BEAM.len, u_cos: SIM.RAID.BEAM.cos, u_col: u.kind === 'police' ? [1, 0.95, 0.8] : [0.85, 0.95, 1] }); }); G.blend(); }
+    if (ST.raid && ST.raid.units.length) { G.blend('add'); ST.raid.units.forEach((u) => { if (!S.raidHeads[u.i]) return; const b = SIM.raidBeam(u), o = [b.o[0] - cx, b.o[1] - cy], len = SIM.RAID.BEAM.len;
+      G.draw(L.P.beam, { u_o: o, u_d: b.d, u_amt: u.st === 'chase' ? 0.55 : 0.36, u_len: len, u_cos: SIM.RAID.BEAM.cos, u_col: u.kind === 'police' ? [1, 0.95, 0.8] : [0.85, 0.95, 1] }, G.xf(o[0] - len, o[1] - len, 2 * len, 2 * len)); }); G.blend(); }
     // falling leaves (world-anchored, wind-driven, deterministic)
     for (let i = 0; i < 46; i++) { const per = 9 + 5 * L.rnd(i, 3), ph = (T / per + L.rnd(i, 1)) % 1, k = Math.floor(T / per + L.rnd(i, 1));
       const X = ((L.rnd(i, 5 + k) * (W + 400)) - 200 + 140 * SIM.windAt(T, i * 300) * ph * 3 + 40 * Math.sin(T * 1.7 + i)), Y = -60 + ph * (H + 120);
@@ -518,6 +559,40 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     bubbles();
     hud();
   };
+  // a lamp that was shot out comes back after 90 s with a stutter
+  const relight = (i) => { const o = ST.lampOff && ST.lampOff[i]; if (o === undefined) return 1; const a = GT - o - 90; return a < 0 || a > 1.5 ? 1 : (Math.sin(a * 37) > 0.2 ? 1 : 0.15); };
+  const vis0 = (x, y, m = 500) => onScreen(P(x, y), m);
+  // a tree is drawn up from its foot: visible only while the foot is below the top edge and less than a tree height under the bottom
+  const visTree = (x, y, s) => { const q = P(x, y); return q[0] > -260 * s && q[0] < W + 260 * s && q[1] > -20 && q[1] < H + 580 * s; };
+  // stunned by a firecracker: stars circling the head
+  function dizzy(hd, seed) { if (!hd) return; for (let k = 0; k < 3; k++) { const an = GT * 6 + k * 2.1 + seed; L.star(hd[0] + Math.cos(an) * 22, hd[1] - 10 + Math.sin(an) * 7, 15, [1, 0.9, 0.35], 0.95); } }
+  function kolyaOverlays(q, hd) { if (!hd || ST.hidden) return;
+    if (GT - (ST.eggd || -99) < 10) markAt({ k: 'egg', t: ST.eggd, s: 11, x: ST.x }, hd[0] + 4, hd[1] + 34, 0.42, true);
+    if ((ST.wrapT || -99) > GT) { const f = Math.min(1, ((ST.wrapT || 0) - GT) / 0.3); for (let k = 0; k < 5; k++) { const y = hd[1] + 22 + k * 19, w = 46 - Math.abs(k - 2) * 4;
+        L.solid(q[0] - w / 2, y, w, 9, [0.97, 0.96, 0.92], 0.18 * (k % 2 ? 1 : -1), w / 2, 4.5, 0.95 * f); }
+      L.solid(q[0] + 16, hd[1] + 60, 22, 7, [0.95, 0.94, 0.9], 0.6 + 0.3 * Math.sin(GT * 9), 0, 3.5, f); }
+    if ((ST.sugarT || -99) > GT && Math.hypot(ST.vx, ST.vy) > 40) for (let k = 0; k < 2; k++) { const ph = (GT * 3 + k * 0.5) % 1; L.star(q[0] + (k ? 14 : -14), q[1] - 6 - 30 * ph, 12, [1, 0.6, 0.9], 1 - ph); } }
+  // an alarm clock on the ground (a decoy): it shakes while it rings
+  function alarmClock(d) { const q = P(d.x, d.y), ring = d.rang && GT < d.end, dx = ring ? 2.5 * Math.sin(GT * 70) : 0; L.shadow(q[0], q[1], 14, 5, 0.4);
+    L.rrect(q[0] - 9 + dx, q[1] - 22, 18, 18, 9, [0.9, 0.15, 0.1], [0.55, 0.06, 0.05]); L.rrect(q[0] - 6 + dx, q[1] - 19, 12, 12, 6, [0.98, 0.95, 0.88], [0.85, 0.82, 0.75]);
+    L.rrect(q[0] - 11 + dx, q[1] - 27, 7, 7, 3.5, [0.95, 0.8, 0.3], [0.7, 0.5, 0.15]); L.rrect(q[0] + 4 + dx, q[1] - 27, 7, 7, 3.5, [0.95, 0.8, 0.3], [0.7, 0.5, 0.15]);
+    if (!d.rang) { const left = Math.max(0, d.ring - GT); if (left < 2 && Math.floor(GT * 6) % 2) L.glow(q[0], q[1] - 14, 16, [1, 0.3, 0.2], 0.6, 3); } }
+  // Vera's candy bowl on her path (fewer sweets each time)
+  function candyBowl() { const q = P(SIM.BOWL[0], SIM.BOWL[1]), b = ST.bowl || { n: 0 }, left = GT - (b.t || -99) > 120 ? 6 : Math.max(0, 6 - 2 * (b.n || 0)); L.shadow(q[0], q[1], 26, 9, 0.45);
+    for (let j = 0; j < left; j++) L.rrect(q[0] - 15 + (j % 3) * 10 + (j > 2 ? 5 : 0), q[1] - 24 - (j > 2 ? 4 : 0), 8, 6, 3, [[1, 0.4, 0.6], [0.4, 0.8, 1], [1, 0.85, 0.2], [0.6, 1, 0.4], [1, 0.55, 0.15], [0.8, 0.5, 1]][j], [0.4, 0.2, 0.2]);
+    L.rrect(q[0] - 22, q[1] - 22, 44, 18, 9, [0.95, 0.5, 0.12], [0.55, 0.22, 0.05]); L.rrect(q[0] - 20, q[1] - 22, 40, 5, 2.5, [1, 0.7, 0.3], [0.8, 0.45, 0.15]);
+    L.glow(q[0], q[1] - 14, 34, WARM, 0.15, 3); }
+  // the black cat (procedural): walks, sits, follows; eyes glow in the dark
+  function drawCat(c) { const q = P(c.x, c.y), f = Math.cos(c.ang || 0) >= 0 ? 1 : -1, mv = c.mv > 0, ph = (c.gph || 0) * Math.PI * 2, dark = [0.06, 0.05, 0.07], dk2 = [0.02, 0.02, 0.03];
+    L.shadow(q[0], q[1], 24, 7, 0.45);
+    if (mv) { for (let k = 0; k < 4; k++) { const lx = q[0] + (k < 2 ? 11 : -11) * f + (k % 2 ? 4 : -4), sw = Math.sin(ph + (k === 0 || k === 3 ? 0 : Math.PI)) * 4; L.rrect(lx + sw * f - 2, q[1] - 12, 4, 12, 2, dark, dk2); }
+      L.rrect(q[0] - 19, q[1] - 26, 38, 15, 7.5, dark, dk2);
+      for (let k = 0; k < 6; k++) L.rrect(q[0] - f * (19 + k * 3.5) - 2.5, q[1] - 22 - k * 4.5 + Math.sin(GT * 5 + k * 0.7) * 2, 5, 5, 2.5, dark, dk2);
+      const hx = q[0] + f * 19; L.rrect(hx - 9, q[1] - 36, 18, 15, 7, dark, dk2); L.solid(hx - 8, q[1] - 39, 6, 6, dark, 0.785, 3, 3); L.solid(hx + 2, q[1] - 39, 6, 6, dark, 0.785, 3, 3);
+      L.glow(hx + f * 4, q[1] - 30, 6, [0.8, 1, 0.3], 0.8, 3); L.rrect(hx + f * 4 - 1.5, q[1] - 31.5, 3, 3, 1.5, [0.85, 1, 0.35], [0.6, 0.8, 0.2]); }
+    else { L.rrect(q[0] - 12, q[1] - 30, 24, 28, 11, dark, dk2); for (let k = 0; k < 7; k++) L.rrect(q[0] - f * (8 - k * 3) - 2.5, q[1] - 5 + Math.sin(GT * 2 + k * 0.6) * 1.2, 5, 5, 2.5, dark, dk2);
+      const hx = q[0] + f * 3; L.rrect(hx - 9, q[1] - 44, 18, 16, 7, dark, dk2); L.solid(hx - 8, q[1] - 47, 6, 6, dark, 0.785, 3, 3); L.solid(hx + 2, q[1] - 47, 6, 6, dark, 0.785, 3, 3);
+      const bl = Math.sin(GT * 0.9 + c.x) > 0.97 ? 0.2 : 1; for (const ex of [-4, 4]) { L.glow(hx + ex, q[1] - 38, 6, [0.8, 1, 0.3], 0.7 * bl, 3); L.rrect(hx + ex - 1.5, q[1] - 39.5, 3, 3 * bl, 1.5, [0.85, 1, 0.35], [0.6, 0.8, 0.2]); } } }
   function SCENE_KIR_ARMS() { const sayE = [...ST.ev].reverse().find((e) => e.k === 'say' && e.who === 'kirill' && GT - e.t < e.dur); if (!sayE) return null;
     const a = GT - sayE.t, w = Math.sin(a * 9) * 0.15; return { L: [-0.55, -0.55 + w], R: [0.2, 0.95] }; }
   // Kirill's own painted jack-o'-lantern: after the swap the rotten one sits over it (fraction of the house sprite)
@@ -598,7 +673,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     const r = atlasFrame(n, fi, q[0], q[1] + 4, fl, { alpha: 1, tint: [1, 1, 1, 0], rim: [0.3, fl ? 0.004 : -0.004, -0.004, 1], rimCol: u.st === 'chase' ? [1, 0.3, 0.2] : [0.6, 0.7, 1] }, 1, 128);
     let led = r && r.led; if (!led) { const b = SIM.raidBeam(u); led = [b.o[0] - cx, b.o[1] - cy]; }
     L.glow(led[0], led[1], 16, [1, 0.97, 0.85], 0.9, 3); hitOverlay(u, q, 128, 90 + u.i * 13);
-    const hd = r ? r.head : [q[0], q[1] - 128];
+    const hd = r ? r.head : [q[0], q[1] - 128]; if ((u.stunT || -99) > GT) { dizzy(hd, 20 + u.i); return hd; }
     if (u.st === 'chase') L.label('ux' + u.i, '!', hd[0], hd[1] - 26 - 4 * Math.sin(GT * 14), { size: 46, col: '#ff3a2a', out: '#300000', al: 0.5 });
     else if (u.sus > 0.08) { const f = Math.min(1, u.sus); L.label('uq' + u.i, '?', hd[0], hd[1] - 24, { size: 40, col: f > 0.6 ? '#ff9a2a' : '#ffe07a', out: '#302000', al: 0.5, a: 0.4 + 0.6 * f });
       L.rrect(hd[0] - 22, hd[1] - 8, 44, 6, 3, [0.1, 0.06, 0.06], [0.1, 0.06, 0.06], 0.8); L.rrect(hd[0] - 21, hd[1] - 7, 42 * f, 4, 2, [1, 0.6, 0.15], [1, 0.4, 0.1]); }
@@ -625,12 +700,13 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       L.label('finnext', `${F.i + 1}/${F.lines.length}  ▶ клик или пробел`, x + pw - 30, y + ph - 26, { size: 18, col: '#c9a27a', out: '#120806', al: 1, a: 0.6 + 0.4 * Math.sin(T * 4) }); }
     if (F.end) { L.solid(0, 0, W, H, [0.02, 0.01, 0.03], 0, 0, 0, 0.72); const st = ST.stats || {}, md = SIM.MODIDS.map((id) => ST[SIM.MODS[id].key]);
       L.label('fend', 'Конец', W / 2, 200, { size: 96, col: '#ffb45a', out: '#2a0a02', al: 0.5, font: SERIF });
-      L.label('fend2', '«Сладость или гадость» — спасибо за игру!', W / 2, 290, { size: 34, col: '#f6e7c8', out: '#120806', al: 0.5 });
-      const rows = [['Время на часах', SIM.clockStr(ST)], ['Домов закидано на 100 %', md.filter((k) => k.done >= 0).length + ' из 3'], ['Помирился подарком', md.filter((k) => k.sweet).length + ' из 3'],
+      L.label('fend2', F.kind === 'peace' ? 'Добрая концовка: ни одной гадости модерам. Спасибо за игру!' : '«Сладость или гадость» — спасибо за игру!', W / 2, 290, { size: 34, col: '#f6e7c8', out: '#120806', al: 0.5 });
+      const nAch = SIM.ACH.filter((a) => ST.ach && ST.ach[a.id]).length;
+      const rows = [['Концовка', F.kind === 'peace' ? 'добрая (все простили)' : 'вечеринка-сюрприз'], ['Достижений за игру', nAch + ' из ' + SIM.ACH.length], ['Время на часах', SIM.clockStr(ST)], ['Домов закидано на 100 %', md.filter((k) => k.done >= 0).length + ' из 3'], ['Помирился подарком', md.filter((k) => k.sweet).length + ' из 3'],
         ['Яиц брошено', st.eggs || 0], ['Рулонов бумаги', st.tp || 0], ['Шариков выпущено', st.bb || 0], ['Попаданий в прохожих', st.hits || 0],
         ['Задержаний', ST.raid ? ST.raid.arrests : 0], ['Покупок вируса', (ST.rai.junk || []).length], ['Трусов продано на аукционе', ST.kir.auction || 0], ['Деньги', ST.money + ' ₽']];
-      const x0 = W / 2 - 330; panel(x0 - 30, 340, 720, rows.length * 44 + 40, 16, 0.85); L.uiBox('fendp', x0 - 30, 340, 720, rows.length * 44 + 40, 4);
-      rows.forEach(([k, v], i) => { L.label('fr' + i, k, x0, 380 + i * 44, { size: 26, col: '#e8dcc8', out: '#120806', weight: 'normal' }); L.label('fv' + i, String(v), x0 + 660, 380 + i * 44, { size: 26, col: '#ffd76a', out: '#120806', al: 1 }); });
+      const x0 = W / 2 - 330, RH = 41; panel(x0 - 30, 330, 720, rows.length * RH + 40, 16, 0.85); L.uiBox('fendp', x0 - 30, 330, 720, rows.length * RH + 40, 4);
+      rows.forEach(([k, v], i) => { L.label('fr' + i, k, x0, 370 + i * RH, { size: 26, col: '#e8dcc8', out: '#120806', weight: 'normal' }); L.label('fv' + i, String(v), x0 + 660, 370 + i * RH, { size: 26, col: '#ffd76a', out: '#120806', al: 1 }); });
       L.label('fexit', 'Клик — в главное меню', W / 2, H - 70, { size: 26, col: '#c9a27a', out: '#120806', al: 0.5, a: 0.6 + 0.4 * Math.sin(T * 3) }); } }
   // the wanted panel (top, left of centre) while the raid lasts
   const inRect = (x, y, r) => x > r[0] && x < r[2] && y > r[1] && y < r[3];
@@ -642,6 +718,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     else if (ST.hidden) { s = '🚨 Спрятан — не найдут'; col = '#a0e0a0'; }
     else if (SIM.raidCrowd(ST) > 0 && Math.hypot(ST.vx, ST.vy) < 190) { s = '🚨 В толпе — незаметен'; col = '#a0e0a0'; }
     else if ((inRect(ST.x, ST.y, SIM.ALLEY) || inRect(ST.x, ST.y, SIM.ENDLOT)) && !ST.light) { s = '🚨 В темноте — почти не видно'; col = '#a0d0e0'; }
+    else if (SIM.inLampLight(ST)) { s = '🚨 Под фонарём — тебя видно издалека'; col = '#ffd27a'; }
     const w = textW(s, 24) + 40, x = 450, y = 34; panel(x, y, w, 44, 14, 0.9, true); L.uiBox('raid', x, y, w, 44, 2); L.label('raid', s, x + 20, y + 22, { size: 24, col, out: '#120806' }); }
   // GL scissor in view px (the comp target may be smaller than the view)
   const clipOn = (x, y, w, h) => { const gl = G.gl, t = L.T.comp, k = t.w / W; gl.enable(gl.SCISSOR_TEST); gl.scissor(Math.floor(x * k), Math.floor((H - y - h) * k), Math.ceil(w * k), Math.ceil(h * k)); };
@@ -765,13 +842,27 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     if (S.state && ST.ptr && !ST.dlg && !ST.phone && !ST.chalk) { const c = [ST.ptr[0] + cx, ST.ptr[1] + cy], hit = SIM.pick(ST, c); if (hit) { const s = HOVER[hit.k] || ''; if (s) { const w = textW(s, 20) + 26; L.rrect(ST.ptr[0] + 18, ST.ptr[1] + 14, w, 32, 10, [0.1, 0.06, 0.06], [0.05, 0.03, 0.03], 0.85); L.uiBox('hover', ST.ptr[0] + 18, ST.ptr[1] + 14, w, 32, 2); L.label('hover', s, ST.ptr[0] + 31, ST.ptr[1] + 30, { size: 20, col: '#ffd9a0', out: '#120806' }); } } }
     if (ST.dlg) dialog();
     if (ST.phone) phone();
+    achPopups();
     if (ST.hp <= 0) L.label('ko', 'Коля без сил… Идёт домой пить чай', W / 2, H / 2, { size: 44, col: '#ffc56a', out: '#200800', al: 0.5 });
     if (S.arrestA > 0.05) L.label('arrest', 'ЗАДЕРЖАН 🚓', W / 2, H / 2, { size: 64, col: '#ff5a4a', out: '#200000', al: 0.5, a: S.arrestA });
   }
+  // Steam-like achievement cards, bottom right above the phone button: slide in, hold, slide out
+  const TIERC = { 3: [[1, 0.8, 0.3], '#ffd76a', 'золото'], 2: [[0.8, 0.85, 0.95], '#dfe6f2', 'серебро'], 1: [[0.85, 0.55, 0.3], '#e8a070', 'бронза'] };
+  function achIcon(id, x, y, sz, a = 1, grey = false) { const i = SIM.ACH.findIndex((q) => q.id === id); if (i < 0 || !has('ach_icons')) return;
+    L.sprite('ach_icons', x, y, { w: sz, h: sz, src: [(i % 5) / 5, Math.floor(i / 5) / 3, (i % 5 + 1) / 5, (Math.floor(i / 5) + 1) / 3], u: { alpha: a, grade: grey ? [0.15, 0.7, 0, 1] : [1, 1, 0, 1] } }); }
+  function achPopups() { const list = ST.ev.filter((e) => e.k === 'ach' && GT - e.t < 5.6 && GT >= e.t).slice(-3);
+    list.forEach((e, k) => { const a = GT - e.t, d = SIM.ACHI[e.id]; if (!d) return; const sl = a < 0.35 ? 1 - ease(a / 0.35) : a > 5.1 ? ease((a - 5.1) / 0.5) : 0, al = 1 - sl;
+      const w = 460, h = 104, x = ST.phone ? SIM.HUD.phone.x - w - 24 : W - w - 26, y = H - 300 - (list.length - 1 - k) * (h + 12) + sl * 80, tc = TIERC[d.tier] || TIERC[1];
+      L.rrect(x - 2, y - 2, w + 4, h + 4, 14, tc[0], tc[0].map((c) => c * 0.5), 0.95 * al); L.rrect(x, y, w, h, 12, [0.1, 0.07, 0.11], [0.04, 0.03, 0.05], 0.96 * al); L.uiBox('ach' + k, x, y, w, h, 4);
+      achIcon(e.id, x + 14, y + 14, 76, al); if (a < 0.9) L.glow(x + 52, y + 52, 70, tc[0], 0.8 * (1 - a / 0.9) * al, 2.5);
+      L.label('acht' + k, 'Достижение получено', x + 106, y + 22, { size: 16, col: '#c9a27a', out: '#120806', a: al });
+      L.label('achn' + k, d.name, x + 106, y + 48, { size: 23, col: tc[1], out: '#120806', a: al });
+      wrap(d.desc, 15, w - 126, 'normal').slice(0, 2).forEach((l, i) => L.label('achd' + k + '_' + i, l, x + 106, y + 72 + i * 18, { size: 15, col: '#e8dcc8', out: '#120806', weight: 'normal', a: al })); }); }
   const SHORT = { eggs: 'Яйца', tp: 'Бумага', bell: 'Звонок', rotten: 'Тыква', alarm: 'Будил.', chalk: 'Мел', fire: 'Петард.', slime: 'Слайм', pizza: 'Пицца', flyers: 'Флаеры' };
-  const SLOTHINT = { eggs: 'ПКМ по дому: бросить', tp: 'держи ПКМ и отпусти: бросок на крышу', bell: 'E у двери: позвонить и убежать', rotten: 'найди в переулке, E у крыльца: подменить', alarm: 'E у почтового ящика: подложить',
-    chalk: 'E на тротуаре у калитки: рисовать', fire: 'E у крыльца: поджечь и бежать', slime: 'держи E у двери', pizza: 'ПКМ/E: заказать в телефоне', flyers: 'E у фонаря: приклеить' };
-  const HOVER = { npc: 'Поговорить', door: 'Постучать: «Сладость или гадость?»', door2: 'Постучать', money: 'Подобрать', vp: 'Подобрать тыкву', rotten: 'Взять гнилую тыкву' };
+  const SLOTHINT = { eggs: 'ПКМ по дому: бросить', tp: 'держи ПКМ и отпусти: бросок на крышу', bell: 'E у любой двери: позвонить и убежать', rotten: 'E у крыльца модера: подменить, G — положить', alarm: 'E у ящика или где угодно: приманка',
+    chalk: 'E: рисовать где угодно (у калитки модера — гадость)', fire: 'ПКМ — бросить, E — поджечь под ногами', slime: 'держи E у любой двери', pizza: 'ПКМ/E: заказать в телефоне', flyers: 'E у фонаря: приклеить' };
+  const HOVER = { npc: 'Поговорить', door: 'Постучать: «Сладость или гадость?»', door2: 'Постучать', money: 'Подобрать', vp: 'Подобрать тыкву', rotten: 'Взять гнилую тыкву', drop: 'Поднять гнилую тыкву',
+    cat: 'Погладить кота', bowl: 'Взять конфету из миски', bin: 'Пнуть мусорный бак' };
   const ICON = {};
   function slotCount(n) { const I = ST.inv; return { eggs: I.eggs, tp: I.tp, bell: null, rotten: ST.carry === 'rotten' ? 1 : 0, alarm: I.alarm, chalk: I.chalk, fire: I.fire, slime: I.slime, pizza: !ST.target || ST[SIM.MODS[ST.target].key].pr.pizza || ST.courier ? 0 : null, flyers: I.flyers }[n]; }
   function quests(x, y) {
@@ -821,7 +912,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
         ST.raid.units.forEach((u) => { const q = mp(u.x, u.y); g.fillStyle = u.st === 'chase' ? '#ff2a2a' : u.kind === 'police' ? '#5a8aff' : '#8aa060'; g.beginPath(); g.arc(q[0], q[1], 4, 0, 6.3); g.fill(); }); }
       const k = mp(cam[0], cam[1]); g.translate(k[0], k[1]); g.rotate(ST.ang || 0); g.fillStyle = '#5aa0ff'; g.beginPath(); g.moveTo(9, 0); g.lineTo(-6, -6); g.lineTo(-3, 0); g.lineTo(-6, 6); g.closePath(); g.fill();
       if (virusGlitch()) glitchCanvas(g, 2 * c, 2 * c, 0.8);
-      g.restore(); g.strokeStyle = '#8a5a2a'; g.lineWidth = 6; g.beginPath(); g.arc(c, c, R - 2, 0, Math.PI * 2); g.stroke(); g.strokeStyle = '#2a1408'; g.lineWidth = 2; g.beginPath(); g.arc(c, c, R - 6, 0, Math.PI * 2); g.stroke(); });
+      g.restore(); g.strokeStyle = '#8a5a2a'; g.lineWidth = 6; g.beginPath(); g.arc(c, c, R - 2, 0, Math.PI * 2); g.stroke(); g.strokeStyle = '#2a1408'; g.lineWidth = 2; g.beginPath(); g.arc(c, c, R - 6, 0, Math.PI * 2); g.stroke(); }, 20);
     L.sprite('minimap', X - R - 10, Y - R - 10, { w: 2 * R + 20, h: 2 * R + 20 }); L.uiBox('minimap', X - R - 10, Y - R - 10, 2 * R + 20, 2 * R + 20, 0);
   }
   function dialog() {
@@ -838,7 +929,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     wrap(d.text, 25, p.w - 200, 'normal').slice(0, 3).forEach((l, i) => L.label('dlgt' + i, l, p.x + 160, p.y + 76 + i * 32, { size: 25, col: '#f6e7c8', out: '#120806', weight: 'normal' }));
     lay.choices.forEach((r, i) => { const hov = ST.ptr && ST.ptr[0] > r.x && ST.ptr[0] < r.x + r.w && ST.ptr[1] > r.y && ST.ptr[1] < r.y + r.h;
       L.rrect(r.x, r.y, r.w, r.h, 14, hov ? [1, 0.65, 0.25] : [0.55, 0.3, 0.12], hov ? [0.85, 0.35, 0.08] : [0.32, 0.15, 0.06], 0.95); L.uiBox('ch' + i, r.x, r.y, r.w, r.h, 4);
-      L.label('ch' + i, (i + 1) + '. ' + d.choices[i][0], r.x + r.w / 2, r.y + r.h / 2, { size: 22, col: '#fff3dc', out: '#200a00', al: 0.5 }); });
+      L.label('ch' + i, (i + 1) + '. ' + TR(d.choices[i][0]), r.x + r.w / 2, r.y + r.h / 2, { size: 22, col: '#fff3dc', out: '#200a00', al: 0.5 }); });
   }
   function drawPortrait(X, Y) { L.rrect(X - 30, Y - 10, 60, 60, 26, [0.32, 0.16, 0.36], [0.2, 0.1, 0.22]); L.rrect(X - 22, Y - 44, 44, 44, 22, [0.95, 0.75, 0.6], [0.8, 0.55, 0.45]); L.solid(X - 40, Y - 52, 80, 10, [0.15, 0.08, 0.2]); L.solid(X - 14, Y - 90, 28, 40, [0.15, 0.08, 0.2], 0.1); }
   // Raiva's virus: the map (and now and then the whole phone) glitches — shifted slices, colour fringes, error text
@@ -862,9 +953,9 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       btn('close', '✕', '#5a3a4a'); if (ph.app !== 'home') btn('home', '‹ Назад', '#5a3a4a');
       if (ph.app === 'home') { T2(SIM.clockStr(ST), p.w / 2, 170, 58, '#ffffff', 'center'); T2('пятница, 31 октября', p.w / 2, 202, 18, '#c8b8e0', 'center', 'normal');
         const AP = { map: ['Карта', '#3a7a5a'], chats: ['Чаты', '#3a5aa0'], light: [ST.light ? 'Фонарик: вкл' : 'Фонарик', ST.light ? '#e0b030' : '#6a6060'], shop: ['Магазин', '#c05a20'], pizza: ['Пицца', '#b03030'], orders: ['Покупки', '#6a4a9a'],
-          contacts: ['Контакты', '#2a8a7a'], dev: ['Консоль', '#2a2a30'] };
+          contacts: ['Контакты', '#2a8a7a'], ach: ['Достижения', '#9a7420'], dev: ['Консоль', '#2a2a30'] };
         items.filter((b) => AP[b.id]).forEach((b) => { const x = b.x - p.x, y = b.y - p.y, [lab, col] = AP[b.id]; g.fillStyle = col; rr(x + 10, y, 90, 90, 22); g.fill();
-          g.fillStyle = b.id === 'dev' ? '#5aff8a' : 'rgba(255,255,255,0.85)'; g.font = 'bold ' + (b.id === 'dev' ? 32 : 40) + 'px ' + FONT; g.textAlign = 'center'; g.fillText({ map: '⌖', chats: '✉', light: '☀', shop: '₽', pizza: '◔', orders: '☰', contacts: '☎', dev: '>_' }[b.id], x + 55, y + 60);
+          g.fillStyle = b.id === 'dev' ? '#5aff8a' : 'rgba(255,255,255,0.85)'; g.font = 'bold ' + (b.id === 'dev' ? 32 : 40) + 'px ' + FONT; g.textAlign = 'center'; g.fillText({ map: '⌖', chats: '✉', light: '☀', shop: '₽', pizza: '◔', orders: '☰', contacts: '☎', ach: '★', dev: '>_' }[b.id], x + 55, y + 60);
           T2(lab, x + 55, y + 120, 17, '#f0e6ff', 'center');
           if (b.id === 'chats') { const u = ST.msgs.filter((m) => !m.read).length; if (u) { g.fillStyle = '#e02020'; g.beginPath(); g.arc(x + 96, y + 6, 15, 0, 6.3); g.fill(); T2(String(u), x + 96, y + 13, 17, '#fff', 'center'); } } });
         T2('Совет: на Хэллоуин все модеры дома 🎃', p.w / 2, p.h - 60, 17, '#c8b8e0', 'center', 'normal'); }
@@ -875,7 +966,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
           g.fillStyle = i % 2 ? '#22182a' : '#2a1e32'; rr(x, y, b.w, b.h, 14); g.fill(); g.fillStyle = c[0]; g.beginPath(); g.arc(x + 44, y + b.h / 2, 28, 0, 6.3); g.fill();
           T2(c[2], x + 44, y + b.h / 2 + 9, 26, '#fff', 'center'); T2(n, x + 86, y + 34, 21, '#f6e7c8'); T2(c[1], x + 86, y + 60, 15, '#a898c0', 'left', 'normal');
           if (SIM.LOANS[n]) T2(Ln ? (Ln.paid ? 'долг вернул ✓' : Ln.over ? 'помогает модерам!' : `долг ${Ln.amt} ₽ до 01:00`) : 'даст в долг 1 раз', x + b.w - 14, y + 34, 14, Ln && !Ln.paid ? '#ff9a6a' : '#9ad08a', 'right', 'normal');
-          const un = ST.msgs.filter((m) => m.from === n && !m.read).length; if (un) { g.fillStyle = '#e02020'; g.beginPath(); g.arc(x + b.w - 22, y + 62, 12, 0, 6.3); g.fill(); T2(String(un), x + b.w - 22, y + 68, 15, '#fff', 'center'); } }); }
+          const un = ST.msgs.filter((m) => !m.read && (n === SIM.CONTACTS[0] ? m.group : m.from === n && !m.group)).length; if (un) { g.fillStyle = '#e02020'; g.beginPath(); g.arc(x + b.w - 22, y + 62, 12, 0, 6.3); g.fill(); T2(String(un), x + b.w - 22, y + 68, 15, '#fff', 'center'); } }); }
       if (ph.app === 'dm') { const n = ph.who, c = CONT[n] || ['#444', '', '?'], list = (ST.dm || {})[n] || [];
         g.fillStyle = c[0]; g.beginPath(); g.arc(p.w / 2 - 70, 148, 20, 0, 6.3); g.fill(); T2(c[2], p.w / 2 - 70, 155, 18, '#fff', 'center'); T2(n, p.w / 2 - 40, 156, 24, '#fff'); T2(c[1], p.w / 2 - 40, 178, 14, '#a898c0', 'left', 'normal');
         const lim = items.some((q) => q.id === 'loan' || q.id === 'repay') ? p.h - 202 : p.h - 142; let y = lim;
@@ -889,13 +980,14 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       if (ph.app === 'dev') { g.fillStyle = '#05080a'; rr(24, 116, p.w - 48, p.h - 260, 18); g.fill(); T2('>_ консоль разработчика', 44, 146, 18, '#5aff8a', 'left', 'bold');
         let y = p.h - 170; const L2 = []; g.font = `14px ui-monospace, Menlo, Consolas, monospace`;
         const mwrap = (str, maxW) => { const out = []; let line = ''; for (const w of str.split(' ')) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > maxW && line) { out.push(line); line = '  ' + w; } else line = t; } out.push(line); return out; };   // wrap in the monospace font it is drawn with
-        for (const m of [...(ST.devLog || [])].reverse()) { const lines = mwrap((m.me ? '> ' : '') + m.text, p.w - 96); for (let i = lines.length - 1; i >= 0; i--) L2.push([lines[i], m.me]); }
+        for (const m of [...(ST.devLog || [])].reverse()) { const lines = mwrap((m.me ? '> ' : '') + (m.me ? m.text : TR(m.text)), p.w - 96); for (let i = lines.length - 1; i >= 0; i--) L2.push([lines[i], m.me]); }
         for (const [l, me] of L2) { if (y < 170) break; g.fillStyle = me ? '#ffd76a' : '#9affb4'; g.textAlign = 'left'; g.fillText(l, 42, y); y -= 19; }
         field('команда, например: money 5000 · help'); }
       if (ph.app === 'map') phoneMap(g, p, ph, rr, T2);
+      if (ph.app === 'ach') phoneAch(g, p, ph, rr, T2);
       if (ph.app === 'chats') { T2('Чаты', p.w / 2, 156, 26, '#fff', 'center'); let y = p.h - 50; const list = [...ST.msgs].reverse(), MOD = { 'Кирилл': ['#3a2a46', '#ffb45a'], 'Райва': ['#22304a', '#7ab0ff'], 'Эльф': ['#1e3a34', '#9af0d0'] };
         for (const m of list) { const lines = wrap(m.text, 18, p.w - 120, 'normal'), h = 34 + lines.length * 22; y -= h + 10; if (y < 175) break; const cl = MOD[m.from] || ['#2a2a40', '#9ac8ff'];
-          g.fillStyle = cl[0]; rr(36, y, p.w - 72, h, 14); g.fill(); T2(m.group ? m.from + '  · Модеры 🎃' : m.from, 52, y + 24, 17, cl[1]);
+          g.fillStyle = cl[0]; rr(36, y, p.w - 72, h, 14); g.fill(); T2(m.group ? TR(m.from) + TR('  · Модеры 🎃') : m.from, 52, y + 24, 17, cl[1]);
           lines.forEach((l, i) => T2(l, 52, y + 48 + i * 22, 17, '#f0e6ff', 'left', 'normal')); }
         const v = ST.rai.virus; if (v && v.st === 'download') { const f = Math.min(1, (GT - v.t0) / 3.2); g.fillStyle = 'rgba(10,6,16,0.92)'; rr(40, 300, p.w - 80, 190, 18); g.fill();
           T2('Загрузка «КотоМем.apk»', p.w / 2, 350, 21, '#ffffff', 'center'); T2('😺 ' + Math.round(f * 100) + ' %', p.w / 2, 392, 26, '#9ad0ff', 'center');
@@ -914,10 +1006,27 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
             wrap(j.name, 16, p.w - 170, 'bold').slice(0, 2).forEach((l, k2) => T2(l, 46, y + 18 + k2 * 18, 15, '#f6e7c8')); T2('−' + j.price + ' ₽', p.w - 46, y + 26, 16, '#ff7a6a', 'right'); });
           T2('Итого списано: ' + J.reduce((a, j) => a + j.price, 0) + ' ₽', p.w / 2, p.h - 64, 18, '#ffb45a', 'center'); T2('(я этого не заказывал…)', p.w / 2, p.h - 40, 14, '#a090b0', 'center', 'normal'); } }
       if (virusGlitch() && ph.app !== 'map') glitchCanvas(g, p.w, p.h, 0.5);
-    });
+    }, 30);
     L.sprite('phone', p.x + ox, p.y, { w: p.w, h: p.h }); L.uiBox('phone', p.x, p.y, p.w, p.h, 0);
   }
 
+  // phone «Достижения»: 15 achievements, hardest first; got this game (✓), got in an earlier game (ранее), progress for counters
+  const assetUrl = (n) => (window.ASSET_URL ? window.ASSET_URL(n) : 'assets/' + n + '.png');
+  const ACHIMG = new Image(); ACHIMG.src = assetUrl('ach_icons');                     // the phone draws on a 2D canvas: its own copy of the icon atlas
+  function phoneAch(g, p, ph, rr, T2) {
+    const G0 = window.ACHG || {}, got = (id) => (ST.ach && ST.ach[id]) ? 1 : G0[id] ? 2 : 0, n = SIM.ACH.filter((a) => got(a.id)).length, sc = Math.max(0, Math.min(SIM.ACH.length - 7, ph.scroll || 0));
+    T2('Достижения', p.w / 2, 148, 26, '#fff', 'center'); T2(`Получено ${n} из ${SIM.ACH.length}`, p.w / 2, 176, 16, '#c8b8e0', 'center', 'normal');
+    const TC = { 3: '#ffd76a', 2: '#dfe6f2', 1: '#e8a070' };
+    for (let r = 0; r < 7; r++) { const i = r + sc, a = SIM.ACH[i]; if (!a) break; const y = 194 + r * 84, st = got(a.id);
+      g.fillStyle = st ? '#2e2240' : '#1a1520'; rr(28, y, p.w - 56, 78, 12); g.fill(); g.fillStyle = TC[a.tier]; g.globalAlpha = st ? 0.9 : 0.3; rr(28, y, 5, 78, 2); g.fill(); g.globalAlpha = 1;
+      if (ACHIMG.complete && ACHIMG.naturalWidth) { const cw = ACHIMG.naturalWidth / 5, ch = ACHIMG.naturalHeight / 3; g.save(); if (!st) { g.globalAlpha = 0.4; g.filter = 'grayscale(1) brightness(0.7)'; }
+        g.drawImage(ACHIMG, (i % 5) * cw, Math.floor(i / 5) * ch, cw, ch, 40, y + 8, 62, 62); g.restore(); }
+      g.font = 'bold 17px ' + FONT; const nw = g.measureText(a.name).width, fs = Math.max(12, Math.min(17, 17 * 250 / Math.max(1, nw)));
+      T2(a.name, 112, y + 25, fs, st ? TC[a.tier] : '#9a8aa8', 'left', 'bold');
+      wrap(a.desc, 13, 262, 'normal').slice(0, 2).forEach((l, k) => T2(l, 112, y + 45 + k * 16, 13, st ? '#e8dcc8' : '#8a7a98', 'left', 'normal'));
+      if (st === 1) T2('✓', p.w - 42, y + 28, 22, '#8ad06a', 'right'); else if (st === 2) T2('ранее', p.w - 40, y + 25, 12, '#a0c890', 'right', 'normal');
+      else { const pr = SIM.achProgress(ST, a.id); if (pr) T2(pr[0] + '/' + pr[1], p.w - 40, y + 25, 14, '#ffb45a', 'right'); } }
+    if (sc < SIM.ACH.length - 7) T2('▼ колесо мыши — ещё', p.w / 2, p.h - 26, 13, '#8a7aa0', 'center', 'normal'); else if (sc > 0) T2('▲ колесо мыши — назад', p.w / 2, p.h - 26, 13, '#8a7aa0', 'center', 'normal'); }
   // phone «Карта»: a tilted 3D night map of the street (perspective camera over Kolya): houses extrude and rise when the app opens,
   // windows flicker, lamps pool light, people move live, quest markers bob, the camera drifts a little
   function phoneMap(g, p, ph, rr, T2) {
@@ -1023,7 +1132,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     // compass: north (the houses' side, −y) as the map shows it
     { const a = pr(ST.x, ST.y), b = pr(ST.x, ST.y - 400), an = Math.atan2(b[1] - a[1], b[0] - a[0]), cx2 = X0 + MW - 38, cy2 = Y0 + MH - 40;
       g.fillStyle = 'rgba(15,8,20,0.75)'; g.beginPath(); g.arc(cx2, cy2, 22, 0, 6.3); g.fill(); g.save(); g.translate(cx2, cy2); g.rotate(an); g.fillStyle = '#ff7050'; g.beginPath(); g.moveTo(16, 0); g.lineTo(-4, -6); g.lineTo(-4, 6); g.closePath(); g.fill(); g.restore();
-      T2('С', cx2 + Math.cos(an) * 32, cy2 + Math.sin(an) * 32 + 5, 13, '#ffd0c0', 'center'); }
+      T2(window.LANG === 'en' ? 'N' : 'С', cx2 + Math.cos(an) * 32, cy2 + Math.sin(an) * 32 + 5, 13, '#ffd0c0', 'center'); }
     T2('Карта района', p.w / 2, 104, 22, '#ffffff', 'center');
     T2('★ модеры   ☆ странные огни   ▲ ты', p.w / 2, Y0 + MH + 34, 15, '#c8b8e0', 'center', 'normal');
   }

@@ -3,7 +3,7 @@
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module';
 const { chromium } = createRequire(import.meta.url)('/root/.cache/ref2game/claude/scripts/node_modules/playwright');
 const [dir = 'live', out = 'frames/menu'] = process.argv.slice(2); fs.mkdirSync(out, { recursive: true });
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.webp': 'image/webp' };
 const srv = http.createServer((q, r) => { const f = path.join(dir, decodeURIComponent(q.url.split('?')[0]));
   fs.stat(f, (e) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream', 'last-modified': 'x' }); fs.createReadStream(f).pipe(r); }); });
 await new Promise((r) => srv.listen(0, '127.0.0.1', r));

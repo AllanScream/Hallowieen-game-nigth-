@@ -121,6 +121,17 @@
     page: () => noise(0.16, { f: 3200, f1: 1600, q: 0.8, vol: 0.05 }),
     party: () => { for (let k = 0; k < 4; k++) tone(R(500, 800), 0.7, { type: 'sawtooth', f1: R(900, 1300), vol: 0.05, at: k * 0.08, lp: 2500, vib: 30 });
       noise(1.6, { f: 1400, q: 0.6, vol: 0.12, at: 0.05, am: 9 }); noise(1.2, { f: 2600, q: 0.8, vol: 0.06, at: 0.2, am: 13 }); [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.25, { type: 'square', vol: 0.03, at: 0.4 + i * 0.07, lp: 4000 })); },
+    // v9: pumpkins put down, kicked bins, the cat, shot-out lamps, achievements, angry passers-by
+    putdown: (v, p) => { noise(0.14, { type: 'lowpass', f: 420, vol: 0.35 * v, pan: p }); tone(90, 0.16, { f1: 60, vol: 0.2 * v, pan: p }); },
+    binkick: (v, p) => { noise(0.5, { type: 'lowpass', f: 1500, f1: 200, vol: 0.7 * v, pan: p }); tone(140, 0.35, { type: 'square', f1: 70, vol: 0.12 * v, pan: p, lp: 700 });
+      for (let k = 0; k < 7; k++) { noise(0.07, { f: R(800, 3000), q: 2, vol: 0.18 * v, at: 0.12 + k * R(0.06, 0.13), pan: p + R(-0.2, 0.2) }); tone(R(300, 900), 0.12, { type: 'triangle', vol: 0.05 * v, at: 0.1 + k * 0.1, pan: p }); } },
+    purr: (v, p) => { noise(1.4, { type: 'lowpass', f: 160, vol: 0.25 * v, pan: p, am: 24 }); tone(720, 0.5, { type: 'sawtooth', f1: 980, vol: 0.04 * v, pan: p, lp: 2400, vib: 20, at: 1.2 }); },
+    meow: (v, p) => { tone(620, 0.55, { type: 'sawtooth', f1: 900, vol: 0.06 * v, pan: p, lp: 2200, vib: 25 }); tone(880, 0.35, { type: 'sawtooth', f1: 520, vol: 0.05 * v, pan: p, lp: 2200, at: 0.45 }); },
+    hiss: (v, p) => { noise(0.9, { type: 'highpass', f: 3200, vol: 0.22 * Math.max(0.5, v), pan: p, a: 0.05 }); tone(240, 0.4, { type: 'sawtooth', f1: 180, vol: 0.04, pan: p, lp: 900, at: 0.3 }); },
+    lampbreak: (v, p) => { noise(0.05, { f: 6000, q: 2, vol: 0.3 * v, pan: p }); for (let k = 0; k < 8; k++) tone(R(2500, 5200), 0.12, { type: 'triangle', vol: 0.05 * v, at: 0.04 + k * R(0.03, 0.08), pan: p }); noise(0.3, { type: 'lowpass', f: 400, vol: 0.1 * v, pan: p, at: 0.05 }); },
+    ach: () => { [659, 880, 1046, 1318].forEach((f, i) => tone(f, i === 3 ? 0.9 : 0.25, { type: 'triangle', vol: 0.1, at: i * 0.09 })); tone(2637, 0.6, { vol: 0.04, at: 0.36 }); noise(0.8, { f: 8000, q: 0.5, vol: 0.03, at: 0.3 }); },
+    nthrow: (v, p) => noise(0.28, { f: 500, f1: 2400, q: 1.2, vol: 0.1 * v, pan: p }),
+    angry: (v, p) => { const f = R(240, 330); tone(f, 0.4, { type: 'sawtooth', f1: f * 0.7, vol: 0.07 * v, pan: p, lp: 1400, vib: 15 }); },
     arrest: () => { for (const at of [0, 0.12, 0.5, 0.62]) noise(0.03, { f: 5500, q: 6, vol: 0.25, at }); tone(110, 1.2, { type: 'sawtooth', f1: 55, vol: 0.12, lp: 600, at: 0.2 }); },
   };
   AU.FX = FX;
@@ -137,7 +148,7 @@
       if (d < 1800) FX.radio(Math.max(0.2, 1 - d / 1800), Math.max(-1, Math.min(1, (u.x - S.x) / 1500))); } prev.radio = t + R(9, 20); }
     if (S && S.finale) { if (t > (prev.beat || 0)) { const b = prev.bi = ((prev.bi || 0) + 1) % 64, at = 0, BASS = [110, 87.3, 130.8, 98];   // a party groove: kick, hats, bass, stabs
         prev.beat = Math.max(t, (prev.beat || t)) + 0.25; const root = BASS[Math.floor(b / 16) % 4];
-        if (b % 4 === 0) tone(130, 0.18, { f1: 42, vol: 0.5, dest: partyBus, at });
+        if (b % 4 === 0 && S.finale.kind !== 'peace') tone(130, 0.18, { f1: 42, vol: 0.5, dest: partyBus, at });   // the kind ending: no kick, a softer groove
         if (b % 2 === 1) noise(0.05, { type: 'highpass', f: 7000, vol: 0.08, dest: partyBus, at });
         if (b % 8 === 4) noise(0.15, { f: 1800, q: 0.7, vol: 0.12, dest: partyBus, at });
         if (b % 2 === 0) tone(root * (b % 8 === 6 ? 1.5 : 1), 0.22, { type: 'square', vol: 0.12, dest: partyBus, lp: 700, at });
