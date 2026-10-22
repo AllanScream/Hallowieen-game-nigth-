@@ -4025,6 +4025,102 @@ window.LANG_EN = [
 "English"
 ],
 [
+"Все три! Держи 150 ₽ и… вот, внук оставил: страйкбольный автомат и 300 шариков. В окна не стреляй. Ну… разве что модерам. (F — достать) А ещё заходи переодеться: у меня сундук его костюмов.",
+"All three! Here's 150 ₽ and… here, my grandson left these: an airsoft rifle and 300 BBs. Don't shoot at windows. Well… except the mods'. (F — take it out) And come back to change: I have a whole chest of his costumes."
+],
+[
+"Тыквы на месте, спасибо тебе! Хочешь переодеться? У внука целый сундук костюмов.",
+"The pumpkins are back, thank you! Want to change? My grandson has a whole chest of costumes."
+],
+[
+"Сменить костюм",
+"Change costume"
+],
+[
+"Выбирай! Только не порви — внук расстроится.",
+"Pick one! Just don't tear it — my grandson would be upset."
+],
+[
+"👻 Призрак",
+"👻 Ghost"
+],
+[
+"🎃 Тыква",
+"🎃 Pumpkin"
+],
+[
+"🧙 Колдун",
+"🧙 Wizard"
+],
+[
+"😈 Чертёнок",
+"😈 Little devil"
+],
+[
+"Свой худи",
+"My hoodie"
+],
+[
+"Призрак",
+"Ghost"
+],
+[
+"Колдун",
+"Wizard"
+],
+[
+"Чертёнок",
+"Little devil"
+],
+[
+"Бу-у! Простыня внука. Модеры тебя не узнают. Ну, почти.",
+"Boo! My grandson's bedsheet. The mods won't recognise you. Well, almost."
+],
+[
+"Тыква-шлем! Внутри фонарик, чтобы не врезаться в забор.",
+"A pumpkin helmet! There's a little light inside so you don't walk into a fence."
+],
+[
+"Шляпа колдуна. Говорят, в ней яйца летят точнее. Врут, конечно.",
+"A wizard's hat. They say eggs fly straighter in it. They're lying, of course."
+],
+[
+"Рожки! Тебе идёт. Подозрительно идёт.",
+"Horns! They suit you. Suspiciously well."
+],
+[
+"И правильно. Худи — это классика.",
+"Good call. The hoodie is a classic."
+],
+[
+"Костюм: {0}. Патруль узнаёт тебя медленнее",
+"Costume: {0}. The patrol recognises you more slowly"
+],
+[
+"Снова в худи",
+"Back in the hoodie"
+],
+[
+"Костюм: {0}",
+"Costume: {0}"
+],
+[
+"Костюм из сундука Веры (по желанию)",
+"A costume from Vera's chest (optional)"
+],
+[
+"Молния! На улице погас свет — патрулю хуже видно",
+"Lightning! The street lights are out — the patrol can see less"
+],
+[
+"costume ghost|pumpkin|hat|horns|none — костюм",
+"costume ghost|pumpkin|hat|horns|none — costume"
+],
+[
+"Иногда идёт дождь, а в грозу молния гасит фонари — в темноте патрулю хуже видно. Дворы за домами открыты. После задания Веры у неё можно переодеться: призрак, тыква, колдун или чертёнок.",
+"Sometimes it rains, and in a thunderstorm lightning knocks the street lights out — in the dark the patrol sees less. The backyards behind the houses are open. After Vera's quest you can change at her place: ghost, pumpkin, wizard or little devil."
+],
+[
 "К",
 "K"
 ],

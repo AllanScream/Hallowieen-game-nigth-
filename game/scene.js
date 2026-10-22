@@ -178,12 +178,25 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
   const KF = window.KFR || {}, KH = 122;
   const KSEQ = { e: [0, 1, 2, 3, 5, 6] };                                       // walk loop per view (default: all 8 frames)
   const kolyaFrame = (view, kind, i, X, Y, flip, u, sy = 1) => atlasFrame('kf_' + view + '_' + kind, i, X, Y, flip, u, sy, KH);
-  function atlasFrame(name, i, X, Y, flip, u, sy = 1, HH = KH) {
+  // legs [l, r]: seen from behind the gait reads poorly (the swing foot only shows its sole), so each leg below the hip is drawn on
+  // its own and shortened from the hip by l / r of the leg length — the stepping foot rises, the other stays planted (v10)
+  let AFLOW = 0;                                                               // v10 ghost costume: > 0 draws only the frame's bottom strip (shins, shoes)
+  function atlasFrame(name, i, X, Y, flip, u, sy = 1, HH = KH, legs = null) {
     const m = KF[name]; if (!m || !has(name)) return null;
     const k = HH / m.h, w = m.fw * k, h = m.fh * k, ax = m.ax * k, ay = m.ay * k;
+    if (AFLOW > 0) { const cut = Math.max(0, m.ay - AFLOW), v0 = i / m.n, v1 = (i + 1) / m.n;
+      L.sprite(name, flip ? X - (w - ax) : X - ax, Y - ay * sy + cut * k * sy, { w, h: (m.fh - cut) * k * sy, src: [v0, cut / m.fh, v1, 1], flip, u }); }
+    else if (legs && (legs[0] > 0.004 || legs[1] > 0.004)) {
+      const hipF = m.ay - 0.45 * m.h, v0 = i / m.n, v1 = (i + 1) / m.n, hv = hipF / m.fh, top = Y - ay * sy, hipY = top + hipF * k * sy, legH = (m.fh - hipF) * k * sy;
+      L.sprite(name, flip ? X - (w - ax) : X - ax, top, { w, h: hipF * k * sy, src: [v0, 0, v1, hv], flip, u });
+      for (const [c0, c1, lf] of [[0, m.ax, legs[0]], [m.ax, m.fw, legs[1]]]) {
+        const x0 = flip ? X + (m.ax - c1) * k : X + (c0 - m.ax) * k;
+        L.sprite(name, x0, hipY, { w: (c1 - c0) * k, h: legH * (1 - lf), src: [v0 + c0 / m.fw / m.n, hv, v0 + c1 / m.fw / m.n, 1], flip, u }); }
+    } else
     L.sprite(name, flip ? X - (w - ax) : X - ax, Y - ay * sy, { w, h: h * sy, src: [i / m.n, 0, (i + 1) / m.n, 1], flip, u });
     const led = m.led[i] ? [X + (flip ? -1 : 1) * m.led[i][0] * k, Y + m.led[i][1] * k * sy] : null;
-    return { head: [X, Y - HH * sy], led };
+    const hp = (window.KHEAD || {})[name], hd = hp && hp[i] ? [X + (flip ? -1 : 1) * hp[i][0] * k, Y + hp[i][1] * k * sy] : null;
+    return { head: [X, Y - HH * sy], led, af: { name, i, X, Y, flip, sy, k, hd } };
   }
   // 16 walk / idle directions (atlases k16_<p|m><yaw>w: 8 walk frames + 2 idle, 9 drawn yaws, the rest mirrored).
   // b = body yaw step of 22.5° (0 = right, 4 = toward the viewer, 12 = away)
@@ -192,6 +205,24 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     return [set + '_' + (d >= 0 ? 'p' : 'm') + Math.floor(Math.abs(d)) + 'w', fl]; };
   const K32 = (b, set = 'k16') => { let d = (((b * 11.25 + 180) % 360) + 360) % 360 - 180, fl = false; if (d > 90) { d = 180 - d; fl = true; } else if (d < -90) { d = -180 - d; fl = true; }
     return [set + '_' + (d >= 0 ? 'p' : 'm') + Math.floor(Math.abs(d)) + 'w', fl]; };                       // 32 directions: 17 drawn yaws, the rest mirrored
+  // v10 costumes from Vera's chest: the ghost sheet over the walking legs, or a pumpkin helmet / a wizard hat / devil horns on the head.
+  // The view (0 front … 4 back, mirrored for the left half) comes from the drawn atlas's yaw
+  const cosView = (name) => { const m = /_(p|m)(\d+)w$/.exec(name); if (!m) return 1; const yw = (m[1] === 'p' ? 1 : -1) * +m[2]; return Math.max(0, Math.min(4, Math.round((90 - yw) / 45))); };
+  function costumeOver(cos, r, a, walking) { const f = r.af, v = cosView(f.name), fl = f.flip, u = { alpha: a, tint: ST.hp < 30 ? [1, 0.6, 0.6, 0.3] : [1, 1, 1, 0], rim: [0.3, fl ? 0.004 : -0.004, -0.004, 1], rimCol: [1, 0.7, 0.4] };
+    if (cos === 'ghost') { const n = 'cos_ghost_' + v, md = (window.COSMETA || {}).ghost, g = md ? md[v] : { gf: 0.99, tf: 0.01, cx: 0.5 }; if (!has(n)) return;
+      const Hs = KH * 1.04, sc = Hs / ((g.gf - g.tf) * A[n].h), w = A[n].w * sc, h = A[n].h * sc, gx = f.X, gy = f.Y + (walking ? -1.5 * Math.abs(Math.sin(Math.PI * 2 * ST.gph)) : 0);
+      const x0 = fl ? gx - (1 - g.cx) * w : gx - g.cx * w, y0 = gy - g.gf * h, rot = walking ? 0.03 * Math.sin(Math.PI * 2 * ST.gph) : 0.012 * Math.sin(T * 1.7);
+      L.sprite(n, x0, y0, { w, h, flip: fl, u, rot, pivot: [fl ? (1 - g.cx) * w : g.cx * w, g.gf * h] });
+      r.head = [gx, y0 + g.tf * h];
+      if (ST.carry === 'rotten' && has('rotten')) { const hh = 44, ww = L.hsz('rotten', hh); L.sprite('rotten', gx - ww / 2 + (fl ? -10 : 10), gy - KH * 0.48, { w: ww, h: hh }); }
+      if (ST.gun && !(ST.hidden)) drawRifle(gx, gy);
+      return; }
+    const hd = f.hd; if (!hd) return; const n = 'cos_' + cos + '_' + v; if (!has(n)) return;
+    const spec = { pumpkin: [0.31, 0.6, 0.0], hat: [0.42, 0.86, -0.05], horns: [0.27, 1.0, -0.035] }[cos];
+    let w = KH * spec[0], h = w * A[n].h / A[n].w; if (cos === 'horns') { h = KH * 0.105; w = h * A[n].w / A[n].h; }      // the horns keep their height in every view
+    L.sprite(n, hd[0] - w / 2, hd[1] + KH * spec[2] - h * spec[1], { w, h, flip: fl, u });
+    if (cos === 'pumpkin' && v <= 2) { const q = [hd[0] + (fl ? -1 : 1) * w * [0, 0.12, 0.3][v], hd[1] - h * 0.12]; L.glow(q[0], q[1], 16, [1, 0.7, 0.25], 0.5 + 0.15 * Math.sin(T * 9), 2.5); }
+    r.head = [hd[0], hd[1] - (cos === 'hat' ? KH * 0.3 : KH * 0.12)]; }
   const K16XF = 0.07, MZ = new WeakMap();                                     // MZ: where each BB left the drawn muzzle                                                            // crossfade between neighbouring directions (s)
   function drawKolya(X, Y, a) {
     const v = SIM.KVIEWS[ST.vi === undefined ? 1 : ST.vi], view = v[0], flip = v[2], sp = Math.hypot(ST.vx, ST.vy), moving = sp > 25 && !ST.hidden;
@@ -212,6 +243,8 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     else if (moving || turning) { kind = 'walk'; const seq = KSEQ[view] || [0, 1, 2, 3, 4, 5, 6, 7]; i = seq[Math.floor(((ST.gph % 1) + 1) % 1 * seq.length) % seq.length]; }
     else { kind = 'idle'; sy = 1 + (ST.neutral ? 0 : 0.006 * Math.sin(T * 2.2)); }  // idle: breathing
     let r = null;
+    const cos = ST.costume && !ST.hidden && has('cos_ghost_0') ? ST.costume : '';
+    AFLOW = cos === 'ghost' ? 0.36 * 300 : 0;                                    // under the sheet only the shins and the shoes of the frame are drawn
     const carry = ST.carry === 'rotten' && has('k16c_p0w') && !th && !use && !pick && !ST.hidden;
     if (carry) kind = moving || turning ? 'walk' : 'idle';
     const set = carry ? 'k16c' : hset;
@@ -224,13 +257,17 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       const KN = (b) => (N === 32 ? K32(b, set) : K16(b, set));
       const ph8 = ((ST.gph % 1) + 1) % 1, fi = kind !== 'walk' ? 8 : turning ? [1, 2, 5, 6][Math.floor(ph8 * 4) % 4] : Math.floor(ph8 * 8) % 8, yaw = bin * st, bob = kind === 'walk' ? (1.3 + 1.4 * Math.abs(Math.sin(yaw))) * (0.5 - 0.5 * Math.cos(4 * Math.PI * ST.gph)) : 0;   // front/back: a deeper bob
       const swy = kind === 'walk' && !turning ? 3 * Math.abs(Math.sin(yaw)) * Math.sin(2 * Math.PI * ST.gph) : 0, Xs = X + swy;   // weight over the stance foot
-      const [n1, f1] = KN(bin); r = atlasFrame(n1, fi, Xs, Y - bob, f1, mkU(f1, a), sy);
+      const [n1, f1] = KN(bin), bm = /_m(\d+)w$/.exec(n1), bw = kind === 'walk' && !turning && bm ? Math.max(0, Math.min(1, (+bm[1] - 45) / 45)) : 0;
+      const gs = Math.sin(2 * Math.PI * ph8), legs = bw ? [0.13 * bw * Math.max(0, gs), 0.13 * bw * Math.max(0, -gs)] : null;   // walking away: the stepping foot rises
+      r = atlasFrame(n1, fi, Xs, Y - bob, f1, mkU(f1, a), sy, KH, legs);
       const xf = ST.t - binT, dd = ((((ST.yaw || 0) - bin * st) / st + N / 2) % N + N) % N - N / 2;
       if (Math.abs(ST.yawV || 0) > 1.5 && Math.abs(dd) > 0.08) { const [n0, f0] = KN((bin + (dd > 0 ? 1 : N - 1)) % N); atlasFrame(n0, fi, Xs, Y - bob, f0, mkU(f0, a * Math.min(0.5, Math.abs(dd))), sy); }
       else if (xf >= 0 && xf < K16XF && binP !== bin) { const [n0, f0] = KN(binP); atlasFrame(n0, fi, Xs, Y - bob, f0, mkU(f0, a * (1 - xf / K16XF)), sy); }
       if (r && (set === 'k16' || set === 'k16c')) r.led = null;                    // the phone light / the muzzle come from the atlas
     }
+    AFLOW = 0;
     if (!r) r = kolyaFrame(view, kind === 'idle' ? 'act' : kind, kind === 'idle' ? 0 : i, X, Y, flip, u, sy) || { head: [X, Y - KH], led: null };
+    if (cos && r.af) costumeOver(cos, r, a, kind === 'walk' && !turning);
     if (r.led && ST.light) { L.glow(r.led[0], r.led[1], 22, [1, 0.97, 0.85], 0.9, 3); }
     if (ST.gun && hset !== 'k16r' && !ST.hidden && Math.sin(ST.ang || 0) >= -0.2) drawRifle(X, Y);
     if (ST.gun && hset === 'k16r' && r.led && GT - (ST.shotT || -9) < 0.06) { const c = Math.cos(ST.ang || 0), s2 = Math.sin(ST.ang || 0); L.star(r.led[0] + c * 10, r.led[1] + s2 * 6, 26, [1, 0.95, 0.7], 1); L.glow(r.led[0], r.led[1], 40, [1, 0.8, 0.4], 0.8, 2.5); }
@@ -295,10 +332,17 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     for (let k = 0; k < 4; k++) L.puff(q[0] + (k - 1.5) * 22 + 3 * w, q[1] - 34 - (k % 2) * 12, 40, [0.32 + 0.1 * L.rnd(i, k), 0.12, 0.05], 0.95, i * 5 + k); }
   function car(xc, yc, i, alarm) { const x0 = xc - 150, x1 = xc + 150, y0 = yc - 62, y1 = yc + 62;
     if (has('car_a')) { const n = i % 2 ? 'car_b' : 'car_a', ww = 360, hh = ww * A[n].h / A[n].w; const qc = P(xc, yc); L.shadow(qc[0], qc[1] + 10, 170, 50, 0.5); L.sprite(n, qc[0] - ww / 2, qc[1] - hh * 0.62, { w: ww, h: hh });
-      ST.marks.forEach((m) => { if (m.on === 'scar' && m.id === i) markAt(m, qc[0] - 175 + m.u * 350, qc[1] - 140 + m.v * 195, 0.55, true); }); }
+      ST.marks.forEach((m) => { if (m.on === 'scar' && m.id === i) markAt(m, m.cm ? qc[0] - ww / 2 + m.u * ww : qc[0] - 175 + m.u * 350, m.cm ? qc[1] - hh * 0.62 + m.v * hh : qc[1] - 140 + m.v * 195, 0.55, true); }); }
     else { isoBox(x0, y0, x1, y1, 18, 70, [0.1, 0.1, 0.12], [0.16, 0.14, 0.16], [0.08, 0.08, 0.09]); isoBox(x0 + 70, y0 + 10, x1 - 60, y1 - 10, 70, 112, [0.12, 0.12, 0.15], [0.22, 0.25, 0.3], [0.12, 0.13, 0.16]); }
-    const on = alarm && Math.floor(GT * 4) % 2 === 0, tl = P(x0 + 5, y1 - 25, 50), hl = P(x1 - 5, y1 - 25, 50);
-    glowE(tl[0], tl[1], 22, 12, [1, 0.12, 0.05], 0.7 + (on ? 0.8 : 0)); if (on) { glowE(hl[0], hl[1], 40, 20, [1, 0.7, 0.2], 1.2); glowE(tl[0], tl[1], 60, 30, [1, 0.5, 0.1], 0.8); } }
+    const on = alarm && Math.floor(GT * 4) % 2 === 0;
+    if (has('car_a')) {   // v10: the lamps where the sprite draws them (px in the 720-wide image): both tail lights and the headlight flash together
+      const n = i % 2 ? 'car_b' : 'car_a', ww = 360, hh = ww * A[n].h / A[n].w, qc = P(xc, yc), k = ww / A[n].w, ox = qc[0] - ww / 2, oy = qc[1] - hh * 0.62;
+      const LP = i % 2 ? { tail: [[38, 300], [158, 380]], head: [[694, 132]] } : { tail: [[28, 285], [205, 360]], head: [[690, 112]] };
+      LP.tail.forEach(([px, py]) => { const x = ox + px * k, y = oy + py * k; glowE(x, y, 16, 10, [1, 0.12, 0.05], 0.55 + (on ? 0.6 : 0)); if (on) glowE(x, y, 54, 28, [1, 0.5, 0.1], 0.9); });
+      if (on) LP.head.forEach(([px, py]) => { const x = ox + px * k, y = oy + py * k; glowE(x, y, 46, 24, [1, 0.75, 0.3], 1.2); });
+      if (on) { const q = P(xc, yc, 0); L.glow(q[0], q[1] - 20, 230, [1, 0.45, 0.12], 0.18, 2); } }                 // the orange wash on the asphalt around the car
+    else { const tl = P(x0 + 5, y1 - 25, 50), tr2 = P(x0 + 5, y0 + 25, 50), hl = P(x1 - 5, y1 - 25, 50);
+      [tl, tr2].forEach((q) => { glowE(q[0], q[1], 22, 12, [1, 0.12, 0.05], 0.7 + (on ? 0.8 : 0)); if (on) glowE(q[0], q[1], 60, 30, [1, 0.5, 0.1], 0.8); }); if (on) glowE(hl[0], hl[1], 40, 20, [1, 0.7, 0.2], 1.2); } }
   function bin(x, y, down = 0) { if (has('bins')) { const q = P(x, y), h = 86, w = L.hsz('bins', h); L.shadow(q[0] - 20 * down, q[1], 40 + 20 * down, 14, 0.4);
       if (down > 0) { L.sprite('bins', q[0] - w / 2, q[1] - h + 6, { w, h, rot: -1.45 * down, pivot: [w * 0.15, h * 0.95] }); return; }
       L.sprite('bins', q[0] - w / 2, q[1] - h + 6, { w, h }); return; }
@@ -334,9 +378,10 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     if (hs) L.sprite(h.tex, hs.x, hs.y, { w: hs.w, h: hs.h });
     else { isoBox(h.x0, h.y0, h.x1, h.y1, 0, 170, [0.15, 0.12, 0.12], [0.3, 0.26, 0.24], [0.22, 0.19, 0.18]); }
     return hs; }
-  function houseLights(h, hs, i) { if (!hs) return; (hs.an.lights || []).forEach(([lx, ly, n], j) => { const X = hs.x + lx * hs.k, Y = hs.y + ly * hs.k, r = Math.min(110, 18 + Math.sqrt(n) * 1.6);
-    L.glow(X, Y, r, WARM, 0.22 * flick(i * 10 + j, 0.6), 3.2); });
-    const d = P(h.door[0], h.y1 + 70); glowE(d[0], d[1], 150, 75, WARM, 0.2 * flick(i * 3, 0.5), 2.2); }
+  function houseLights(h, hs, i) { if (!hs) return; const bo = ST.blackout && GT < ST.blackout.end ? 0.25 : 1;          // v10: a blackout dims the windows too
+    (hs.an.lights || []).forEach(([lx, ly, n], j) => { const X = hs.x + lx * hs.k, Y = hs.y + ly * hs.k, r = Math.min(110, 18 + Math.sqrt(n) * 1.6);
+    L.glow(X, Y, r, WARM, 0.22 * bo * flick(i * 10 + j, 0.6), 3.2); });
+    const d = P(h.door[0], h.y1 + 70); glowE(d[0], d[1], 150, 75, WARM, 0.2 * bo * flick(i * 3, 0.5), 2.2); }
 
   // ---------- frame ----------
   S.render = (t) => {
@@ -361,6 +406,8 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     for (let x = Math.floor((cx / C) / 400) * 400 - 2400; x < (cx + W) / C + 1200; x += 400) { gSolid(x, -9, x + 230, -4, [0.78, 0.56, 0.16], 0.65); gSolid(x, 4, x + 230, 9, [0.78, 0.56, 0.16], 0.65); }
     for (let k = 0; k < 9; k++) gSolid(3120 + k * 38, -185, 3120 + k * 38 + 20, 185, [0.8, 0.78, 0.72], 0.32);
     [[2000, 70], [4400, -60], [5800, 80]].forEach(([x, y]) => { const q = P(x, y); ell(L.P.shadow, q[0], q[1], 46, 23, { u_amt: 0.75 }); L.ring(q[0], q[1], 44, 22, [0.3, 0.27, 0.25], 0.5, 0.12); });
+    // v10 rain: the ground darkens, puddles appear
+    const RAIN = ST.noWeather ? 0 : SIM.rainAt(GT); if (RAIN > 0.003) L.rain(GT, RAIN, [cx, cy], 'ground');
     // puddles reflecting lamps (wet road)
     SIM.LAMPS.forEach(([x, y], i) => { const ry = y < 0 ? -150 : 150, q = P(x + 60, ry); if (!onScreen(q)) return; glowE(q[0], q[1] + 30, 24, 110, LAMPC, 0.16 * flick(i, 0.3), 2); });
     // chalk drawing
@@ -398,10 +445,11 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       add([ax0, ay0 - 6, ax1, ay0 + 6], () => fence(ax0, ax1, ay0));
       ALLEYBULBS.forEach(([x, y], i) => add([x - 4, y - 20, x + 4, y + 20], () => { const q = P(x, y, 104); L.solid(q[0] - 1, q[1] - 2, 14, 3, [0.16, 0.14, 0.12]); L.rrect(q[0] - 4, q[1] - 2, 8, 10, 4, [0.85, 1, 0.75], [0.5, 0.6, 0.45]); })); }
     (SIM.PROPS || []).forEach(([n, x, y, r]) => { if (vis(x, y)) add([x - r, y - r, x + r, y + r], () => propSprite(n, x, y, 130)); });
-    // the north: backyards, the back fence, lot dividers and the wood (decor only, out of reach)
-    (SIM.NDECOR || []).forEach(([n, x, y, w]) => { if (vis(x, y, 600)) add([x - 70, y - 50, x + 70, y + 50], () => propSprite(n, x, y, w)); });
+    // the north: backyards (walkable since v10, the clutter is solid), the back fence, lot dividers with a wicket, the wood
+    (SIM.NDECOR || []).forEach((d) => { const [n, x, y, w] = d; if (vis(x, y, 600)) add(SIM.nsBox(d), () => propSprite(n, x, y, w)); });
     (SIM.NFENCE || []).forEach(([a, b, y]) => { for (let x = a; x < b; x += 900) { const x2 = Math.min(b, x + 900); if (vis(x, y, 1200) || vis(x2, y, 1200)) add([x, y - 8, x2, y + 8], () => fence(x, x2, y)); } });
-    (SIM.NDIV || []).forEach((x) => { if (!vis(x, -1200, 1200)) return; const Lw = 250 * 0.96 / C * 0.96, y0 = SIM.FACADE - 430; for (let y = -1420; y < y0 - 4; y += Lw) { const y2 = Math.min(y0, y + Lw); add([x - 4, y, x + 4, y2], () => sideFence(x, y, y2)); } });
+    (SIM.NDIV || []).forEach((x) => { if (!vis(x, -1200, 1200)) return; const Lw = 250 * 0.96 / C * 0.96, y0 = SIM.FACADE - 430, G2 = SIM.NGATE;
+      for (const [ya, yb] of [[-1420, G2[0]], [G2[1], y0]]) for (let y = ya; y < yb - 4; y += Lw) { const y2 = Math.min(yb, y + Lw); add([x - 4, y, x + 4, y2], () => sideFence(x, y, y2)); } });
     (SIM.NTREES || []).forEach(([x, y, s], i) => { if (visTree(x, y, s)) add([x - 30 * s, y - 30 * s, x + 30 * s, y + 30 * s], () => ntree(x, y, s, i)); });
     MD.forEach(([id, k, h]) => { if (!((ST.courier && (ST.courier.mod || 'kirill') === id && !['wait', 'come'].includes(ST.courier.st)) || k.pr.pizza)) return;
       const x = h.door[0] + 95, y = SIM.FACADE + 46; add([x - 14, y - 14, x + 14, y + 14], () => { const q = P(x, y); L.shadow(q[0], q[1], 20, 7, 0.45); pizzaStack(q[0], q[1] + 2, 48); }); });
@@ -471,6 +519,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     B.forEach((it) => it.draw());
     // night: darker everywhere (settings → brightness), the phone flashlight cuts through; lamps re-light their pools below
     { const ho0 = S.kolLed || P(ST.x, ST.y, 62), d0 = [Math.cos(ST.ang || 0), Math.sin(ST.ang || 0)], nAmt = (window.SETTINGS && SETTINGS.night !== undefined) ? SETTINGS.night : 0.4;
+      if (RAIN > 0.003) L.solid(0, 0, W, H, [0.015, 0.02, 0.035], 0, 0, 0, 0.2 * RAIN);                                   // v10: overcast under the rain
       if (nAmt > 0.01) { G.draw(L.P.night, { u_o: ho0, u_d: d0, u_on: ST.light ? 1 : 0, u_amt: nAmt }, G.xf(0, 0, W, H));
         SIM.LAMPS.forEach(([x, y], i) => { const q = P(x, y); if (onScreen(q) && SIM.lampLit(ST, i)) pool(x + (y < 0 ? 40 : -40), y + (y < 0 ? 40 : -40), 210, LAMPC, 0.5 * nAmt * flick(i, 0.3) * relight(i)); });
         (SIM.NDECOR || []).forEach(([n, x, y], i) => { if ((n === 'greenhouse' || n === 'shed') && onScreen(P(x, y))) { pool(x, y + 30, n === 'greenhouse' ? 170 : 110, LAMPC, 0.42 * nAmt * flick(i + 7, 0.2)); const g2 = P(x, y, n === 'greenhouse' ? 60 : 70); L.glow(g2[0], g2[1], 60, [1, 0.75, 0.4], 0.35, 2.5); } }); } }
@@ -503,7 +552,10 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     MD.forEach(([id, k]) => { const F = k.fire; if (!F || F.done) return; const q = P(F.x, F.y, 6); L.rrect(q[0] - 14, q[1] - 10, 28, 12, 3, [0.8, 0.1, 0.08], [0.5, 0.05, 0.04]); for (let j = 0; j < 4; j++) L.star(q[0] + 10 + 8 * L.rnd(GT * 30 | 0, j) - 4, q[1] - 14 - 10 * L.rnd(j, GT * 30 | 0), 14, [1, 0.8, 0.3], 0.9); });
     // event FX
     for (const e of ev) { const a = GT - e.t; if (a < 0) continue;
-      if (e.k === 'step' && a < 0.5) { const q = P(e.x, e.y), u = a / 0.5; L.puff(q[0] + (e.foot ? 8 : -8), q[1] - 3 - 6 * u, 5 + 7 * u, [0.35, 0.27, 0.24], 0.25 * (1 - u), e.t * 9); }
+      if (e.k === 'step' && a < 0.5) { const q = P(e.x, e.y), u = a / 0.5, fx = q[0] + (e.foot ? 8 : -8);
+        if (RAIN > 0.15) { L.ring(fx, q[1] - 2, 8 + 26 * u, 4 + 12 * u, [0.7, 0.78, 0.9], 0.55 * (1 - u) * RAIN, 0.14);          // v10: a splash in the puddles
+          if (a < 0.3) for (let j = 0; j < 5; j++) { const an = -Math.PI * (0.15 + 0.7 * L.rnd(e.t * 7, j)), v = 40 + 50 * L.rnd(j, e.t * 3); L.rrect(fx + Math.cos(an) * v * a - 1.5, q[1] - 4 + Math.sin(an) * v * a + 260 * a * a - 1.5, 3, 3, 1.5, [0.75, 0.82, 0.95], [0.5, 0.6, 0.75], (1 - a / 0.3) * RAIN); } }
+        else L.puff(fx, q[1] - 3 - 6 * u, 5 + 7 * u, [0.35, 0.27, 0.24], 0.25 * (1 - u), e.t * 9); }
       if (e.k === 'splat' && a < 0.5 && e.sx !== undefined) { const q = [e.sx - cx, e.sy - cy], u = a / 0.5; for (let j = 0; j < 7; j++) { const an = j / 7 * 6.28 + e.t, d = 10 + 40 * u; L.puff(q[0] + Math.cos(an) * d, q[1] + Math.sin(an) * d * 0.7 + 30 * u * u, 6 * (1 - u) + 2, [1, 0.85, 0.3], 1 - u, j + e.t); } }
       if (e.k === 'tpland' && a < 0.6 && e.sx !== undefined) { const q = [e.sx - cx, e.sy - cy], u = a / 0.6; L.ring(q[0], q[1], 20 + 40 * u, 12 + 20 * u, [1, 1, 0.95], 1 - u); }
       if (e.k === 'pile' && a < 1.2) { const q = P(e.x, e.y), u = a / 1.2; for (let j = 0; j < 14; j++) { const s = L.rnd(e.i, j), an = -Math.PI * (0.15 + 0.7 * s), v = 120 + 160 * L.rnd(j, e.i);
@@ -529,6 +581,8 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       if (e.k === 'hiss' && a < 1.4) { const q = P(e.x, e.y, 50); L.label('hiss', 'Ш-Ш-Ш!', q[0], q[1] - 10 * a, { size: 22, col: '#c8ff8a', out: '#102000', al: 0.5, a: 1 - a / 1.4 }); }
       if (e.k === 'angry' && a < 0.8) { const q = P(e.x, e.y, 120); L.puff(q[0], q[1], 30 + 30 * a, [0.9, 0.2, 0.15], 0.5 * (1 - a / 0.8), 7); }
       if (e.k === 'putdown' && a < 0.5) { const q = P(e.x, e.y), u = a / 0.5; for (let j = 0; j < 5; j++) L.puff(q[0] + (j - 2) * 12 * (1 + u), q[1] - 4 - 10 * u, 8 + 10 * u, [0.35, 0.28, 0.24], 0.35 * (1 - u), j); }
+      if (e.k === 'costume' && a < 0.9) { const q = P(e.x, e.y, 60), u = a / 0.9; for (let j = 0; j < 10; j++) { const an = j / 10 * 6.28 + e.t; L.puff(q[0] + Math.cos(an) * 50 * (0.3 + u), q[1] + Math.sin(an) * 30 * (0.3 + u) - 30 * u, 22 + 20 * u, [0.92, 0.9, 0.95], 0.75 * (1 - u), j + 11); }
+        if (a < 0.5) for (let j = 0; j < 5; j++) L.star(q[0] + (L.rnd(e.t, j) - 0.5) * 120, q[1] - 40 - 60 * L.rnd(j, e.t), 18, [1, 0.85, 0.5], 1 - a / 0.5); }
       if (e.k === 'slime' && a < 1) { const q = P(e.x + 20, SIM.FACADE, 60); L.glow(q[0], q[1], 60, [0.3, 1, 0.3], 0.8 * (1 - a), 3); } }
     Object.keys(ST.hslime || {}).forEach((id) => { const h = SIM.HOUSES.find((q2) => q2.id === id); if (!h) return; const q = P(h.door[0] + 22, SIM.FACADE + 2, 58); ell(L.P.puff, q[0], q[1], 12, 16, { u_col: [0.35, 0.95, 0.3], u_amt: 0.95, u_seed: 5 }); });
     MD.forEach(([id, k, h]) => { if (!k.slime) return; const q = P(h.door[0] + 22, SIM.FACADE + 2, 58); ell(L.P.puff, q[0], q[1], 12, 16, { u_col: [0.35, 0.95, 0.3], u_amt: 0.95, u_seed: 4 }); L.glow(q[0], q[1], 30, [0.3, 1, 0.3], 0.25, 3); });
@@ -555,12 +609,25 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     if (ST.hp > 0) { const hu = ev.find((e) => e.k === 'hurt' && GT - e.t < 0.5); if (hu) { const a = 1 - (GT - hu.t) / 0.5; G.draw(L.P.solid, { u_col: [0.6, 0.02, 0.02], u_a: 0.25 * a }, G.xf(0, 0, W, H)); } }
     else { const a = Math.min(0.7, (GT - (ST.koT || GT)) / 2); G.draw(L.P.solid, { u_col: [0, 0, 0], u_a: a }, G.xf(0, 0, W, H)); }
 
+    // v10 rain: splashes and lit puddles, then the slanted streaks over everything; lightning flashes the whole street
+    if (RAIN > 0.003) { L.rain(GT, RAIN * 1.4, [cx, cy], 'fx', { mask: noMask() }); L.rain(GT, RAIN * 1.5, [cx, cy], 'sky', { wind: 0.16 }); }
+    for (const e of ev) { if (e.k !== 'lightning') continue; const a = GT - e.t; if (a < 0 || a > 0.6) continue;
+      const f = (a < 0.07 ? 1 : a < 0.14 ? 0.25 : a < 0.24 ? 0.8 : Math.max(0, 1 - (a - 0.24) / 0.36) * 0.5) * (e.near ? 1 : 0.55);
+      G.blend('add'); L.solid(0, 0, W, H, [0.55, 0.6, 0.8], 0, 0, 0, 0.55 * f); G.blend(); }
     // ===== world-space UI (bubbles, prompts) =====
+    behindMark();
     bubbles();
     hud();
   };
+  let NOMASK = null; const noMask = () => { if (!NOMASK) { const cv = document.createElement('canvas'); cv.width = cv.height = 2; G.canvasTex('rain_nomask', cv, { mip: false }); NOMASK = 1; } return G.tex('rain_nomask'); };
+  // v10: behind a house the roof hides Kolya completely (the house art is not see-through) — a small chevron over the roof says where he is
+  function behindMark() { if (ST.finale || ST.hidden) return; const cov = (z) => { const c = [C * (ST.x + ST.y), SN * (ST.y - ST.x) - z];
+      return SIM.HOUSES.some((h) => ((ST.y < h.y0 + 30 && ST.x > h.x0 - 60) || (ST.x > h.x1 - 30 && ST.y < h.y1)) && SIM.maskHit(SIM.houseRect(h), c)); };
+    if (!(cov(25) && cov(70) && cov(115))) return; const q = P(ST.x, ST.y, 150), b = 4 * Math.sin(GT * 5);
+    L.label('behindmk', '▼', q[0], q[1] + b, { size: 30, col: '#ffb45a', out: '#2a0a02', al: 0.5, a: 0.75 }); }
   // a lamp that was shot out comes back after 90 s with a stutter
-  const relight = (i) => { const o = ST.lampOff && ST.lampOff[i]; if (o === undefined) return 1; const a = GT - o - 90; return a < 0 || a > 1.5 ? 1 : (Math.sin(a * 37) > 0.2 ? 1 : 0.15); };
+  const relight = (i) => { const b = ST.blackout; if (b) { const a2 = GT - b.end; if (a2 >= 0 && a2 < 1.3) return Math.sin(a2 * 41 + i * 2.3) > 0 ? 1 : 0.12; }     // v10: the power comes back with a stutter
+    const o = ST.lampOff && ST.lampOff[i]; if (o === undefined) return 1; const a = GT - o - 90; return a < 0 || a > 1.5 ? 1 : (Math.sin(a * 37) > 0.2 ? 1 : 0.15); };
   const vis0 = (x, y, m = 500) => onScreen(P(x, y), m);
   // a tree is drawn up from its foot: visible only while the foot is below the top edge and less than a tree height under the bottom
   const visTree = (x, y, s) => { const q = P(x, y); return q[0] > -260 * s && q[0] < W + 260 * s && q[1] > -20 && q[1] < H + 580 * s; };
@@ -875,6 +942,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       else items.push(['', k.done >= 0 ? `Дом ${md.gen} закидан!` : `Закидать дом ${md.gen} (${Math.round(k.p)} %)`, k.done >= 0, k.done >= 0 ? null : k.p / 100]); });
     items.push(['★', 'Украшения для двора', true]);
     items.push(['', ST.q.vera === 0 ? 'Поговорить с Верой' : ST.q.vera === 1 ? `Найти пропавшие тыквы (${ST.vp.filter((v) => v >= 0).length}/3)` : 'Тыквы вернулись к Вере', ST.q.vera === 2]);
+    if (ST.q.vera === 2) items.push(['', 'Костюм из сундука Веры (по желанию)', !!ST.costume]);
     items.push(['☆', 'Странные огни', true]);
     items.push(['', 'Осмотреть источник света на окраине района', ST.q.strange > 0]);
     if (K.done >= 0 && (K.auction > 0 || K.revengeAt < 0)) { items.push(['☠', 'Месть Кирилла', true]); items.push(['', `Трусы на аукционе: продано лотов ${K.auction}`, false]); }
@@ -920,11 +988,11 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     if (d.cg && has(d.cg)) { if (S.cgDlg !== d) { S.cgDlg = d; S.cgT0 = T; } const a = A[d.cg], f = Math.min(1, 0.3 + (T - S.cgT0) / 0.3), hh = 600 + 30 * f, ww = hh * a.w / a.h, x = W / 2 - ww / 2, y = p.y - hh - 26;   // forgiven: the picture over the dialog
       panel(x - 10, y - 10, ww + 20, hh + 20, 18, 0.95 * f); L.sprite(d.cg, x, y, { w: ww, h: hh, u: { alpha: f } }); }
     panel(p.x, p.y, p.w, p.h, 18, 0.94); L.uiBox('dlg', p.x, p.y, p.w, p.h, 6);
-    const por = d.who === 'kirill' ? 'kirill_se' : null; L.rrect(p.x + 20, p.y + 20, 120, 120, 14, [0.2, 0.14, 0.2], [0.08, 0.05, 0.08]);
+    const por = d.who === 'kirill' ? 'kirill_se' : d.who === 'vera' ? 'npc_witch_se' : null; L.rrect(p.x + 20, p.y + 20, 120, 120, 14, [0.2, 0.14, 0.2], [0.08, 0.05, 0.08]);
     const pf = { raiva: ['rf_se_act', ST.rai.refused ? 1 : 0], elf: ['ef_se_act', ST.elf.sweet ? 5 : ST.elf.refused ? 1 : 0] }[d.who];
     if (pf && has(pf[0])) { const m = KF[pf[0]], ch = 0.34 * m.fh, cw = ch * 100 / 110, cx0 = pf[1] * m.fw + m.ax - cw / 2, tw = m.n * m.fw;
       L.sprite(pf[0], p.x + 30, p.y + 26, { w: 100, h: 110, src: [cx0 / tw, 0.02, (cx0 + cw) / tw, 0.02 + ch / m.fh] }); }
-    else if (por && has(por)) L.sprite(por, p.x + 30, p.y + 26, { w: 100, h: 110, src: [0.12, 0.0, 0.88, 0.3] }); else drawPortrait(p.x + 80, p.y + 80);
+    else if (por && has(por)) L.sprite(por, p.x + 30, p.y + 26, { w: 100, h: 110, src: por === 'npc_witch_se' ? [0.14, 0.0, 0.86, 0.335] : [0.12, 0.0, 0.88, 0.3] }); else drawPortrait(p.x + 80, p.y + 80);
     L.label('dlgname', name, p.x + 160, p.y + 36, { size: 28, col: '#ffb45a', out: '#120806' });
     wrap(d.text, 25, p.w - 200, 'normal').slice(0, 3).forEach((l, i) => L.label('dlgt' + i, l, p.x + 160, p.y + 76 + i * 32, { size: 25, col: '#f6e7c8', out: '#120806', weight: 'normal' }));
     lay.choices.forEach((r, i) => { const hov = ST.ptr && ST.ptr[0] > r.x && ST.ptr[0] < r.x + r.w && ST.ptr[1] > r.y && ST.ptr[1] < r.y + r.h;

@@ -3,7 +3,7 @@
 // (volume by distance to Kolya, pan by screen x). M mutes. The AudioContext starts on the first key or click.
 (function () {
   const AU = (window.AUDIO = { muted: false, vol: { master: 1, music: 1, sfx: 1 } });
-  let ac = null, master, comp, sfx, amb, mus, phoneBus, partyBus, NB = null, windG = null, windF = null;
+  let ac = null, master, comp, sfx, amb, mus, phoneBus, partyBus, NB = null, windG = null, windF = null, rainG = null;
   const seen = new WeakSet();
   let prev = { phone: null, app: null, dlg: null, light: null, hidden: null, loop: -1 }, nextCricket = 0, nextOwl = 0, nextNote = 0, noteI = 0, primed = false;
   const R = (a, b) => a + Math.random() * (b - a);
@@ -16,6 +16,9 @@
     // wind: looping noise through a moving band-pass; its level follows the sim's gusts
     const src = ac.createBufferSource(); src.buffer = NB; src.loop = true; windF = ac.createBiquadFilter(); windF.type = 'bandpass'; windF.frequency.value = 420; windF.Q.value = 0.6;
     windG = ac.createGain(); windG.gain.value = 0.0; src.connect(windF); windF.connect(windG); windG.connect(amb); src.start();
+    // v10 rain: a second noise loop, high and hissy, its level follows the sim's rain
+    { const r = ac.createBufferSource(); r.buffer = NB; r.loop = true; r.playbackRate.value = 0.83; const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1400;
+      const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 7000; rainG = ac.createGain(); rainG.gain.value = 0; r.connect(hp); hp.connect(lp); lp.connect(rainG); rainG.connect(amb); r.start(); }
     // a low drone under the music box
     for (const [f, dt] of [[55, 0], [82.4, 3], [110.3, -4]]) { const o = ac.createOscillator(), g = ac.createGain(), lp = ac.createBiquadFilter(); o.type = 'triangle'; o.frequency.value = f; o.detune.value = dt;
       lp.type = 'lowpass'; lp.frequency.value = 380; g.gain.value = 0.05; o.connect(lp); lp.connect(g); g.connect(mus); o.start(); }
@@ -51,7 +54,8 @@
   }
   // ---- sound effects ----
   const FX = {
-    step: (v, p, surf) => { if (surf === 'grass') noise(0.09, { f: 2600, q: 0.8, vol: 0.05 * v, pan: p }); else if (surf === 'gravel') { noise(0.08, { f: 3200, q: 1.5, vol: 0.06 * v, pan: p }); noise(0.05, { f: 900, q: 2, vol: 0.04 * v, pan: p, at: 0.02 }); }
+    step: (v, p, surf) => { if (surf === 'puddle') { noise(0.12, { f: 1800, f1: 900, q: 1.2, vol: 0.09 * v, pan: p }); noise(0.06, { type: 'highpass', f: 4000, vol: 0.05 * v, pan: p, at: 0.02 }); return; }
+      if (surf === 'grass') noise(0.09, { f: 2600, q: 0.8, vol: 0.05 * v, pan: p }); else if (surf === 'gravel') { noise(0.08, { f: 3200, q: 1.5, vol: 0.06 * v, pan: p }); noise(0.05, { f: 900, q: 2, vol: 0.04 * v, pan: p, at: 0.02 }); }
       else { noise(0.05, { f: 1400, q: 2.2, vol: 0.07 * v, pan: p }); tone(110, 0.05, { vol: 0.05 * v, pan: p }); } },
     pile: (v, p) => { noise(0.7, { f: 4200, f1: 2400, q: 0.7, vol: 0.16 * v, pan: p, am: 23 }); noise(0.35, { f: 1800, q: 1, vol: 0.08 * v, pan: p, at: 0.05, am: 31 }); },
     coin: (v, p) => { tone(1318, 0.12, { type: 'square', vol: 0.06 * v, pan: p, lp: 5000 }); tone(1976, 0.35, { type: 'square', vol: 0.06 * v, pan: p, at: 0.08, lp: 6000 }); tone(3951, 0.25, { vol: 0.03 * v, pan: p, at: 0.1 }); },
@@ -65,6 +69,11 @@
     fuse: (v, p) => { for (let k = 0; k < 14; k++) noise(0.2, { f: R(4000, 7000), q: 2, vol: 0.05 * v, at: k * 0.21, pan: p, am: 40 }); },
     bang: (v, p) => { noise(1.2, { type: 'lowpass', f: 1800, f1: 120, vol: 0.9 * v, pan: p }); tone(60, 0.6, { f1: 30, vol: 0.6 * v, pan: p });
       for (let k = 0; k < 10; k++) { const at = 0.15 + k * R(0.07, 0.16); noise(0.06, { f: R(1500, 4000), q: 1, vol: 0.25 * v, at, pan: p + R(-0.3, 0.3) }); } },
+    // v10 weather: thunder rolls in after the flash (farther = later and duller), the power dies with a thump, steps splash
+    lightning: (v, p, e) => { const dl = e && e.dl || 1, near = e && e.near; noise(0.25, { type: 'highpass', f: 2500, vol: (near ? 0.35 : 0.12), at: dl * 0.25 });
+      noise(3.2, { type: 'lowpass', f: near ? 900 : 420, f1: 60, vol: near ? 0.8 : 0.45, at: dl, am: 7 }); tone(48, 2.5, { f1: 30, vol: near ? 0.35 : 0.2, at: dl + 0.05 }); },
+    costume: () => { noise(0.5, { f: 900, f1: 3500, q: 0.8, vol: 0.18 }); for (let k = 0; k < 4; k++) tone(880 * [1, 1.25, 1.5, 2][k], 0.25, { type: 'triangle', vol: 0.06, at: 0.1 + k * 0.07 }); },
+    blackout: () => { tone(120, 0.4, { f1: 40, vol: 0.18, type: 'sawtooth', lp: 400 }); noise(0.08, { f: 3000, q: 2, vol: 0.12 }); },
     caralarm: (v, p) => { for (let k = 0; k < 9; k++) tone(k % 2 ? 900 : 650, 0.42, { type: 'square', vol: 0.05 * v, at: k * 0.45, pan: p, lp: 3000 }); },
     hurt: (v) => { noise(0.15, { type: 'lowpass', f: 600, vol: 0.4 * v }); tone(140, 0.2, { f1: 70, vol: 0.3 * v }); },
     splat2: (v, p) => { noise(0.08, { f: 900, q: 1.5, vol: 0.35 * v, pan: p }); tone(180, 0.12, { f1: 90, vol: 0.2 * v, pan: p }); },
@@ -142,6 +151,7 @@
     const t = ac.currentTime;
     if (window.SIM && S) { const g = SIM.gustAt(T, S.x || 0), w = 0.5 + 0.3 * Math.sin(T * 0.13); windG.gain.setTargetAtTime(0.03 + 0.05 * w + 0.12 * Math.min(1, g), t, 0.4); windF.frequency.setTargetAtTime(360 + 500 * Math.min(1, g), t, 0.5); }
     else windG.gain.setTargetAtTime(0.05, t, 0.5);
+    if (rainG) rainG.gain.setTargetAtTime(window.SIM && S && !S.noWeather && SIM.rainAt ? 0.22 * SIM.rainAt(S.t) : 0, t, 0.8);
     if (t > nextCricket) { nextCricket = t + R(0.25, 0.9); const f = R(4300, 5200), p = R(-0.8, 0.8); for (let k = 0; k < 3; k++) tone(f, 0.03, { vol: 0.012, at: k * 0.05, dest: amb, pan: p }); }
     if (t > nextOwl) { if (nextOwl) { const p = R(-0.9, 0.9); tone(370, 0.35, { vol: 0.05, dest: amb, pan: p, vib: 4, lp: 900 }); tone(330, 0.6, { vol: 0.05, dest: amb, pan: p, at: 0.45, vib: 4, lp: 900 }); } nextOwl = t + R(22, 45); }
     const RD = S && S.raid; if (RD && RD.st === 'search' && t > (prev.radio || 0)) { if (prev.radio) { const u = RD.units[Math.floor(Math.random() * RD.units.length)], d = Math.hypot(u.x - S.x, u.y - S.y);
@@ -168,7 +178,8 @@
     const SM = window.SIM, cam = S.cam || [0, 0];
     for (const e of S.ev) { if (seen.has(e)) continue; seen.add(e); if (!primed || S.t - e.t > 0.3) continue;
       let v = 1, p = 0; if (e.x !== undefined && SM) { const d = Math.hypot(e.x - S.x, e.y - S.y); v = Math.max(0.12, Math.min(1, 1.25 - d / 1600)); p = (SM.proj(e.x, e.y)[0] - cam[0] - 960) / 1100; }
-      if (e.k === 'step') { if (e.npc) { if (v > 0.3) AU.play('step', (e.boots ? 1.3 : 0.7) * v, p, 'hard'); } else AU.play('step', e.soft ? 0.6 : 1, 0, surf(e.x, e.y)); continue; }
+      if (e.k === 'step') { const wet = SM && SM.rainAt && !S.noWeather && SM.rainAt(S.t) > 0.25; if (e.npc) { if (v > 0.3) AU.play('step', (e.boots ? 1.3 : 0.7) * v, p, wet ? 'puddle' : 'hard'); } else AU.play('step', e.soft ? 0.6 : 1, 0, wet ? 'puddle' : surf(e.x, e.y)); continue; }
+      if (e.k === 'lightning') { AU.play('lightning', 1, p, e); continue; }
       if (e.k === 'flood') { AU.play(e.on ? 'flood_on' : 'flood_off', v, p); continue; }
       if (e.k === 'say' && e.text) { AU.play('dlg', 0.6); continue; }
       if (e.k === 'virus') { AU.play('virus_' + e.kind, 1); continue; }

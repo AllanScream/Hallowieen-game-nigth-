@@ -33,7 +33,7 @@ def mask(path, cell):
     return {'w': W, 'h': H, 'cell': cell, 'rows': rows}
 for f in sorted(glob.glob('live/assets/house_*.png')):
     n = os.path.basename(f)[:-4]; out[n]['mask'] = mask(f, 12)
-for n in ['tree_a', 'tree_b']:
+for n in ['tree_a', 'tree_b', 'car_a', 'car_b']:                                    # v10: the parked cars too (egg / BB hits anywhere on the body)
     f = 'live/assets/%s.png' % n
     if os.path.exists(f): out[n] = {'mask': mask(f, 10)}; out[n]['w'] = out[n]['mask']['w']; out[n]['h'] = out[n]['mask']['h']
 open('live/anchors.js', 'w').write('(typeof window !== "undefined" ? window : globalThis).ANCH = ' + json.dumps(out) + ';\n')

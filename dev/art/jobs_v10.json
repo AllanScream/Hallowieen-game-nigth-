@@ -1,0 +1,27 @@
+[
+ {
+  "name": "costume_ghost",
+  "prompt": "art/prompts/costume_ghost.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium",
+  "ref": [
+   "art/gen/kolya_se.png=Kolya, the current approved in-game sprite (identity, outfit, colours, pixel style)",
+   "refs/kolya.png=Kolya turnaround sheet: front, 3/4, side and back views"
+  ]
+ },
+ {
+  "name": "costume_pumpkin",
+  "prompt": "art/prompts/costume_pumpkin.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium"
+ },
+ {
+  "name": "costume_hats",
+  "prompt": "art/prompts/costume_hats.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium"
+ }
+]

@@ -2,7 +2,7 @@
 // World: x along the street (screen up-right), y across toward the viewer (screen down-right). Units ≈ 1/55 m.
 // Everything that happens lives here (movement, NPCs, Kirill, pranks, phone, quests, money, camera); the scene only draws.
 (function (root) {
-  const DT = 1 / 120, L = 26.0, VERSION = 'v9';
+  const DT = 1 / 120, L = 26.0, VERSION = 'v10';
   const VIEW = { W: 1920, H: 1080 };
   const C = 0.894, SN = 0.447;
   const proj = (x, y, z = 0) => [C * (x + y), SN * (y - x) - z];
@@ -42,14 +42,18 @@
   const BINS = [[4180, -760], [4540, -760], [4385, -1295], [2950, -370], [5480, -370]];
   const BENCHES = [[2000, 345], [4050, 345], [6000, 345]];
   const PROPS = [['crates', 4458, -880, 34], ['crates', 6640, -700, 34]];
-  // the north of the map (behind the houses, out of reach): backyards with their clutter, a back fence and a wood beyond it
+  // the north of the map: backyards behind the houses (walkable since v10) with their clutter, a back fence and a wood beyond it
   const NDECOR = [['trampoline', -640, -1170, 210], ['clothesline', -380, -1300, 190], ['pumpkin_patch', 800, -1140, 170], ['greenhouse', 1080, -1260, 200],
     ['swingset', 1700, -1170, 190], ['shed', 2000, -1290, 190], ['shed', 2700, -1260, 190], ['trampoline', 2980, -1150, 210], ['clothesline', 3700, -1160, 190],
     ['pumpkin_patch', 3990, -1280, 170], ['greenhouse', 5000, -1230, 200], ['swingset', 5850, -1160, 190], ['pumpkin_patch', 6150, -1290, 170]];
   const NFENCE = [[X0, ALLEY[0], -1420], [ALLEY[2], X1, -1420]], NDIV = [-140, 460, 1360, 2360, 3360, 5560];   // back fence; lot dividers (x) from the houses' backs to it
+  const NGATE = [-1275, -1165];                                                                             // v10: an open wicket in every lot divider
+  // v10: the backyard clutter is solid — footprints relative to the prop's spot: ['c', dx, dy, r] or ['b', x0, y0, x1, y1]
+  const NSOLID = { trampoline: ['c', 34, -34, 66], clothesline: ['b', -75, -26, 109, -8], pumpkin_patch: ['b', -22, -78, 90, 10], greenhouse: ['b', -39, -67, 89, 17], swingset: ['b', -55, -45, 105, -5], shed: ['b', -52, -46, 52, 46] };
+  const nsBox = ([n, x, y]) => { const f = NSOLID[n]; return f[0] === 'c' ? [x + f[1] - f[3] * 0.75, y + f[2] - f[3] * 0.75, x + f[1] + f[3] * 0.75, y + f[2] + f[3] * 0.75] : [x + f[1], y + f[2], x + f[3], y + f[4]]; };
   const NTREES = [], hh0 = (n) => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); }; for (let r = 0; r < 4; r++) for (let x = X0 - 200 + (r % 2) * 95; x < X1 + 300; x += 190) {
     const j = hh0(x * 0.013 + r * 7.7); NTREES.push([x + (j - 0.5) * 90, -1560 - r * 230 - hh0(x * 0.07 + r) * 90, 0.95 + 0.4 * hh0(x * 0.031 + r * 3.1)]); }
-  [[150, -1150], [420, -1260], [1300, -1200], [2250, -1180], [3250, -1230], [5450, -1180], [6350, -1280]].forEach(([x, y], i) => NTREES.push([x, y, 1.05 + 0.15 * (i % 3)]));   // trees between the yards          // decorative clutter in the alley and the end lot: [tex, x, y, r]
+  const YTREES = [[150, -1150], [420, -1330], [1250, -1320], [2250, -1180], [3250, -1320], [5440, -1340], [6350, -1280]].map(([x, y], i) => [x, y, 1.05 + 0.15 * (i % 3)]); YTREES.forEach((t) => NTREES.push(t));   // trees between the yards          // decorative clutter in the alley and the end lot: [tex, x, y, r]
   const BUSHES = [[HK.x0 - 50, -470], [HK.x1 + 60, -480], [HK.x0 + 60, -395], [1450, -420], [3450, -420], [4650, -400], [4760, -395], [5380, -480], [5600, -480], [800, -400], [6150, -420], [-1040, -470], [-240, -420]];
   const PILES = [[350, -260, 1], [1600, 260, 0], [2300, -420, 1], [2850, -250, 0], [3600, 270, 1], [4350, -900, 1], [5000, -270, 0], [5850, -430, 1], [6250, 250, 0]];
   const FENCE_Y = SWN[0] - 12;
@@ -57,15 +61,32 @@
   const SFENCE = [X0, X1];                             // south picket fence along y = 390 (south yards are not walkable)
   // money: [x, y, ₽, where]
   const MONEY = [[1180, 330, 20, 'bench'], [2000, 360, 50, 'bench'], [4050, 360, 30, 'bench'], [4300, -1200, 100, 'dark'], [4420, -1000, 50, 'dark'],
-    [6550, -1000, 80, 'dark'], [350, -260, 30, 'pile'], [2300, -420, 40, 'pile'], [3600, 270, 25, 'pile'], [4350, -900, 35, 'pile'], [5850, -430, 30, 'pile'], [2650, 120, 10, 'street'], [5100, -120, 15, 'street']];
+    [6550, -1000, 80, 'dark'], [350, -260, 30, 'pile'], [2300, -420, 40, 'pile'], [3600, 270, 25, 'pile'], [4350, -900, 35, 'pile'], [5850, -430, 30, 'pile'], [2650, 120, 10, 'street'], [5100, -120, 15, 'street'],
+    [-560, -1360, 40, 'dark'], [2560, -1370, 60, 'dark'], [5240, -1360, 50, 'dark'], [1820, -1000, 30, 'dark']];   // v10: coins in the backyards
   const VPUMPKINS = [[4440, -1260], [3180, 300], [5640, -430]];   // Вера's missing pumpkins
   const ROTTENS = [[4300, -1120], [6600, -820]], ROTTEN = ROTTENS[0];                    // rotten pumpkins: the alley, the end lot
   const STRANGE = [6560, -950];
   // v9 interactive bits: Vera's candy bowl on her path, the black cat's haunts, the lamp heads (BB targets: shoot a lamp out)
   const BOWL = [HOUSES[0].door[0] + 62, FACADE + 42];
+  // v10: costumes from Vera's chest (after her quest): [id, the choice label, what she says]
+  const COSTUMES = [['ghost', '👻 Призрак', 'Бу-у! Простыня внука. Модеры тебя не узнают. Ну, почти.'], ['pumpkin', '🎃 Тыква', 'Тыква-шлем! Внутри фонарик, чтобы не врезаться в забор.'],
+    ['hat', '🧙 Колдун', 'Шляпа колдуна. Говорят, в ней яйца летят точнее. Врут, конечно.'], ['horns', '😈 Чертёнок', 'Рожки! Тебе идёт. Подозрительно идёт.']];
   const CATSPOTS = [[300, -280], [900, 280], [1800, -300], [2600, 300], [3300, -290], [4100, 270], [4900, -300], [5600, 290], [6200, -290], [-500, -290], [-200, 300], [1300, -280], [3800, 290]];
   const LAMPHEAD = (() => { const a = (root.ASSETS || {}).lamp, w = a ? 270 * a.w / a.h : 200; return [(0.81 - 0.336) * w, 216]; })();   // screen offset of the bulb from the pole's foot
-  const lampLit = (S, i) => !(S.lampOff && S.lampOff[i] !== undefined && S.t - S.lampOff[i] < 90);
+  // v10: rain and thunderstorms on a fixed evening schedule (s of play, faded in and out); during the heavy part lightning strikes now and
+  // then and blacks the street lamps out for a while (darker: the patrol sees less), then the power comes back
+  const RAINW = [[150, 380], [780, 1030], [1440, 1680], [2120, 2400], [2950, 3200], [3700, 3950]];
+  const rainAt = (t) => { let a = 0; for (const [s0, s1] of RAINW) a = Math.max(a, Math.min(1, (t - s0) / 25, (s1 - t) / 25)); return Math.max(0, a); };
+  const STRIKES = []; RAINW.forEach(([s0, s1], w) => { let t = s0 + 45 + 20 * hh0(w * 3.3); while (t < s1 - 35) { STRIKES.push([t, w]); t += 24 + 26 * hh0(t * 0.37 + w); } });
+  const dark = (S) => !!(S.blackout && S.t < S.blackout.end);
+  const lampLit = (S, i) => !dark(S) && !(S.lampOff && S.lampOff[i] !== undefined && S.t - S.lampOff[i] < 90);
+  function weatherStep(S) { if (S.noWeather) return; const t = S.t;
+    if (S.si === undefined) { S.si = STRIKES.findIndex((q) => q[0] > t); if (S.si < 0) S.si = STRIKES.length; }
+    while (S.si < STRIKES.length && STRIKES[S.si][0] <= t) { const [t0, w] = STRIKES[S.si++]; if (t - t0 > 1) continue;
+      const fl = hh0(t0 * 1.7), x = S.x + (fl - 0.5) * 3000, y = -1800 - 600 * hh0(t0 * 2.9), dur = 9 + 7 * hh0(t0 * 0.53);
+      ev(S, { k: 'lightning', x, y, near: fl < 0.35 ? 1 : 0, dl: 0.4 + 1.8 * hh0(t0 * 4.1) });
+      if (fl < 0.75) { const was = dark(S); S.blackout = { t0: t, end: t + dur }; ev(S, { k: 'blackout', x: S.x, y: S.y });
+        if (!was && S.stormW !== w) { S.stormW = w; toast(S, 'Молния! На улице погас свет — патрулю хуже видно'); } } } }
   // achievements, hardest first (tier 3 gold, 2 silver, 1 bronze); n: a counter to reach
   const ACH = [
     { id: 'saint', tier: 3, name: 'Святой Коля', desc: 'Помириться со всеми тремя модерами, не сделав им ни одной гадости' },
@@ -138,21 +159,22 @@
   // ---------------- collision ----------------
   const BOX = [];     // [x0, y0, x1, y1] blocked
   HOUSES.forEach((h) => BOX.push([h.x0, h.y0, h.x1, h.y1]));
-  HOUSES.forEach((h) => { BOX.push([h.x0 - 140, h.y0, h.x0 - 120, FACADE + 0]); });                        // side fences (between yards)
   FENCES.forEach(([a, b]) => BOX.push([a, FENCE_Y - 8, b, FENCE_Y + 8]));
   BOX.push([X0, 390, X1, 410]);                                                                             // south fence
   CARS.forEach(([x, y]) => BOX.push([x - 150, y - 62, x + 150, y + 62]));
   BENCHES.forEach(([x, y]) => BOX.push([x - 68, y - 18, x + 68, y + 20]));                                       // benches are solid
   BOX.push([X0 - 100, -1500, X0, 500], [X1, -1500, X1 + 100, 500]);                                        // street ends
-  // back areas: everything north of the facade except the alley and the end lot
-  const NORTH = [[X0, -1500, ALLEY[0], FACADE], [ALLEY[2], -1500, ENDLOT[0], FACADE], [ALLEY[0], -1500, ALLEY[2], ALLEY[1]], [ENDLOT[0], -1500, X1, ENDLOT[1]]];
-  NORTH.forEach((b) => BOX.push(b));
+  // v10: the backyards are open — only the back fence (and the wood beyond it) stops him; lot dividers with a wicket, solid clutter
+  BOX.push([X0, -1500, X1, -1420]);
+  NDIV.forEach((x) => { BOX.push([x - 6, NGATE[1], x + 6, FACADE - HD], [x - 6, -1420, x + 6, NGATE[0]]); });
+  NDECOR.forEach((d) => { if (NSOLID[d[0]][0] === 'b') BOX.push(nsBox(d)); });
   // the alley's tall side fences and back fence are solid (thick enough that Kolya never overlaps their sprites)
   BOX.push([ALLEY[0] - 14, ALLEY[1], ALLEY[0] + 16, FACADE], [ALLEY[2] - 16, ALLEY[1], ALLEY[2] + 14, FACADE], [ALLEY[0], ALLEY[1] - 6, ALLEY[2], ALLEY[1] + 16]);
   // the garage in the end lot (its sprite's footprint: front corner by the strange lights, walls along +x and −y) is solid
   const GARAGE = [6585, -1199, 6852, -940]; BOX.push([GARAGE[0], GARAGE[1], X1, GARAGE[3]]);
   const CIRC = [...LAMPS.map(([x, y]) => [x, y, 14]), ...TREES.filter((t) => t[1] < 0).map(([x, y, s]) => [x, y, 30 * s]), ...BINS.map(([x, y]) => [x, y, 26]),
-    ...BENCHES.map(([x, y]) => [x, y, 0]), ...PROPS.map(([, x, y, r]) => [x, y, r])];
+    ...BENCHES.map(([x, y]) => [x, y, 0]), ...PROPS.map(([, x, y, r]) => [x, y, r]), ...YTREES.map(([x, y, s]) => [x, y, 24 * s]),
+    ...NDECOR.filter((d) => NSOLID[d[0]][0] === 'c').map(([n, x, y]) => [x + NSOLID[n][1], y + NSOLID[n][2], NSOLID[n][3]])];
   const inBox = (x, y, b, m = 0) => x > b[0] - m && x < b[2] + m && y > b[1] - m && y < b[3] + m;
   const blocked = (x, y, r = K.R) => BOX.some((b) => inBox(x, y, b, r)) || CIRC.some(([cx, cy, cr]) => cr > 0 && Math.hypot(x - cx, (y - cy)) < cr + r);
   function collide(S) {
@@ -261,7 +283,7 @@
   }
   const spawn = (worldT) => { const S = Object.assign(create(), { wt0: worldT }), hp = proj(S.x, S.y); S.cam = [hp[0] - VIEW.W / 2, hp[1] - VIEW.H / 2 - 50]; return S; };   // camera on Kolya from the first frame
   const respawn = (S, worldT) => { const R = spawn(worldT); Object.assign(R, { money: Math.floor(S.money * 0.8), inv: S.inv, kir: S.kir, rai: S.rai, elf: S.elf, raid: S.raid, hasGun: S.hasGun, dm: S.dm, loans: S.loans, boost: S.boost, stats: S.stats, devLog: S.devLog, target: S.target, q: S.q, talked: S.talked, got: S.got, piles: S.piles, vp: S.vp, msgs: S.msgs, marks: S.marks, rottenGot: S.rottenGot, gt: S.gt,
-      drops: S.drops || [], drawings: S.drawings || [], flyers2: S.flyers2 || [], ach: S.ach || {}, achv: S.achv || {}, bowl: S.bowl || { n: 0, t: -99 } });
+      drops: S.drops || [], drawings: S.drawings || [], flyers2: S.flyers2 || [], ach: S.ach || {}, achv: S.achv || {}, bowl: S.bowl || { n: 0, t: -99 }, costume: S.costume || '' });
     if (S.carry === 'rotten') R.drops.push({ x: S.x, y: S.y, kind: 'rotten', t: 0 });                           // the pumpkin stays where he fell
     R.toasts = [{ text: 'Коля сходил домой, выпил чаю и вернулся (−20 % денег)', t: 0 }]; R.ang = 0.46; return R; };
   const outOfPlay = (S) => S.hp <= 0 && S.t - (S.koT || S.t) > 2.5;
@@ -272,7 +294,8 @@
   const say = (S, who, text, dur = 3.2) => { ev(S, { k: 'say', who, text, dur, x: 0, y: 0 }); };
 
   function addPrank(S, id, kind, label) {
-    const k = M(S, id), md = MODS[id], h = MODH[id]; if (k.done >= 0 || k.sweet) return false;
+    const k = M(S, id), md = MODS[id], h = MODH[id]; k.dirty = 1;                   // v10: any prank on a moderator (even before knocking, even after the gift) rules out the kind ending
+    if (k.done >= 0 || k.sweet) return false;
     if (!k.refused) { toast(S, `Сначала постучи к ${md.dat}: вдруг будет сладость?`); return false; }
     const [amt, cap] = PRANK[kind], had = k.pr[kind] || 0, add = Math.max(0, Math.min(amt, cap - had));
     if (add <= 0) { toast(S, `«${SLOT_NAME[kind]}» больше не действует на ${md.acc}`); return false; }
@@ -336,8 +359,12 @@
       k.refused = true; S.target = S.target || id; S.dlg = { who: id, text: D.gift[n], choices: [['Ну всё…', 'close']] }; return; }
     if (c === 'vera_take') { S.q.vera = 1; S.dlg = { who: 'vera', text: 'Спасибо! Одна укатилась в переулок, одна у лавки, а одну утащили к Эльфу во двор.', choices: [['Найду!', 'close']] }; return; }
     if (c === 'vera_give') { S.q.vera = 2; S.money += 150; S.hasGun = true; S.inv.bb += 300;
-      S.dlg = { who: 'vera', text: 'Все три! Держи 150 ₽ и… вот, внук оставил: страйкбольный автомат и 300 шариков. В окна не стреляй. Ну… разве что модерам. (F — достать)', choices: [['Ура!', 'close']] };
+      S.dlg = { who: 'vera', text: 'Все три! Держи 150 ₽ и… вот, внук оставил: страйкбольный автомат и 300 шариков. В окна не стреляй. Ну… разве что модерам. (F — достать) А ещё заходи переодеться: у меня сундук его костюмов.', choices: [['Ура!', 'close']] };
       ev(S, { k: 'coin', amt: 150, x: S.x, y: S.y }); ev(S, { k: 'gunon', x: S.x, y: S.y }); toast(S, 'Получен страйкбольный автомат! F — достать, ПКМ — стрелять', 'big'); achieve(S, 'grandson'); return; }
+    if (c === 'vera_wardrobe') { S.dlg = { who: 'vera', text: 'Выбирай! Только не порви — внук расстроится.', choices: COSTUMES.map(([id, name]) => [name, 'cos_' + id]).concat(S.costume ? [['Свой худи', 'cos_none']] : []) }; return; }
+    if (c.startsWith('cos_') && S.q.vera === 2) { const id = c.slice(4), cs = COSTUMES.find((q) => q[0] === id); S.costume = cs ? id : '';
+      S.dlg = { who: 'vera', text: cs ? cs[2] : 'И правильно. Худи — это классика.', choices: [['Спасибо!', 'close']] }; ev(S, { k: 'costume', id: S.costume, x: S.x, y: S.y });
+      toast(S, cs ? `Костюм: ${cs[1].replace(/^\S+ /, '')}. Патруль узнаёт тебя медленнее` : 'Снова в худи'); return; }
     if (c === 'vera_take' || c === 'vera_give') return;
   }
   function talkNpc(S, n) {
@@ -345,7 +372,7 @@
     if (def.id === 'vera') {
       if (S.q.vera === 0) S.dlg = { who: 'vera', text: 'Коля! Кто-то утащил три мои тыквы. Найдёшь — отблагодарю.', choices: [['Конечно', 'vera_take'], ['Потом', 'close']] };
       else if (S.q.vera === 1) { const n3 = S.vp.filter((v) => v >= 0).length; S.dlg = n3 >= 3 ? { who: 'vera', text: 'Ты нашёл все три?!', choices: [['Держи!', 'vera_give']] } : { who: 'vera', text: `Нашёл ${n3} из 3. Ищи ещё!`, choices: [['Ищу', 'close']] }; }
-      else S.dlg = { who: 'vera', text: 'Тыквы на месте, спасибо тебе! Беги, гуляй.', choices: [['Пока', 'close']] };
+      else S.dlg = { who: 'vera', text: 'Тыквы на месте, спасибо тебе! Хочешь переодеться? У внука целый сундук костюмов.', choices: [['Сменить костюм', 'vera_wardrobe'], ['Пока', 'close']] };
       if (!S.talked.vera) { S.talked.vera = 1; S.q.talk++; }
       return;
     }
@@ -361,7 +388,7 @@
   const HUD = (() => { const W = VIEW.W, H = VIEW.H, n = 10, sw = 78, gap = 8, x0 = W / 2 - (n * sw + (n - 1) * gap) / 2;
     return { slots: Array.from({ length: n }, (_, i) => ({ x: x0 + i * (sw + gap), y: H - 104, w: sw, h: sw })),
       phoneBtn: { x: W - 150, y: H - 150, w: 116, h: 116 }, phone: { x: W - 600, y: 120, w: 440, h: 840 } }; })();
-  function dlgLayout(S) { const W = VIEW.W, H = VIEW.H, n = S.dlg ? S.dlg.choices.length : 0, bw = 360, gap = 20;
+  function dlgLayout(S) { const W = VIEW.W, H = VIEW.H, n = S.dlg ? S.dlg.choices.length : 0, gap = 20, bw = n > 3 ? Math.floor((1100 - (n - 1) * gap) / n) : 360;
     const x0 = W / 2 - (n * bw + (n - 1) * gap) / 2;
     return { panel: { x: W / 2 - 560, y: H - 330, w: 1120, h: 250 }, choices: Array.from({ length: n }, (_, i) => ({ x: x0 + i * (bw + gap), y: H - 160, w: bw, h: 58 })) }; }
   function phoneLayout(S) { const p = HUD.phone, out = [{ id: 'close', x: p.x + p.w - 84, y: p.y + 64, w: 52, h: 46 }];
@@ -547,9 +574,9 @@
   const DEVHELP = ['help — этот список', 'money 5000 — деньги (или +500)', 'give eggs 20 — предмет: eggs tp alarm fire slime chalk flyers energy candle hoodie solder latte bb',
     'all — всё по 20, 99999 ₽ и автомат', 'done kirill|raiva|elf|all — дом закидан на 100 %', 'p elf 80 — процент закиданности', 'sweet elf — помириться (конфеты)', 'refuse all — модеры отказали',
     'revenge elf — месть прямо сейчас', 'raid / noraid — облава вкл/выкл', 'ghost — патруль тебя не видит (вкл/выкл)', 'tp home|vera|kirill|raiva|elf|alley|garage или x y — телепорт',
-    'time 30 — +30 игровых минут', 'hp 100 — здоровье', 'gun — страйкбольный автомат', 'quests — побочные задания выполнены', 'debt — сбросить долги', 'finale — финал (вечеринка)', 'peace — мирный путь со всеми (для мирной концовки)', 'ach — список достижений (ach all — открыть все)'];
+    'time 30 — +30 игровых минут', 'hp 100 — здоровье', 'gun — страйкбольный автомат', 'quests — побочные задания выполнены', 'debt — сбросить долги', 'finale — финал (вечеринка)', 'peace — мирный путь со всеми (для мирной концовки)', 'costume ghost|pumpkin|hat|horns|none — костюм', 'ach — список достижений (ach all — открыть все)'];
   const DEVA = { 'помощь': 'help', 'деньги': 'money', 'дать': 'give', 'всё': 'all', 'все': 'all', 'закидать': 'done', 'месть': 'revenge', 'облава': 'raid', 'телепорт': 'tp', 'время': 'time',
-    'здоровье': 'hp', 'автомат': 'gun', 'финал': 'finale', 'призрак': 'ghost', 'сладость': 'sweet', 'отказ': 'refuse', 'задания': 'quests', 'долги': 'debt' };
+    'здоровье': 'hp', 'автомат': 'gun', 'финал': 'finale', 'призрак': 'ghost', 'сладость': 'sweet', 'отказ': 'refuse', 'задания': 'quests', 'долги': 'debt', 'костюм': 'costume' };
   const DEVID = { kirill: 'kirill', 'кирилл': 'kirill', raiva: 'raiva', 'райва': 'raiva', elf: 'elf', 'эльф': 'elf' };
   function forceDone(S, id) { const k = M(S, id); k.refused = true; k.sweet = false; k.p = 100; if (k.done < 0) { k.done = S.t; k.revengeAt = S.gt + (id === 'elf' ? 180 : 60); ev(S, { k: 'housedone', id, x: MODH[id].door[0], y: MODH[id].door[1] }); } S.target = S.target || id; }
   const DEVCMDS = ['help', 'money', 'give', 'all', 'done', 'p', 'sweet', 'refuse', 'revenge', 'raid', 'noraid', 'ghost', 'tp', 'time', 'hp', 'gun', 'quests', 'debt', 'finale', 'peace', 'ach'];
@@ -583,7 +610,8 @@
     else if (cmd === 'quests') { S.q.vera = 2; S.vp = S.vp.map(() => S.t); S.q.talk = 5; S.q.strange = 1; S.strange = S.t; S.hasGun = true; S.inv.bb += 300; out('Побочные задания выполнены (и автомат от Веры).'); }
     else if (cmd === 'debt') { S.loans = {}; S.boost = {}; out('Долги сброшены.'); }
     else if (cmd === 'finale') { startFinale(S); out('Финал.'); }
-    else if (cmd === 'peace') { MODIDS.forEach((id) => { const k = M(S, id); k.sweet = true; k.done = -1; k.revengeAt = -1; k.p = 0; k.pr = {}; }); S.raid = null; out('Мир со всеми, гадостей не было. Иди домой — мирная концовка.'); }
+    else if (cmd === 'costume') { const id = w[1] || ''; S.costume = COSTUMES.some((q) => q[0] === id) ? id : ''; out(S.costume ? 'Костюм: ' + S.costume : 'Снова в худи'); }
+    else if (cmd === 'peace') { MODIDS.forEach((id) => { const k = M(S, id); k.sweet = true; k.done = -1; k.revengeAt = -1; k.p = 0; k.pr = {}; k.dirty = 0; }); S.raid = null; out('Мир со всеми, гадостей не было. Иди домой — мирная концовка.'); }
     else if (cmd === 'ach') { if (w[1] === 'all') { ACH.forEach((a) => achieve(S, a.id)); out('Все достижения открыты.'); }
       else ACH.forEach((a) => out((S.ach && S.ach[a.id] ? '✓ ' : '· ') + a.name)); }
     else out('Не знаю такую команду. help — список.');
@@ -600,7 +628,7 @@
   }
   const timesWord = (n) => (n % 10 === 1 && n % 100 !== 11 ? 'раз' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'раза' : 'раз');
   // the kind ending: all three forgiven (gifts) and not a single prank on any of them
-  const peaceful = (S) => MODIDS.every((id) => { const k = M(S, id); return k.sweet && k.done < 0 && (k.p || 0) <= 0 && !Object.keys(k.pr || {}).length; });
+  const peaceful = (S) => MODIDS.every((id) => { const k = M(S, id); return k.sweet && !k.dirty && k.done < 0 && (k.p || 0) <= 0 && !Object.keys(k.pr || {}).length; });
   function peaceScript(S) { const L = [], add = (cg, who, text) => L.push({ cg, who, text });
     add('cg_peace1', 'Коля', '…Почему у моего порога все трое? И… с пирогом?');
     add('cg_peace1', 'Кирилл', 'Ты единственный, кто сегодня ничего не закидал. Мы проверили по камерам. Даже по Райвиным.');
@@ -802,7 +830,7 @@
     // ---- projectiles ----
     S.proj = S.proj.filter((p) => { const u = (t - p.t0) / p.dur; if (u < 1) return true; landProj(S, p); return false; });
     // ---- courier (pizza) and kids (flyers) ----
-    courierStep(S); kidsStep(S); fireStep(S); decoyStep(S); houseStep(S); catStep(S);
+    courierStep(S); kidsStep(S); fireStep(S); decoyStep(S); houseStep(S); catStep(S); weatherStep(S);
     if (S.q.talk >= 5) achieve(S, 'social'); if (S.q.vera === 2) achieve(S, 'grandson');
     // ---- revenge: Kirill's auction ----
     if (k.revengeAt >= 0 && S.gt >= k.revengeAt) { k.revengeAt = -1; msg(S, 'Кирилл', 'Я украл ВСЕ твои трусы 🩲 и запускаю онлайн-аукцион среди своих подписчиков. Ставки открыты 😏'); k.nextAuction = S.gt + 600; toast(S, 'Месть Кирилла началась…', 'big'); }
@@ -915,6 +943,7 @@
   function houseRect(h) { const an = AN()[h.tex]; if (!an || !an.gw) return null; const k = 405 / an.gw, c = proj(h.x0, h.y1); return { x: c[0] - an.cx * k, y: c[1] - an.cy * k + 6, w: an.w * k, h: an.h * k, k, an }; }
   function treeRect(i) { const [x, y, s] = TREES[i], n = i % 2 ? 'tree_b' : 'tree_a', an = AN()[n]; if (!an || !an.w) return null; const hh = (n === 'tree_a' ? 340 : 400) * s, ww = hh * an.w / an.h, q = proj(x, y);
     return { x: q[0] - ww * 0.51, y: q[1] - hh + 10, w: ww, h: hh, an, n }; }
+  const carRect = (i) => { const an = AN()[i % 2 ? 'car_b' : 'car_a']; if (!an || !an.mask) return null; const q = proj(CARS[i][0], CARS[i][1]), hh = 360 * an.h / an.w; return { x: q[0] - 180, y: q[1] - hh * 0.62, w: 360, h: hh, an }; };
   const maskHit = (r, c) => { if (!r || c[0] < r.x || c[1] < r.y || c[0] > r.x + r.w || c[1] > r.y + r.h) return null; const u = (c[0] - r.x) / r.w, v = (c[1] - r.y) / r.h, m = r.an.mask;
     if (!m) return [u, v]; const row = m.rows[Math.floor(v * m.h / m.cell)]; return row && row[Math.floor(u * m.w / m.cell)] === '1' ? [u, v] : null; };
   const THROW_R = 1350;
@@ -931,7 +960,8 @@
     if (S.courier) person('courier', 0, S.courier.x, S.courier.y);
     const vcar = (kind, id, x, y) => { const q = proj(x, y); if (c[0] > q[0] - 175 && c[0] < q[0] + 175 && c[1] > q[1] - 140 && c[1] < q[1] + 55)
       take({ kind, id, box: [x - 150, y - 62, x + 150, y + 62], ground: [x, y], u: (c[0] - q[0] + 175) / 350, v: (c[1] - q[1] + 140) / 195 }); };
-    CARS.forEach(([x, y], i) => vcar('scar', i, x, y));
+    CARS.forEach(([x, y], i) => { const r = carRect(i); if (!r) { vcar('scar', i, x, y); return; } const hit = maskHit(r, c);          // v10: the whole painted body counts (rear and front alike)
+      if (hit) take({ kind: 'scar', id: i, box: [x - 150, y - 62, x + 150, y + 62], ground: [x, y], u: hit[0], v: hit[1], mask: 1 }); });
     if (S.gun) LAMPS.forEach(([x, y], i) => { const q = proj(x, y); if (Math.hypot(c[0] - q[0] - LAMPHEAD[0], c[1] - q[1] + LAMPHEAD[1]) < 26) take({ kind: 'lamp', i, box: [x - 14, y - 14, x + 14, y + 14], ground: [x, y] }); });   // shoot a lamp out
     if (S.raid && S.raid.st !== 'wait') { S.raid.units.forEach((u) => person('unit', u.i, u.x, u.y, 132)); S.raid.crowd.forEach((q, i) => person('crowd', i, q.x, q.y)); S.raid.cars.forEach((cr, i) => vcar('rcar', i, cr.x, cr.y)); }
     if (!best) best = { kind: 'ground', ground: unproj(c[0], c[1]) };
@@ -958,7 +988,7 @@
       else { S.marks.push({ k: 'egg', on: 'ground', x: p.x1, y: p.y1, sx: q[0], sy: q[1], t: S.t, s: p.seed }); if (S.marks.length > 90) S.marks.shift(); ev(S, { k: 'splat', x: p.x1, y: p.y1, sx: q[0], sy: q[1] }); } return; }
     if (p.kind === 'firec') { S.fires = S.fires || []; S.fires.push({ x: p.gx1, y: p.gy1, t0: S.t, fuse: 1.4 }); ev(S, { k: 'fuse', x: p.gx1, y: p.gy1 }); return; }
     if (p.kind === 'arrow') { if (Math.hypot(S.x - p.x1, S.y - p.y1) < 70 && !S.hidden) { hurt(S, 8, 'Стрела-присоска Эльфа'); S.stuck = S.t; } ev(S, { k: 'thwack', x: p.x1, y: p.y1 }); return; }
-    const tg = p.tg, m = { k: p.kind === 'eggs' ? 'egg' : 'tp', on: tg.kind, id: tg.id, i: tg.i, u: tg.u, v: tg.v, x: p.gx1, y: p.gy1, sx: p.sx1, sy: p.sy1, t: S.t, s: p.seed };
+    const tg = p.tg, m = { k: p.kind === 'eggs' ? 'egg' : 'tp', on: tg.kind, id: tg.id, i: tg.i, u: tg.u, v: tg.v, cm: tg.mask ? 1 : 0, x: p.gx1, y: p.gy1, sx: p.sx1, sy: p.sy1, t: S.t, s: p.seed };
     if (!['npc', 'courier', 'unit', 'crowd'].includes(tg.kind)) { S.marks.push(m); if (S.marks.length > 90) S.marks.splice(0, S.marks.length - 90); }
     hitTarget(S, tg, p.kind);
     ev(S, { k: p.kind === 'eggs' ? 'splat' : 'tpland', x: p.gx1, y: p.gy1, sx: p.sx1, sy: p.sy1 });
@@ -1053,7 +1083,7 @@
     if (S.courier && near(S.courier.x, S.courier.y, 260)) say(S, 'courier', 'Пиццу чуть не уронил!', 2);
     if (stun) achAdd(S, 'boom', stun);
     for (const id of MODIDS) { const h = MODH[id], k = M(S, id); if (!near(h.door[0], h.door[1], 240)) continue;
-      if (k.refused && k.done < 0 && !k.sweet && !k.pr.fire) addPrank(S, id, 'fire'); k.st = 'out'; k.t0 = t + 0.6; say(S, id, LN[id].fire, 2.6); }
+      k.dirty = 1; if (k.refused && k.done < 0 && !k.sweet && !k.pr.fire) addPrank(S, id, 'fire'); k.st = 'out'; k.t0 = t + 0.6; say(S, id, LN[id].fire, 2.6); }
     HOUSES.forEach((h) => { if (MODS[h.id] || !near(h.door[0], h.door[1], 300)) return; S.yell = S.yell || {}; if (S.t - (S.yell[h.id] || -99) < 8) return; S.yell[h.id] = S.t; say(S, 'house:' + h.id, pickL(NB.fire, t * 1.7), 2.4); });
     CARS.forEach(([cx, cy], i) => { if (near(cx, cy, 1200)) ev(S, { k: 'caralarm', i, x: cx, y: cy }); });
     if (S.cat && near(S.cat.x, S.cat.y, 500)) catScare(S, f.x, f.y); }
@@ -1240,7 +1270,7 @@
       u.mv = 0; u.run = 0;
       if ((u.stunT || -99) > t) { u.v = 0; u.wa += DT * 6 * Math.sin(t * 7 + u.i); u.ang = scrAng(Math.cos(u.wa), Math.sin(u.wa)); u.moving = 0; u.gA = (u.gA || 0) * (1 - Math.min(1, 8 * DT)); return; }   // deafened by a firecracker
       const sp = RAID.say[u.kind], vis = raidSees(S, u), dK = Math.hypot(S.x - u.x, S.y - u.y);
-      if (u.st !== 'chase') { u.sus = Math.max(0, Math.min(1, u.sus + (vis > 0 ? DT * (0.8 + 2.5 * vis) : -DT * 0.35)));
+      if (u.st !== 'chase') { u.sus = Math.max(0, Math.min(1, u.sus + (vis > 0 ? DT * (0.8 + 2.5 * vis) * (S.costume ? 0.7 : 1) : -DT * 0.35)));   // v10: they look for a boy in a hoodie — a costume buys time
         if (vis > 0 && dK < 75) u.sus = 1;
         if (u.sus >= 1) raidChase(S, u);
         else if (u.sus > 0.3 && vis > 0) { u.stareT = t + 1.2; if (!u.hmm) { u.hmm = 1; say(S, 'raid' + u.i, pickL(sp.hmm, S.steps * 0.41 + u.i), 1.8); } }
@@ -1371,8 +1401,8 @@
     if (id === 'master') return [(v.kinds || []).length, 10];
     if (id === 'rotten_hunter') return [Math.min(10, Math.max(0, ...Object.keys(v).filter((k) => k.startsWith('eggs_')).map((k) => v[k]))), 10];
     return n ? [Math.min(n, v[id] || 0), n] : null; }
-  root.SIM = { VERSION, ACH, ACHI, achProgress, chalkPts, BOWL, CATSPOTS, LAMPHEAD, lampLit, GARAGE, peaceful, inLampLight, houseNear, HKO, CONTACTS, LOANS, LOAN_DUE, allMods, raidBeam, runDev, DEVHELP, kirillWinT, DT, L, K, VIEW, HINT, C, SN, proj, unproj, ROAD, SWN, SWS, X0, X1, FACADE, HOUSES, HK, ALLEY, ENDLOT, DARK, LAMPS, TREES, CARS, BINS, BENCHES, BUSHES, PILES, FENCES,
-    FENCE_Y, MONEY, VPUMPKINS, ROTTEN, ROTTENS, STRANGE, HR, HE, RAID, raidSees, raidCrowd, newRaid, MODS, MODIDS, MODH, GIFTS, JUNK, raivaCamT, watchOn, boosted, modNear, SHOP, SLOTS, SLOT_NAME, PRANK, NPCS, BOX, windAt, gustAt, clockStr, kirillWindow, KVIEWS, inYard, nearHidingSpot, lampNear,
-    create, spawn, respawn, outOfPlay, step, at, pick, snap, lerpState, PROPS, NDECOR, NFENCE, NDIV, NTREES, HUD, houseRect, treeRect, aimTarget, THROW_R, dlgLayout, phoneLayout, scriptInput, demoCheck, selfCheck, findPath, chalkShape, toast };
+  root.SIM = { VERSION, COSTUMES, rainAt, RAINW, ACH, ACHI, achProgress, chalkPts, BOWL, CATSPOTS, LAMPHEAD, lampLit, GARAGE, peaceful, inLampLight, houseNear, HKO, CONTACTS, LOANS, LOAN_DUE, allMods, raidBeam, runDev, DEVHELP, kirillWinT, DT, L, K, VIEW, HINT, C, SN, proj, unproj, ROAD, SWN, SWS, X0, X1, FACADE, HOUSES, HK, ALLEY, ENDLOT, DARK, LAMPS, TREES, CARS, BINS, BENCHES, BUSHES, PILES, FENCES,
+    FENCE_Y, MONEY, VPUMPKINS, ROTTEN, ROTTENS, STRANGE, HR, HE, RAID, raidSees, raidCrowd, newRaid, MODS, MODIDS, MODH, GIFTS, JUNK, raivaCamT, watchOn, boosted, modNear, SHOP, SLOTS, SLOT_NAME, PRANK, NPCS, BOX, CIRC, maskHit, windAt, gustAt, clockStr, kirillWindow, KVIEWS, inYard, nearHidingSpot, lampNear,
+    create, spawn, respawn, outOfPlay, step, at, pick, snap, lerpState, PROPS, NDECOR, NFENCE, NDIV, NGATE, NSOLID, nsBox, YTREES, NTREES, HUD, houseRect, treeRect, aimTarget, THROW_R, dlgLayout, phoneLayout, scriptInput, demoCheck, selfCheck, findPath, chalkShape, toast };
   if (typeof module !== 'undefined') module.exports = root.SIM;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -1,0 +1,7 @@
+FIVE views of ONE wearable carved JACK-O'-LANTERN HELMET (a hollow orange pumpkin worn over a teenager's head like a mask, the same size as a head plus a bit), in ONE ROW, evenly spaced, all the same size (about 260 px wide):
+1 FRONT: the carved face toward the viewer: two triangle eyes and a jagged toothy grin, glowing warm candle-yellow inside.
+2 THREE-QUARTER FRONT: turned toward the lower right, the face foreshortened, still glowing.
+3 PROFILE: facing right, the face at the right edge, a sliver of glow.
+4 THREE-QUARTER BACK: turned away toward the upper right, no face, plain ribbed back of the pumpkin.
+5 BACK: plain back of the pumpkin, no face.
+Every view: a short curly green-brown stem on top, deep vertical ribs, a round neck opening at the bottom (dark inside), matte orange (#d54006, #e57c29) with darker red-brown grooves, a dark red-brown one-pixel outline. Seen from the game's high camera (looking down about 30 degrees). Crisp pixel clusters, transparent background, no shadow, no ground, no text.

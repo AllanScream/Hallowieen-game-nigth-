@@ -417,9 +417,9 @@ void main(){ vec2 p = (v_uv - 0.5) * u_sz; vec2 q = abs(p) - (u_sz * 0.5 - u_r);
   // t drives the falling streaks and the splashes (uniforms are per program: a draw that omits u_t freezes them)
   L.rain = (t, amt, cam, phase, o = {}) => { if (amt <= 0.003 || L.NOFX) return;
     if (phase === 'ground') { G.draw(P.wet, { u_amt: amt, u_cam: cam }, G.xf(0, 0, W, H)); return; }
-    const lt = o.light || T.light; if (!lt) return;
-    if (phase === 'fx') { G.blend('add'); G.draw(P.rainfx, { u_t: t, u_amt: amt, u_mode: 0, u_wind: o.wind || 0.12, u_cam: cam, u_mask: T.bg, u_light: lt }, G.xf(0, 0, W, H)); G.blend(); return; }
-    G.draw(P.rainfx, { u_t: t, u_amt: amt, u_mode: 1, u_wind: o.wind || 0.12, u_cam: cam, u_mask: T.bg, u_light: lt }, G.xf(0, 0, W, H)); };
+    const lt = o.light || T.light || T.bg; if (!lt) return;                                  // v10: no light map → the lit ground layer stands in
+    if (phase === 'fx') { G.blend('add'); G.draw(P.rainfx, { u_t: t, u_amt: amt, u_mode: 0, u_wind: o.wind || 0.12, u_cam: cam, u_mask: o.mask || T.bg, u_light: lt }, G.xf(0, 0, W, H)); G.blend(); return; }
+    G.draw(P.rainfx, { u_t: t, u_amt: amt, u_mode: 1, u_wind: o.wind || 0.12, u_cam: cam, u_mask: o.mask || T.bg, u_light: lt }, G.xf(0, 0, W, H)); };
   L.ring = (x, y, rx, ry, col, amt, w = 0.1) => G.draw(P.ring, { u_col: col, u_amt: amt, u_w: w }, G.xf(x - rx, y - ry, 2 * rx, 2 * ry));
   // fbm fog band: p = [scale, speed, threshold, density]; scatters warm light near L.SUN
   L.fog = (y, h, p, col, seed, t, scat = 0.7) => L.NOFX ? 0 :

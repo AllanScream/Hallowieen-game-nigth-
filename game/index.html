@@ -131,6 +131,7 @@ input[type=range]{accent-color:var(--or);width:190px;cursor:pointer}
     <p>Постучи в дверь и попроси сладость. Отказали — устрой гадость и закидай дом на 100 %. Только учти, что каждый модер мстит по-своему.</p>
     <p>Подарок может всё исправить. Когда разберёшься со всеми тремя, возвращайся домой: там тебя кое-что ждёт.</p>
     <p>Концовок две: вечеринка-сюрприз и добрая — если помириться со всеми подарками и не сделать им ни одной гадости. 15 достижений собираются в телефоне (Tab → Достижения).</p>
+    <p>Иногда идёт дождь, а в грозу молния гасит фонари — в темноте патрулю хуже видно. Дворы за домами открыты. После задания Веры у неё можно переодеться: призрак, тыква, колдун или чертёнок.</p>
     <p style="color:#a88a70;font-size:14px">Пиксельная изометрия, звук синтезируется на лету. Консоль разработчика есть в телефоне (Tab → Консоль).</p>
     <button class="sbtn back">‹ Назад</button></div>
   <div class="foot" id="foot"></div>
@@ -216,7 +217,7 @@ menu.addEventListener('keydown', (e) => { if (e.key !== 'ArrowDown' && e.key !==
   const n = list[(i + (e.key === 'ArrowDown' ? 1 : -1) + list.length) % list.length]; if (n) { n.focus(); e.preventDefault(); } });
 if (!render) openMenu('main');
 (async () => {
-  for (const f of ['assets.js', 'sizes.js', 'anchors.js', 'rigs.js', 'kframes.js', 'gl.js', 'lib.js', 'sim.js', 'scene.js', 'audio.js']) await load(f);
+  for (const f of ['assets.js', 'sizes.js', 'anchors.js', 'rigs.js', 'kframes.js', 'khead.js', 'costumes.js', 'gl.js', 'lib.js', 'sim.js', 'scene.js', 'audio.js']) await load(f);
   applySet();
   const q = new URLSearchParams(location.search), DEV = !STATIC || q.has('dev');
   const VW = (SIM.VIEW || {}).W || 1920, VH = (SIM.VIEW || {}).H || 1080;             // view size and aspect come from the sim
