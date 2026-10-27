@@ -1,0 +1,9 @@
+[
+ {
+  "name": "vm_avatar",
+  "prompt": "art/prompts/vm_avatar.txt",
+  "size": "1024x1024",
+  "alpha": "none",
+  "quality": "medium"
+ }
+]

@@ -8,6 +8,7 @@ s = open('live/index.html', encoding='utf-8').read(); i = s.index('\n<script>\n'
 s = s.replace('\n<script>\n', '\n<script>window.__STATIC__ = 1;</script>\n<script>\n', 1)
 open('dist/halloween/game/index.html', 'w', encoding='utf-8').write(s)
 PY
+mkdir -p $G/media && cp live/media/* $G/media/                       # v11: menu music, the voice message and its avatar
 n=0; for p in live/assets/*.png; do b=$(basename "$p" .png); w=$G/assets/$b.webp; if [ ! -f "$w" ] || [ "$p" -nt "$w" ]; then cp "$p" $G/assets/; n=$((n+1)); fi; done
 echo "textures to encode: $n"
 python3 tools/webp.py $G

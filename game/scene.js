@@ -258,7 +258,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       const ph8 = ((ST.gph % 1) + 1) % 1, fi = kind !== 'walk' ? 8 : turning ? [1, 2, 5, 6][Math.floor(ph8 * 4) % 4] : Math.floor(ph8 * 8) % 8, yaw = bin * st, bob = kind === 'walk' ? (1.3 + 1.4 * Math.abs(Math.sin(yaw))) * (0.5 - 0.5 * Math.cos(4 * Math.PI * ST.gph)) : 0;   // front/back: a deeper bob
       const swy = kind === 'walk' && !turning ? 3 * Math.abs(Math.sin(yaw)) * Math.sin(2 * Math.PI * ST.gph) : 0, Xs = X + swy;   // weight over the stance foot
       const [n1, f1] = KN(bin), bm = /_m(\d+)w$/.exec(n1), bw = kind === 'walk' && !turning && bm ? Math.max(0, Math.min(1, (+bm[1] - 45) / 45)) : 0;
-      const gs = Math.sin(2 * Math.PI * ph8), legs = bw ? [0.13 * bw * Math.max(0, gs), 0.13 * bw * Math.max(0, -gs)] : null;   // walking away: the stepping foot rises
+      const gs = Math.sin(2 * Math.PI * ph8), la = (0.14 + 0.16 * Math.min(1, ST.runA || 0)) * bw, legs = bw ? [la * Math.max(0, gs), la * Math.max(0, -gs)] : null;   // walking / running away: the stepping foot rises (higher at a run, v11)
       r = atlasFrame(n1, fi, Xs, Y - bob, f1, mkU(f1, a), sy, KH, legs);
       const xf = ST.t - binT, dd = ((((ST.yaw || 0) - bin * st) / st + N / 2) % N + N) % N - N / 2;
       if (Math.abs(ST.yawV || 0) > 1.5 && Math.abs(dd) > 0.08) { const [n0, f0] = KN((bin + (dd > 0 ? 1 : N - 1)) % N); atlasFrame(n0, fi, Xs, Y - bob, f0, mkU(f0, a * Math.min(0.5, Math.abs(dd))), sy); }
@@ -493,7 +493,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     if (ST.raid && ST.raid.st !== 'wait') { const RD = ST.raid;
       RD.cars.forEach((c, i) => { if (vis(c.x, c.y, 700)) add([c.x - 150, c.y - 62, c.x + 150, c.y + 62], () => raidCar(c, i)); });
       RD.units.forEach((u) => { if (vis(u.x, u.y, 400)) add([u.x - 15, u.y - 15, u.x + 15, u.y + 15], () => { S.raidHeads[u.i] = drawUnit(u); }); else S.raidHeads[u.i] = null; });
-      S.crowdHeads = S.crowdHeads || []; RD.crowd.forEach((q, i) => { if (vis(q.x, q.y)) add([q.x - 15, q.y - 15, q.x + 15, q.y + 15], () => { S.crowdHeads[i] = drawPerson(q.tex, q.x, q.y, { k: 0.93, ang: q.ang, g: 0, id: 'crowd' + i, seed: 30 + i }); hitOverlay(q, P(q.x, q.y), 108, 70 + i * 5); }); }); }
+      S.crowdHeads = S.crowdHeads || []; RD.crowd.forEach((q, i) => { if (!vis(q.x, q.y)) { S.crowdHeads[i] = null; return; } add([q.x - 15, q.y - 15, q.x + 15, q.y + 15], () => { S.crowdHeads[i] = drawPerson(q.tex, q.x, q.y, { k: 0.93, ang: q.ang, g: 0, id: 'crowd' + i, seed: 30 + i }); hitOverlay(q, P(q.x, q.y), 108, 70 + i * 5); }); }); }
     if (ST.courier) { const c = ST.courier, carry = c.st === 'come' || c.st === 'wait', an = c.ang === undefined ? KA : c.ang, back = Math.sin(an) < 0;
       add([c.x - 15, c.y - 15, c.x + 15, c.y + 15], () => { S.courHead = drawPerson('courier', c.x, c.y, { ang: an, gph: c.gph || 0, g: c.gA || 0, stride: 95, id: 'courier',
         carry, holdBehind: back, hold: carry ? (p) => pizzaStack(p[0], p[1] + 10, 46) : null }); }); } else S.courHead = null;
@@ -830,7 +830,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     if (Y - h - 26 >= 126 && X > x + 10 && X < x + w - 10) L.solid(X - 8, y + h - 6, 16, 16, [0.9, 0.82, 0.7], Math.PI / 4, 8, 8, a);
     lines.forEach((l, i) => L.label(slot + i, l, x + 18, y + 26 + i * 30, { size: 24, col: '#2a1408', out: null, a })); }
   function bubbles() {
-    ST.npc.forEach((n) => { if (GT - n.talkT < 3.4 && n.head) bubble('nb' + n.i, n.line, n.head[0], n.head[1], Math.min(1, (3.4 - (GT - n.talkT)) * 3)); });
+    ST.npc.forEach((n) => { if (GT - n.talkT < 3.4 && n.head && vis0(n.x, n.y, 200)) bubble('nb' + n.i, n.line, n.head[0], n.head[1], Math.min(1, (3.4 - (GT - n.talkT)) * 3)); });
     const says = ST.ev.filter((e) => e.k === 'say' && GT - e.t < e.dur); const last = {};
     says.forEach((e) => (last[e.who] = e));
     Object.values(last).forEach((e) => { let hd = null;
@@ -841,7 +841,8 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       if (e.who.startsWith('crowd:')) hd = (S.crowdHeads || [])[+e.who.slice(6)] || null;
       if (e.who === 'courier') hd = S.courHead; if (e.who === 'kid') hd = S.kidHead;
       if (e.who.startsWith('house:')) { const h = SIM.HOUSES.find((q) => 'house:' + q.id === e.who); if (h) hd = P(h.door[0], SIM.FACADE, 250); }
-      if (hd) bubble('say_' + e.who, e.text, hd[0], hd[1], Math.min(1, (e.dur - (GT - e.t)) * 3)); });
+      const onScr = hd && hd[0] > -120 && hd[0] < W + 120 && hd[1] > -60 && hd[1] < H + 260;      // v11: a speaker off screen (a crowd at the far end) is not pinned to the edge
+      if (onScr) bubble('say_' + e.who, e.text, hd[0], hd[1], Math.min(1, (e.dur - (GT - e.t)) * 3)); });
   }
 
   // ===== HUD =====
@@ -927,7 +928,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       wrap(d.desc, 15, w - 126, 'normal').slice(0, 2).forEach((l, i) => L.label('achd' + k + '_' + i, l, x + 106, y + 72 + i * 18, { size: 15, col: '#e8dcc8', out: '#120806', weight: 'normal', a: al })); }); }
   const SHORT = { eggs: 'Яйца', tp: 'Бумага', bell: 'Звонок', rotten: 'Тыква', alarm: 'Будил.', chalk: 'Мел', fire: 'Петард.', slime: 'Слайм', pizza: 'Пицца', flyers: 'Флаеры' };
   const SLOTHINT = { eggs: 'ПКМ по дому: бросить', tp: 'держи ПКМ и отпусти: бросок на крышу', bell: 'E у любой двери: позвонить и убежать', rotten: 'E у крыльца модера: подменить, G — положить', alarm: 'E у ящика или где угодно: приманка',
-    chalk: 'E: рисовать где угодно (у калитки модера — гадость)', fire: 'ПКМ — бросить, E — поджечь под ногами', slime: 'держи E у любой двери', pizza: 'ПКМ/E: заказать в телефоне', flyers: 'E у фонаря: приклеить' };
+    chalk: 'E: рисовать где угодно (у калитки модера — гадость)', fire: 'ПКМ — бросить, E — поджечь под ногами', slime: 'держи E у любой двери', pizza: 'ПКМ/E: заказать в телефоне', flyers: 'E у фонаря: приклеить, у фонаря с флаером — снять' };
   const HOVER = { npc: 'Поговорить', door: 'Постучать: «Сладость или гадость?»', door2: 'Постучать', money: 'Подобрать', vp: 'Подобрать тыкву', rotten: 'Взять гнилую тыкву', drop: 'Поднять гнилую тыкву',
     cat: 'Погладить кота', bowl: 'Взять конфету из миски', bin: 'Пнуть мусорный бак' };
   const ICON = {};

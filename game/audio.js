@@ -31,7 +31,7 @@
   addEventListener('pointerdown', unlock); addEventListener('keydown', unlock);
   // volumes from the settings menu (0..1 each): master, music + ambience, effects
   function applyVol() { if (!ac) return; const V = AU.vol, t = ac.currentTime; master.gain.setTargetAtTime(AU.muted ? 0 : 0.85 * V.master, t, 0.05);
-    sfx.gain.setTargetAtTime(V.sfx, t, 0.05); phoneBus.gain.setTargetAtTime(V.sfx, t, 0.05); amb.gain.setTargetAtTime(0.5 * V.music, t, 0.05); mus.gain.setTargetAtTime(0.16 * V.music, t, 0.05); partyBus.gain.setTargetAtTime(0.42 * V.music, t, 0.05); }
+    sfx.gain.setTargetAtTime(V.sfx, t, 0.05); phoneBus.gain.setTargetAtTime(V.sfx, t, 0.05); amb.gain.setTargetAtTime(0.5 * V.music, t, 0.05); mus.gain.setTargetAtTime(0.16 * V.music * (AU.mv === undefined ? 1 : AU.mv), t, 0.05); partyBus.gain.setTargetAtTime(0.42 * V.music, t, 0.05); }
   AU.setVol = (v) => { Object.assign(AU.vol, v); applyVol(); };
   AU.unlock = () => unlock();
   // ---- building blocks ----
@@ -84,6 +84,7 @@
     housedone: () => { [523, 659, 784, 1046, 784, 1046].forEach((f, i) => tone(f, i === 5 ? 0.9 : 0.22, { type: 'triangle', vol: 0.12, at: i * 0.12 })); noise(1.2, { f: 7000, q: 0.5, vol: 0.04, at: 0.6 }); },
     candy: () => { [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.3, { vol: 0.08, at: i * 0.06 })); },
     slime: (v, p) => { noise(0.35, { type: 'lowpass', f: 700, f1: 250, vol: 0.25 * v, pan: p, am: 12 }); tone(260, 0.3, { f1: 120, vol: 0.1 * v, pan: p }); },
+    flyeroff: (v, p) => { noise(0.3, { f: 4200, f1: 1800, q: 1.2, vol: 0.09 * v, pan: p }); noise(0.1, { f: 900, q: 3, vol: 0.05 * v, at: 0.2, pan: p }); },
     flyer: (v, p) => { noise(0.25, { f: 3000, f1: 5500, q: 1.5, vol: 0.08 * v, pan: p }); noise(0.18, { f: 1800, q: 4, vol: 0.06 * v, at: 0.22, pan: p }); },
     swap: (v, p) => { noise(0.2, { type: 'lowpass', f: 500, vol: 0.3 * v, pan: p }); noise(0.3, { type: 'lowpass', f: 900, f1: 300, vol: 0.15 * v, pan: p, at: 0.1, am: 9 }); },
     pickup: (v, p) => { tone(392, 0.08, { type: 'triangle', vol: 0.08 * v, pan: p }); tone(587, 0.15, { type: 'triangle', vol: 0.08 * v, pan: p, at: 0.06 }); },
@@ -149,6 +150,8 @@
   const MEL = [[440, 523, 659, 880], [392, 494, 587, 784], [349, 440, 523, 698], [330, 415, 494, 659]];
   function ambience(S, T) {
     const t = ac.currentTime;
+    // v11: the page picks the music (AU.musicSrc: 'std' = this music box, 'none' = the author's track or silence) and ducks it under the voice message
+    const mv = (AU.musicSrc === 'none' ? 0 : 1) * (AU.voiceOn ? 0.25 : 1); if (mv !== AU.mv) { AU.mv = mv; mus.gain.setTargetAtTime(0.16 * AU.vol.music * mv, t, 0.3); amb.gain.setTargetAtTime(0.5 * AU.vol.music * (AU.voiceOn ? 0.4 : 1), t, 0.3); }
     if (window.SIM && S) { const g = SIM.gustAt(T, S.x || 0), w = 0.5 + 0.3 * Math.sin(T * 0.13); windG.gain.setTargetAtTime(0.03 + 0.05 * w + 0.12 * Math.min(1, g), t, 0.4); windF.frequency.setTargetAtTime(360 + 500 * Math.min(1, g), t, 0.5); }
     else windG.gain.setTargetAtTime(0.05, t, 0.5);
     if (rainG) rainG.gain.setTargetAtTime(window.SIM && S && !S.noWeather && SIM.rainAt ? 0.22 * SIM.rainAt(S.t) : 0, t, 0.8);
@@ -164,6 +167,7 @@
         if (b % 2 === 0) tone(root * (b % 8 === 6 ? 1.5 : 1), 0.22, { type: 'square', vol: 0.12, dest: partyBus, lp: 700, at });
         if (b % 8 === 2 || b % 8 === 7) for (const m of [2, 2.52, 3]) tone(root * m * 2, 0.16, { type: 'triangle', vol: 0.05, dest: partyBus, at }); }
       return; }
+    if (AU.musicSrc === 'none') { nextNote = 0; return; }
     if (t > nextNote) { const bar = MEL[Math.floor(noteI / 8) % 4], f = bar[[0, 1, 2, 3, 2, 1, 2, 3][noteI % 8]] * (noteI % 32 >= 28 ? 0.5 : 1); noteI++;
       nextNote = (nextNote || t) + 0.46; if (nextNote < t) nextNote = t + 0.46;
       for (const [m, v] of [[1, 0.18], [2, 0.05], [3.01, 0.025]]) { tone(f * m, 1.6, { vol: v, dest: mus, at: nextNote - t - 0.46 > 0 ? 0 : 0 }); }

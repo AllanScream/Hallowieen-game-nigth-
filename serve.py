@@ -3,11 +3,12 @@
 # The port is taken exclusively, so an old version's server still running elsewhere can never answer instead of this one.
 import functools, http.server, os, socket, sys, threading, webbrowser
 
-VERSION, FIRST_PORT = 'v10', 8010
+VERSION, FIRST_PORT = 'v11', 8011
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'game')
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
+    extensions_map = dict(http.server.SimpleHTTPRequestHandler.extensions_map, **{'.webp': 'image/webp', '.mp3': 'audio/mpeg', '.js': 'text/javascript'})   # Windows registry may lack these
     def end_headers(self):
         self.send_header('Cache-Control', 'no-store, must-revalidate')
         super().end_headers()

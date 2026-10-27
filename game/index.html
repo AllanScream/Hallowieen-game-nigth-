@@ -78,7 +78,33 @@ input[type=range]{accent-color:var(--or);width:190px;cursor:pointer}
 .lang button{background:rgba(255,255,255,.06);color:var(--dim);border:1px solid rgba(255,170,80,.25);border-radius:999px;padding:6px 14px;font:600 15px "Trebuchet MS","Segoe UI",sans-serif;cursor:pointer}
 .lang button.on{background:#e2701a;color:#fff;border-color:#ffb45a}
 .lang button:hover:not(.on){background:rgba(255,138,30,.18);color:#fff}
-@media (max-width:700px){.panel{right:4vw;left:4vw;width:auto}.col{left:5vw}}
+/* v11: the voice message in the main menu (a messenger voice note: avatar, play, waveform) */
+#vmsg{position:absolute;right:3.2vw;bottom:9vh;display:flex;align-items:center;gap:14px;z-index:2;max-width:min(470px,86vw);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#menu.pause #vmsg,#menu.panelon #vmsg{display:none}
+#vmsg .ava{position:relative;flex:none;width:86px;height:86px;border-radius:50%;background:#1a0c14 center/cover no-repeat;border:3px solid #ffb45a;box-shadow:0 4px 18px rgba(0,0,0,.6)}
+#vmsg .ava::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:3px solid rgba(255,150,40,.85);opacity:0;pointer-events:none}
+#vmsg.new .ava::after{animation:vmring 1.5s ease-out infinite}
+#vmsg.new{animation:vmbob 2.4s ease-in-out infinite}
+@keyframes vmring{0%{transform:scale(.92);opacity:.95}100%{transform:scale(1.32);opacity:0}}
+@keyframes vmbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+#vmsg .badge{position:absolute;right:-4px;top:-4px;min-width:26px;height:26px;border-radius:13px;background:#e0251a;color:#fff;font:700 15px/26px "Trebuchet MS",sans-serif;text-align:center;box-shadow:0 0 0 3px #12080c;display:none}
+#vmsg.new .badge{display:block;animation:vmbadge 1s ease-in-out infinite}
+@keyframes vmbadge{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+#vmsg .bub{position:relative;background:linear-gradient(180deg,#2c1828,#170b14);border:2px solid #8a4a1e;border-radius:18px 18px 18px 6px;padding:10px 14px 10px 12px;min-width:0;box-shadow:0 6px 24px rgba(0,0,0,.55)}
+#vmsg.new .bub{border-color:#ffb45a;box-shadow:0 0 22px rgba(255,140,30,.45),0 6px 24px rgba(0,0,0,.55)}
+#vmsg .who{font:700 15px "Trebuchet MS","Segoe UI",sans-serif;color:#ffb45a;margin:0 0 4px 2px;white-space:nowrap}
+#vmsg .who small{color:#b9a48e;font-weight:400;margin-left:6px}
+#vmsg .line{display:flex;align-items:center;gap:10px}
+#vmsg .play{flex:none;width:38px;height:38px;border-radius:50%;border:0;background:#e2701a;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+#vmsg .play:hover{background:#ff8a2a}
+#vmsg .wave{display:flex;align-items:center;gap:2px;height:30px}
+#vmsg .wave i{display:block;width:3px;border-radius:2px;background:#7a5a60}
+#vmsg .wave i.on{background:#ffb45a}
+#vmsg .dur{font:600 13px "Trebuchet MS",sans-serif;color:#d8c8b8;min-width:34px;text-align:right}
+.seg{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.seg button{background:rgba(255,255,255,.06);color:var(--dim);border:1px solid rgba(255,170,80,.25);border-radius:999px;padding:5px 11px;font:600 14px "Trebuchet MS","Segoe UI",sans-serif;cursor:pointer}
+.seg button.on{background:#e2701a;color:#fff;border-color:#ffb45a}
+@media (max-width:700px){.panel{right:4vw;left:4vw;width:auto}.col{left:5vw}#vmsg{right:4vw;bottom:3vh}#vmsg .ava{width:64px;height:64px}}
 </style>
 </head><body><canvas id="c"></canvas>
 <input id="txt" type="text" autocomplete="off" spellcheck="false" maxlength="200">
@@ -108,12 +134,20 @@ input[type=range]{accent-color:var(--or);width:190px;cursor:pointer}
     <div class="lang" data-notr><button data-lang="ru">Русский</button><button data-lang="en">English</button></div>
     <div id="load">Загрузка…<div class="bar"><i id="loadBar"></i></div></div>
   </div>
+  <div id="vmsg" role="button" tabindex="0" aria-label="Голосовое сообщение">
+    <div class="ava" style="background-image:url(media/vm_avatar.webp)"><span class="badge">1</span></div>
+    <div class="bub"><div class="who">Аноним<small>голосовое сообщение</small></div>
+      <div class="line"><button class="play" id="vm_play" aria-label="Слушать">▶</button><div class="wave" id="vm_wave"></div><span class="dur" id="vm_dur">0:18</span></div></div>
+  </div>
   <div class="panel" id="p_set">
     <h2>Настройки</h2>
     <h3>Звук</h3>
     <div class="row">Общая громкость<span class="ctl"><input type="range" min="0" max="100" data-k="master"><output></output></span></div>
     <div class="row">Музыка и атмосфера<span class="ctl"><input type="range" min="0" max="100" data-k="music"><output></output></span></div>
     <div class="row">Эффекты<span class="ctl"><input type="range" min="0" max="100" data-k="sfx"><output></output></span></div>
+    <div class="row">Голосовое сообщение<span class="ctl"><input type="range" min="0" max="100" data-k="voice"><output></output></span></div>
+    <div class="row">Музыка в меню<span class="seg" data-k="menuMusic"><button data-v="user">お菓子の森</button><button data-v="std">Стандартная</button><button data-v="off">Выкл</button></span></div>
+    <div class="row">Музыка в игре<span class="seg" data-k="gameMusic"><button data-v="std">Стандартная</button><button data-v="user">お菓子の森</button><button data-v="off">Выкл</button></span></div>
     <h3>Изображение</h3>
     <div class="row">Темнота ночи<span class="ctl"><input type="range" min="0" max="100" data-k="dark"><output></output></span></div>
     <div class="row">Тряска камеры<button class="sw" data-k="shake"></button></div>
@@ -132,6 +166,7 @@ input[type=range]{accent-color:var(--or);width:190px;cursor:pointer}
     <p>Подарок может всё исправить. Когда разберёшься со всеми тремя, возвращайся домой: там тебя кое-что ждёт.</p>
     <p>Концовок две: вечеринка-сюрприз и добрая — если помириться со всеми подарками и не сделать им ни одной гадости. 15 достижений собираются в телефоне (Tab → Достижения).</p>
     <p>Иногда идёт дождь, а в грозу молния гасит фонари — в темноте патрулю хуже видно. Дворы за домами открыты. После задания Веры у неё можно переодеться: призрак, тыква, колдун или чертёнок.</p>
+    <p>Музыка главного меню — «お菓子の森» от whiteelv (её можно поменять в настройках). А в меню тебя ждёт голосовое сообщение.</p>
     <p style="color:#a88a70;font-size:14px">Пиксельная изометрия, звук синтезируется на лету. Консоль разработчика есть в телефоне (Tab → Консоль).</p>
     <button class="sbtn back">‹ Назад</button></div>
   <div class="foot" id="foot"></div>
@@ -145,7 +180,7 @@ const V = Date.now(), STATIC = !!window.__STATIC__;          // STATIC: packed b
 const load = (src) => new Promise((res, rej) => { const s = document.createElement('script'); s.src = src + '?v=' + V; s.onload = res; s.onerror = () => rej(new Error('failed ' + src)); document.head.appendChild(s); });
 const $ = (id) => document.getElementById(id), LS = { get(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
 // ---- settings (applied before the game scripts read them) ----
-const DEF = { master: 80, music: 70, sfx: 90, dark: 60, shake: true, hints: true, lang: /^(ru|uk|be|kk)/i.test(navigator.language || 'ru') ? 'ru' : 'en' };
+const DEF = { master: 80, music: 70, sfx: 90, voice: 85, menuMusic: 'user', gameMusic: 'std', dark: 60, shake: true, hints: true, lang: /^(ru|uk|be|kk)/i.test(navigator.language || 'ru') ? 'ru' : 'en' };
 const SET = Object.assign({}, DEF, LS.get('sog_settings') || {});
 const TR = (s) => (window.TR ? window.TR(s) : s);
 function applyLang() { if (window.setLang) setLang(SET.lang); document.querySelectorAll('.lang button').forEach((b) => b.classList.toggle('on', b.dataset.lang === SET.lang)); }
@@ -164,7 +199,7 @@ const menu = $('menu'); let menuMode = null, ready = false;
 for (let i = 0; i < 18; i++) { const l = document.createElement('i'), s = 9 + Math.random() * 12; l.className = 'leaf';
   Object.assign(l.style, { left: Math.random() * 100 + '%', width: s + 'px', height: s + 'px', background: ['#c4501a', '#e07a24', '#8a2e12', '#d89a30', '#a63a16'][i % 5], animationDuration: 9 + Math.random() * 11 + 's', animationDelay: -Math.random() * 20 + 's' });
   l.style.setProperty('--dx', (Math.random() * 30 - 12) + 'vw'); l.style.setProperty('--r', (Math.random() * 900 - 450) + 'deg'); $('leaves').appendChild(l); }
-function showPanel(id) { document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('on', p.id === id)); if (id) { const f = $(id).querySelector('input,button'); if (f) f.focus({ preventScroll: true }); } }
+function showPanel(id) { document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('on', p.id === id)); menu.classList.toggle('panelon', !!id); if (id) { const f = $(id).querySelector('input,button'); if (f) f.focus({ preventScroll: true }); } }
 function openMenu(mode) { menuMode = mode; menu.classList.add('on'); menu.classList.toggle('pause', mode === 'pause'); $('mainBtns').style.display = mode === 'main' ? '' : 'none'; $('pauseBtns').style.display = mode === 'pause' ? '' : 'none';
   $('load').style.display = mode === 'main' && !ready ? '' : 'none'; showPanel(null); refreshSave(); $('c').classList.toggle('dim', mode === 'pause');
   const b = menu.querySelector(mode === 'pause' ? '#p_resume' : (!$('m_cont').disabled ? '#m_cont' : '#m_new')); if (b && !b.disabled) b.focus({ preventScroll: true }); }
@@ -205,6 +240,40 @@ document.querySelectorAll('#p_set input[type=range]').forEach((r) => { const k =
   r.addEventListener('input', () => { SET[k] = +r.value; o.textContent = r.value; applySet(); LS.set('sog_settings', SET); }); });
 document.querySelectorAll('#p_set .sw').forEach((b) => { const k = b.dataset.k; b.classList.toggle('on', !!SET[k]);
   b.addEventListener('click', () => { SET[k] = !SET[k]; b.classList.toggle('on', SET[k]); applySet(); LS.set('sog_settings', SET); }); });
+document.querySelectorAll('#p_set .seg').forEach((g) => { const k = g.dataset.k, sync = () => g.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === SET[k]));
+  sync(); g.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { SET[k] = b.dataset.v; sync(); LS.set('sog_settings', SET); applySet(); })); });
+// ---- v11: the music (the author's track «お菓子の森» in the menu, the synthesized music box in the game — both switchable) and the voice message ----
+const MEDIA = (() => {
+  const theme = new Audio('media/menu_theme.mp3'), voice = new Audio('media/voice.mp3'); theme.loop = true; theme.preload = 'auto'; voice.preload = 'auto';
+  let unlocked = false, heard = !!LS.get('sog_vm_heard');
+  const card = $('vmsg'), wave = $('vm_wave'), dur = $('vm_dur'), playB = $('vm_play');
+  const BARS = [0.15, 0.71, 0.47, 0.14, 0.73, 0.63, 0.42, 0.5, 0.17, 0.35, 0.36, 0.3, 0.79, 1, 0.75, 0.25, 0.18, 0.26, 0.23, 0.08, 0.65, 0.43, 0.4, 1, 0.98, 0.84, 0.33, 0.92, 0.69, 0.73, 0.86, 0.67, 0.87, 0.68, 0.72, 0.65, 0.76, 0.92, 0.43, 0.27];
+  BARS.forEach((v) => { const i = document.createElement('i'); i.style.height = Math.round(5 + 25 * v) + 'px'; wave.appendChild(i); });
+  const fmt = (t) => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0');
+  const mark = () => card.classList.toggle('new', !heard); mark();
+  const vol = () => (window.AUDIO && AUDIO.muted ? 0 : 1) * SET.master / 100;
+  function want() { const play = window.__PLAY ? window.__PLAY() : null, inGame = !!(play && !menuMode), mode = inGame ? SET.gameMusic : (menuMode === 'main' || !play ? SET.menuMusic : SET.gameMusic);
+    return play && play.finale ? 'std' : mode; }                                                       // the ending has its own party groove (audio.js)
+  function tick() {
+    const mode = want(); if (window.AUDIO) AUDIO.musicSrc = mode === 'std' ? 'std' : 'none';                  // audio.js: the music box only when chosen
+    const talking = !voice.paused, target = mode === 'user' ? vol() * SET.music / 100 * 0.5 * (talking ? 0.18 : 1) : 0;
+    theme.volume = Math.max(0, Math.min(1, theme.volume + (target - theme.volume) * 0.15));
+    if (target > 0.001 && theme.paused && unlocked) theme.play().catch(() => {}); else if (target <= 0.001 && theme.volume < 0.01 && !theme.paused) theme.pause();
+    voice.volume = Math.max(0, Math.min(1, vol() * SET.voice / 100));
+    if (!voice.paused || voice.currentTime > 0) { const f = voice.duration ? voice.currentTime / voice.duration : 0, n = Math.round(f * BARS.length);
+      [...wave.children].forEach((b, i) => b.classList.toggle('on', i < n)); dur.textContent = fmt(voice.paused ? voice.duration || 18 : voice.currentTime); }
+    playB.textContent = voice.paused ? '▶' : '❚❚';
+    if (window.AUDIO) AUDIO.voiceOn = !voice.paused; }
+  setInterval(tick, 50);
+  const unlock = () => { if (unlocked) return; unlocked = true; tick(); };
+  addEventListener('pointerdown', unlock, true); addEventListener('keydown', unlock, true);
+  voice.addEventListener('loadedmetadata', () => { if (voice.duration) dur.textContent = fmt(voice.duration); });
+  voice.addEventListener('timeupdate', () => { if (!heard && voice.duration && voice.currentTime / voice.duration > 0.85) { heard = true; LS.set('sog_vm_heard', 1); mark(); } });
+  voice.addEventListener('ended', () => { heard = true; LS.set('sog_vm_heard', 1); mark(); voice.currentTime = 0; [...wave.children].forEach((b) => b.classList.remove('on')); });
+  const toggle = (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } unlocked = true; if (voice.paused) voice.play().catch(() => {}); else voice.pause(); tick(); };
+  card.addEventListener('click', toggle); card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') toggle(e); });
+  return { theme, voice, tick, stopVoice: () => voice.pause() };
+})();
 const fullscreen = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); } catch (e) {} };
 $('s_full').onclick = fullscreen; $('m_full').onclick = fullscreen;
 let wipeArm = 0; $('s_wipe').onclick = () => { if (Date.now() - wipeArm > 2500) { wipeArm = Date.now(); $('s_wipe').textContent = 'Точно стереть все?'; setTimeout(() => ($('s_wipe').textContent = 'Стереть все'), 2500); return; } LS.del('sog_save'); LS.del('sog_slots'); $('s_wipe').textContent = 'Стереть все'; refreshSave(); };
@@ -241,6 +310,7 @@ if (!render) openMenu('main');
   const keys = {}, dev = $('dev'), flash = $('flash'), txt = $('txt'), cv = $('c');
   const SPEEDS = [0.1, 0.25, 0.5, 1];
   let play = null, prevSnap = null, acc = 0, simT = 0, speed = 1, paused = false, stepOnce = false, fps = 60, lastSave = 0;
+  window.__PLAY = () => play;
   const start = (S, t) => { play = S; simT = t; prevSnap = null; acc = 0; closeMenu(); for (const k in keys) keys[k] = 0; if (window.AUDIO && AUDIO.unlock) AUDIO.unlock(); };
   const autosave = () => { if (play && !play.finale) LS.set('sog_save', { v: SIM.VERSION, simT, play, at: Date.now() }); };
   // live preview: keep the play state across reloads; Claude's hot restore can drop straight into play
@@ -260,7 +330,13 @@ if (!render) openMenu('main');
   $('p_resume').onclick = () => closeMenu();
   $('p_exit').onclick = () => { autosave(); play = null; SCENE.state = null; openMenu('main'); };
   document.addEventListener('visibilitychange', () => { if (document.hidden && play && !menuMode) { autosave(); openMenu('pause'); } });
-  addEventListener('beforeunload', () => { if (STATIC) autosave(); });
+  addEventListener('beforeunload', (e) => { if (STATIC || play) autosave();
+    if (STATIC && play && !menuMode && !play.finale) { e.preventDefault(); e.returnValue = ''; return ''; } });     // v11: closing the tab mid-game asks first
+  // v11: browsers with mouse gestures (Yandex, Opera, Vivaldi) read a burst of right clicks with an aiming drag as «back» / «close tab»,
+  // side buttons of gaming mice go «back»: buttons other than the left one do nothing to the page, and «back» lands in the pause menu
+  const noBrowse = (e) => { if (e.button > 0 && !(e.target && e.target.closest && e.target.closest('#menu .panel'))) e.preventDefault(); };
+  for (const ty of ['mousedown', 'mouseup', 'auxclick']) addEventListener(ty, noBrowse, { passive: false });
+  try { history.pushState({ sog: 1 }, ''); addEventListener('popstate', () => { try { history.pushState({ sog: 1 }, ''); } catch (e) {} if (play && !menuMode && !play.finale) { autosave(); openMenu('pause'); } }); } catch (e) {}
   // the phone's text field: a real <input> laid over the drawn field (console commands, messages to contacts)
   const pend = { slot: 0, wheel: 0, texts: [] }; let txtApp = null;
   txt.addEventListener('keydown', (e) => { e.stopPropagation();
@@ -295,7 +371,7 @@ if (!render) openMenu('main');
   addEventListener('contextmenu', (e) => e.preventDefault());
   const toView = (e) => { const r = cv.getBoundingClientRect(); ptr.x = (e.clientX - r.left) / r.width * VW; ptr.y = (e.clientY - r.top) / r.height * VH; };
   addEventListener('pointermove', toView);
-  addEventListener('pointerdown', (e) => { if (menuMode || !play) return; toView(e); if (txtApp && document.activeElement === txt) txt.blur();
+  addEventListener('pointerdown', (e) => { if (menuMode || !play) return; toView(e); if (txtApp && document.activeElement === txt) txt.blur(); if (e.button > 0) e.preventDefault();
     if (e.button === 2) { ptr.rdown = 1; ptr.rclick = 1; } else { ptr.down = 1; ptr.click = 1; } });
   addEventListener('pointerup', (e) => { if (e.button === 2) ptr.rdown = 0; else ptr.down = 0; });
   addEventListener('blur', () => { for (const k in keys) keys[k] = 0; ptr.down = ptr.rdown = 0; });

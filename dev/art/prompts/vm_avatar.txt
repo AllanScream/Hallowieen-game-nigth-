@@ -1,0 +1,5 @@
+MESSENGER AVATAR for a voice message: a square portrait that will be shown cropped to a CIRCLE, the face centred and filling the middle, nothing important near the corners.
+Head and shoulders of a mischievous ANONYMOUS Halloween hostess: a young woman with long pointed elf ears poking out of a deep black hood pulled low over her brow, the upper half of her face in soft shadow with two glowing amber eyes, a wide playful grin with two tiny vampire fangs, one finger raised to her lips as if keeping a secret ("shh"), a small glowing jack-o'-lantern earring, a few strands of silver-white hair.
+Light: warm pumpkin-orange rim light from below-left, cool violet rim from the top right.
+Background: deep violet-to-black gradient with a big soft orange full moon behind her head and three tiny orange bats.
+The same HD pixel-art style as Image 1 (crisp pixel clusters, 3-5 flat tones per material, dark red-brown outline), a bust portrait seen straight on (not isometric). No text, no letters, no frame, no border.
