@@ -1129,7 +1129,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     if (ST.hidden) L.label('hid', 'спрятался', kh[0], kh[1] - 20, { size: 20, col: '#cfe8c0', out: '#0a1406', al: 0.5 });
     raidHud();
     // hover hint under the cursor
-    if (S.state && ST.ptr && !ST.dlg && !ST.phone && !ST.chalk && !ST.mg) { const c = [ST.ptr[0] + cx, ST.ptr[1] + cy], hit = SIM.pick(ST, c); if (hit) { const s = hit.k === 'fest' ? (SIM.FSTALLS.find((q) => q[1] === hit.id) || [])[6] || '' : HOVER[hit.k] || ''; if (s) { const w = textW(s, 20) + 26; L.rrect(ST.ptr[0] + 18, ST.ptr[1] + 14, w, 32, 10, [0.1, 0.06, 0.06], [0.05, 0.03, 0.03], 0.85); L.uiBox('hover', ST.ptr[0] + 18, ST.ptr[1] + 14, w, 32, 2); L.label('hover', s, ST.ptr[0] + 31, ST.ptr[1] + 30, { size: 20, col: '#ffd9a0', out: '#120806' }); } } }
+    if (S.state && ST.ptr && !ST.dlg && !ST.phone && !ST.chalk && !ST.mg) { const c = [ST.ptr[0] + cx, ST.ptr[1] + cy], hit = SIM.pick(ST, c); if (hit) { const s = hit.k === 'door2' && hit.id === 'kolya' ? 'Домой: чай и шкаф с костюмами' : hit.k === 'fest' ? (SIM.FSTALLS.find((q) => q[1] === hit.id) || [])[6] || '' : HOVER[hit.k] || ''; if (s) { const w = textW(s, 20) + 26; L.rrect(ST.ptr[0] + 18, ST.ptr[1] + 14, w, 32, 10, [0.1, 0.06, 0.06], [0.05, 0.03, 0.03], 0.85); L.uiBox('hover', ST.ptr[0] + 18, ST.ptr[1] + 14, w, 32, 2); L.label('hover', s, ST.ptr[0] + 31, ST.ptr[1] + 30, { size: 20, col: '#ffd9a0', out: '#120806' }); } } }
     mgOverlay();
     if (ST.dlg) dialog();
     if (ST.phone) phone();
@@ -1167,7 +1167,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       else items.push(['', k.done >= 0 ? `Дом ${md.gen} закидан!` : `Закидать дом ${md.gen} (${Math.round(k.p)} %)`, k.done >= 0, k.done >= 0 ? null : k.p / 100]); });
     items.push(['★', 'Украшения для двора', true]);
     items.push(['', ST.q.vera === 0 ? 'Поговорить с Верой' : ST.q.vera === 1 ? `Найти пропавшие тыквы (${ST.vp.filter((v) => v >= 0).length}/3)` : 'Тыквы вернулись к Вере', ST.q.vera === 2]);
-    if (ST.q.vera === 2) items.push(['', 'Костюм из сундука Веры (по желанию)', !!ST.costume]);
+    if (ST.q.vera === 2) items.push(['', 'Костюм: у Веры или дома в шкафу (по желанию)', !!ST.costume]);
     { const F = ST.fest || {}, n = [F.carves, F.apples, F.stage, F.gacha && F.gacha.pulls].filter(Boolean).length;           // v12
       items.push(['☆', 'Праздник на площади', true]); items.push(['', !F.seen ? 'Найти праздник: ворота в южном заборе' : `Мини-игры: ${n}/4 (тыква, яблоки, сцена, гача)`, n >= 4]); }
     items.push(['☆', 'Странные огни', true]);
@@ -1219,7 +1219,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       panel(x - 10, y - 10, ww + 20, hh + 20, 18, 0.95 * f); L.sprite(d.cg, x, y, { w: ww, h: hh, u: { alpha: f } }); }
     panel(p.x, p.y, p.w, p.h, 18, 0.94); L.uiBox('dlg', p.x, p.y, p.w, p.h, 6);
     const por = d.who === 'kirill' ? 'kirill_se' : d.who === 'vera' ? 'npc_witch_se' : null; L.rrect(p.x + 20, p.y + 20, 120, 120, 14, [0.2, 0.14, 0.2], [0.08, 0.05, 0.08]);
-    const pf = { raiva: ['rf_se_act', ST.rai.refused ? 1 : 0], elf: ['ef_se_act', ST.elf.sweet ? 5 : ST.elf.refused ? 1 : 0] }[d.who];
+    const pf = { raiva: ['rf_se_act', ST.rai.refused ? 1 : 0], elf: ['ef_se_act', ST.elf.sweet ? 5 : ST.elf.refused ? 1 : 0], 'Коля': ['kf_se_act', 0] }[d.who];   // v12.2: Kolya at home
     if (pf && has(pf[0])) { const m = KF[pf[0]], ch = 0.34 * m.fh, cw = ch * 100 / 110, cx0 = pf[1] * m.fw + m.ax - cw / 2, tw = m.n * m.fw;
       L.sprite(pf[0], p.x + 30, p.y + 26, { w: 100, h: 110, src: [cx0 / tw, 0.02, (cx0 + cw) / tw, 0.02 + ch / m.fh] }); }
     else if (por && has(por)) L.sprite(por, p.x + 30, p.y + 26, { w: 100, h: 110, src: por === 'npc_witch_se' ? [0.14, 0.0, 0.86, 0.335] : [0.12, 0.0, 0.88, 0.3] }); else drawPortrait(p.x + 80, p.y + 80);

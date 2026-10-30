@@ -2,7 +2,7 @@
 // World: x along the street (screen up-right), y across toward the viewer (screen down-right). Units ≈ 1/55 m.
 // Everything that happens lives here (movement, NPCs, Kirill, pranks, phone, quests, money, camera); the scene only draws.
 (function (root) {
-  const DT = 1 / 120, L = 26.0, VERSION = 'v12.1';
+  const DT = 1 / 120, L = 26.0, VERSION = 'v12.2';
   const VIEW = { W: 1920, H: 1080 };
   const C = 0.894, SN = 0.447;
   const proj = (x, y, z = 0) => [C * (x + y), SN * (y - x) - z];
@@ -357,6 +357,7 @@
     const id = S.dlg && MODS[S.dlg.who] ? S.dlg.who : null, k = id ? M(S, id) : null, D = id ? DLG[id] : null;
     if (c === 'close') { S.dlg = null; if (k && k.st === 'door') { k.st = 'inside'; k.t0 = S.t; } return; }
     if (festChoose(S, c)) return;
+    if (homeChoose(S, c)) return;
     if (c === 'prank' && k) { k.refused = true; S.target = id; S.dlg = { who: id, text: D.prank, choices: [['Ну держись', 'close']] }; msg(S, MODS[id].name, D.warn); return; }
     if (c === 'gift' && k) { const g = Object.keys(GIFTS).filter((n) => S.inv[n] > 0);
       if (!g.length) { S.dlg = { who: id, text: D.empty, choices: [['Ладно…', 'close']] }; k.refused = true; S.target = S.target || id; return; }
@@ -888,12 +889,25 @@
 
   // ---------------- home: the way back, and the party (a visual-novel ending) ----------------
   const allMods = (S) => MODIDS.every((id) => M(S, id).done >= 0 || M(S, id).sweet);
+  // v12.2: home — tea (HP 100) and Kolya's wardrobe: every costume he has unlocked (Vera's set after her quest, the gacha ones) and his hoodie
+  const homeCostumes = (S) => (S.q.vera === 2 ? COSTUMES : []).concat(COS5.filter((c) => ((S.fest || {}).cos || []).includes(c[0])));
   function homeDoor(S) {
-    if (allMods(S)) { startFinale(S); return; }
-    const left = MODIDS.filter((id) => !(M(S, id).done >= 0 || M(S, id).sweet)).map((id) => MODS[id].ins).join(', ');
     if (S.hp < 100) { S.hp = 100; ev(S, { k: 'candy', x: S.x, y: S.y }); toast(S, 'Забежал домой, выпил чаю: HP 100'); }
-    else toast(S, `Дома тихо. Рано возвращаться: ещё не разобрался с ${left}`);
+    const left = MODIDS.filter((id) => !(M(S, id).done >= 0 || M(S, id).sweet)).map((id) => MODS[id].ins).join(', ');
+    const ch = [['Переодеться', 'home_wardrobe']];
+    if (allMods(S)) S.dlg = { who: 'Коля', text: 'Дома горит свет, и кажется, играет музыка… Зайти или сначала переодеться?', choices: [['Зайти домой', 'home_enter']].concat(ch, [['Позже', 'close']]) };
+    else S.dlg = { who: 'Коля', text: `Дома. Чай, шкаф с костюмами и тишина. Рано возвращаться совсем: ещё не разобрался с ${left}.`, choices: ch.concat([['Обратно на улицу', 'close']]) };
   }
+  function homeChoose(S, c) {
+    if (c === 'home_enter') { S.dlg = null; startFinale(S); return true; }
+    if (c === 'home_wardrobe') { const L = homeCostumes(S);
+      S.dlg = L.length ? { who: 'Коля', text: 'Шкаф. Что надеть сегодня?', choices: L.map(([id, name]) => [name, 'hcos_' + id]).concat(S.costume ? [['Свой худи', 'hcos_none']] : [], [['Закрыть шкаф', 'close']]) }
+        : { who: 'Коля', text: 'В шкафу только худи. Костюмы дают у Веры (после её задания с тыквами) и выпадают в гаче на празднике — потом их можно надевать и дома.', choices: [['Ясно', 'close']] };
+      return true; }
+    if (c.startsWith('hcos_')) { const id = c.slice(5), cs = homeCostumes(S).find((q) => q[0] === id); S.costume = cs ? id : ''; ev(S, { k: 'costume', id: S.costume, x: S.x, y: S.y });
+      S.dlg = { who: 'Коля', text: cs ? 'Так, ' + cs[1].replace(/^\S+ /, '') + '. Сойдёт. Модеры не узнают. Наверное.' : 'Худи. Классика. Меня и так все узнают.', choices: [['Ещё переодеться', 'home_wardrobe'], ['На улицу', 'close']] };
+      toast(S, cs ? `Костюм: ${cs[1].replace(/^\S+ /, '')}. Патруль узнаёт тебя медленнее` : 'Снова в худи'); return true; }
+    return false; }
   const timesWord = (n) => (n % 10 === 1 && n % 100 !== 11 ? 'раз' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'раза' : 'раз');
   // the kind ending: all three forgiven (gifts) and not a single prank on any of them
   const peaceful = (S) => MODIDS.every((id) => { const k = M(S, id); return k.sweet && !k.dirty && k.done < 0 && (k.p || 0) <= 0 && !Object.keys(k.pr || {}).length; });

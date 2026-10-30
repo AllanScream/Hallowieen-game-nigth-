@@ -58,7 +58,7 @@ Opening `game/index.html` with a double click won't work: browsers don't let Web
 - Main menu music — «お菓子の森» by whiteelv, in the game — a music box; both can be changed in the settings. A voice message waits in the menu.
 - A street of 7 houses, a dark alley, open backyards (greenhouses, sheds, trampolines, swings, wickets between the plots) and a wood, 8 passers-by in costumes, a black cat, Vera's candy bowl.
 - Rain and thunderstorms: puddles and splashes underfoot, thunder, lightning knocks the street lights out (in the dark the patrol sees less).
-- Costumes from Vera's chest after her quest: ghost, pumpkin head, wizard's hat, little devil horns.
+- Costumes from Vera's chest after her quest: ghost, pumpkin head, wizard's hat, little devil horns; every unlocked costume can also be worn from Kolya's wardrobe at home.
 - 10 tricks and a «egged» meter for every moderator, favourite gifts for the peaceful path.
 - Tricks anywhere: firecrackers stun passers-by and the patrol, chalk (draw anything, five colours), an alarm-clock decoy, the doorbell and slime on any door.
 - Passers-by hold grudges: after three hits they chase you and take revenge (eggs back, «damages», a toilet-paper mummy).

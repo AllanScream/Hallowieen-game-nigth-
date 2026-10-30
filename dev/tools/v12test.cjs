@@ -107,4 +107,14 @@ const fest = (S, id) => { const st = SIM.FSTALLS.find((q) => q[1] === id), a = S
   const c = S.chalk, base = SIM.proj(c.at[0], c.at[1]); for (let k = 0; k < 3; k++) { for (let i = 0; i < 30; i++) run(S, 1, { press: 1, px: base[0] - S.cam[0] - 60 + k * 50 + 3 * i, py: base[1] - S.cam[1] - 30 + 2 * i, slot: k + 1 }); run(S, 1, { px: 5, py: 5 }); }
   ok(c.strokes.length === 3 && c.strokes.map((q) => q.col).join('') === '012' && S.slot === 6, 'the mouse draws, 1–3 pick colours, the hotbar stays');
   run(S, 1, { enter: 1 }); run(S, 1); ok(!S.chalk && S.kir.pr.chalk > 0 && S.drawings.some((d) => d.free && d.mod === 'kirill'), 'Enter: the drawing stays on the sidewalk and counts as a prank'); }
+
+// 12. v12.2: the wardrobe at home
+{ const S = fresh(); const H = SIM.HKO; S.hp = 50; S.x = H.door[0]; S.y = SIM.FACADE + 70; const go = () => { S.dlg = null; S.act = { k: 'door2', id: 'kolya', at: [H.door[0], SIM.FACADE + 60], r: SIM.K.USE }; run(S, 3); };
+  go(); ok(S.hp === 100 && S.dlg && S.dlg.choices[0][1] === 'home_wardrobe', 'home: tea and a wardrobe');
+  run(S, 1, { choose: 0 }); run(S, 1); ok(/только худи/.test(S.dlg.text), 'nothing unlocked yet: only the hoodie');
+  S.q.vera = 2; S.fest.cos = ['pumpkin_gold']; go(); run(S, 1, { choose: 0 }); run(S, 1); ok(S.dlg.choices.length === 6, 'Vera\'s four + the gacha costume + close');
+  const i = S.dlg.choices.findIndex((c) => c[1] === 'hcos_hat'); run(S, 1, { choose: i }); run(S, 1); ok(S.costume === 'hat', 'the wizard hat on, at home');
+  run(S, 1, { choose: 0 }); run(S, 1); const j = S.dlg.choices.findIndex((c) => c[1] === 'hcos_none'); run(S, 1, { choose: j }); run(S, 1); ok(S.costume === '', 'back in the hoodie');
+  SIM.runDev(S, 'done all'); go(); ok(S.dlg.choices[0][1] === 'home_enter' && !S.finale, 'all mods done: a choice to go in or change first');
+  run(S, 1, { choose: 0 }); ok(!!S.finale, '«Зайти домой» starts the ending'); }
 console.log(fails ? fails + ' FAILED' : 'all ok'); process.exit(fails ? 1 : 0);

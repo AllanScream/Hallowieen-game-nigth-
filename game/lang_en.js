@@ -7753,6 +7753,74 @@ window.LANG_EN = [
 "Q — hide or show the quests"
 ],
 [
+"Переодеться",
+"Change clothes"
+],
+[
+"Зайти домой",
+"Go inside"
+],
+[
+"Позже",
+"Later"
+],
+[
+"Обратно на улицу",
+"Back to the street"
+],
+[
+"Закрыть шкаф",
+"Close the wardrobe"
+],
+[
+"Ещё переодеться",
+"Change again"
+],
+[
+"На улицу",
+"To the street"
+],
+[
+"Дома горит свет, и кажется, играет музыка… Зайти или сначала переодеться?",
+"The lights are on at home, and is that music?… Go in or change first?"
+],
+[
+"Дома. Чай, шкаф с костюмами и тишина. Рано возвращаться совсем: ещё не разобрался с {0}.",
+"Home. Tea, the costume wardrobe and silence. Too early to come back for good: still haven't dealt with {0}."
+],
+[
+"Шкаф. Что надеть сегодня?",
+"The wardrobe. What to wear tonight?"
+],
+[
+"В шкафу только худи. Костюмы дают у Веры (после её задания с тыквами) и выпадают в гаче на празднике — потом их можно надевать и дома.",
+"Only the hoodie in the wardrobe. Vera gives costumes (after her pumpkin quest) and they drop from the gacha at the festival — then you can wear them at home too."
+],
+[
+"Так, {0}. Сойдёт. Модеры не узнают. Наверное.",
+"So, {0}. Good enough. The mods won't recognise me. Probably."
+],
+[
+"Худи. Классика. Меня и так все узнают.",
+"The hoodie. A classic. Everyone knows me anyway."
+],
+[
+"Домой: чай и шкаф с костюмами",
+"Home: tea and the costume wardrobe"
+],
+[
+"Костюм: у Веры или дома в шкафу (по желанию)",
+"A costume: at Vera's or from the wardrobe at home (optional)"
+],
+[
+"Неоновый призрак",
+"Neon Ghost"
+],
+[
+"Золотая тыква",
+"Golden Pumpkin"
+],
+[
 "К",
 "K"
 ],
