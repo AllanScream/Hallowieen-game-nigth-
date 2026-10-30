@@ -18,9 +18,9 @@ const slotOf = (n) => SIM.SLOTS.indexOf(n) + 1;
   const ask = (who, t) => { S.phone = { app: 'dm', who, t: S.t - 1 }; run(S, 1, { text: t }); run(S, 600); const l = S.dm[who]; return l[l.length - 1]; };
   let r = ask('Эльф', 'привет'); ok(!r.me && /Коля|Приветик/.test(r.text), 'Elf answers a greeting: ' + r.text);
   r = ask('Тимофей', 'где я?'); ok(/у своего дома|Ты /.test(r.text), 'Timofey says where you are: ' + r.text);
-  SIM.runDev(S, 'refuse all'); S.kir.p = 30; r = ask('Кирилл', 'привет'); ok(/засрал|нахуй/.test(r.text), 'Kirill answers in anger after pranks: ' + r.text);
+  SIM.runDev(S, 'refuse all'); S.kir.p = 30; r = ask('Кирилл', 'привет'); ok(/засрал|нахуй|трусы|преступник|крыльцо|Отмыва/.test(r.text), 'Kirill answers in anger after pranks: ' + r.text);
   S.costume = 'pumpkin'; r = ask('Райва', 'как мой костюм?'); ok(/Тыквоголов/.test(r.text), 'Raiva comments on the costume: ' + r.text);
   r = ask('Скелет', 'займи денег'); ok(/долг/i.test(r.text), 'Skelet on money: ' + r.text); }
 // 4. Elf's messages are flirtier
-{ const S = SIM.spawn(0); ok(S.msgs.some((m) => m.from === 'Эльф' && /😘/.test(m.text)), 'Elf\'s first message flirts'); }
+{ const S = SIM.spawn(0); ok(S.msgs.some((m) => m.from === 'Эльф' && /♡|づ/.test(m.text)), 'Elf\'s first message flirts'); }
 console.log(fails ? fails + ' FAILED' : 'all ok'); process.exit(fails ? 1 : 0);

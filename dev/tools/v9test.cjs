@@ -18,7 +18,7 @@ const at = (S, x, y) => { S.x = x; S.y = y; S.vx = S.vy = 0; S.path = []; };
   hit(S); hit(S); hit(S); ok(!!n.rev, 'three eggs → revenge (' + (n.rev && n.rev.st) + ')');
   let hp0 = S.hp, money0 = S.money; run(S, 120 * 8); ok(S.hp < hp0 || S.money < money0 || S.wrapT > 0, 'revenge lands: hp ' + hp0 + '→' + S.hp + ', money ' + money0 + '→' + S.money + ', ach payback ' + !!S.ach.payback); }
 // 5. unread: messages arriving while the chat is open are read
-{ const S = SIM.spawn(0); run(S, 10); S.phone = { app: 'chats', t: S.t }; S.msgs.push({ from: 'Эльф', text: 'x', gt: 0, read: false }); run(S, 2); ok(S.msgs.every((m) => m.read), 'chats open marks all read');
+{ const S = SIM.spawn(0); run(S, 10); S.phone = { app: 'dm', who: 'Эльф', t: S.t }; S.msgs.push({ from: 'Эльф', text: 'x', gt: 0, read: false }); run(S, 2); ok(S.msgs.filter((m) => m.from === 'Эльф' && !m.group).every((m) => m.read), 'opening a conversation marks it read (v12: the list itself does not)');
   S.phone = { app: 'dm', who: 'Модеры 🎃', t: S.t }; S.msgs.push({ from: 'Кирилл', text: 'y', gt: 0, read: false, group: true }, { from: 'Кирилл', text: 'z', gt: 0, read: false }); run(S, 2);
   ok(S.msgs[S.msgs.length - 2].read && !S.msgs[S.msgs.length - 1].read, 'group chat marks only group messages'); }
 // 6. arrest → released by Elf's house

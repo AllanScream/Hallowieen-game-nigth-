@@ -144,6 +144,22 @@
     angry: (v, p) => { const f = R(240, 330); tone(f, 0.4, { type: 'sawtooth', f1: f * 0.7, vol: 0.07 * v, pan: p, lp: 1400, vib: 15 }); },
     arrest: () => { for (const at of [0, 0.12, 0.5, 0.62]) noise(0.03, { f: 5500, q: 6, vol: 0.25, at }); tone(110, 1.2, { type: 'sawtooth', f1: 55, vol: 0.12, lp: 600, at: 0.2 }); },
   };
+  Object.assign(FX, {                                                                         // v12: the festival, the prologue's stream
+    carve: () => { noise(0.07, { f: 2400 + Math.random() * 800, q: 3, vol: 0.06 }); noise(0.05, { f: 900, q: 2, vol: 0.04, at: 0.03 }); },
+    splash: (v, p, e) => { noise(0.35, { f: 1500, f1: 500, q: 0.8, vol: 0.14 }); noise(0.18, { type: 'highpass', f: 3500, vol: 0.06, at: 0.04 }); tone(300, 0.12, { f1: 120, vol: 0.05, at: 0.02 }); },
+    crunch: () => { noise(0.09, { f: 3200, q: 1.4, vol: 0.18 }); noise(0.07, { f: 1800, q: 2, vol: 0.12, at: 0.06 }); tone(880, 0.08, { type: 'triangle', vol: 0.06, at: 0.1 }); tone(1320, 0.12, { type: 'triangle', vol: 0.05, at: 0.16 }); },
+    pose: () => { for (const [f, d] of [[523, 0], [659, 0.06], [784, 0.12]]) tone(f, 0.18, { type: 'triangle', vol: 0.09, at: d }); noise(0.4, { f: 1800, q: 0.4, vol: 0.06, am: 18, at: 0.05 }); },
+    boo: () => { tone(220, 0.35, { type: 'sawtooth', f1: 150, vol: 0.06, lp: 900 }); },
+    cheer: () => { noise(1.4, { f: 1700, q: 0.35, vol: 0.12, am: 13 }); noise(1.1, { f: 2600, q: 0.6, vol: 0.06, am: 21, at: 0.1 }); for (let i = 0; i < 8; i++) noise(0.03, { type: 'highpass', f: 3000, vol: 0.08, at: 0.1 + i * 0.09 + Math.random() * 0.05 }); },
+    fanfare: () => { [[523, 0], [659, 0.12], [784, 0.24], [1047, 0.36]].forEach(([f, d]) => { tone(f, 0.32, { type: 'square', vol: 0.06, lp: 2400, at: d }); tone(f * 2, 0.3, { type: 'triangle', vol: 0.03, at: d }); }); FX.cheer(); },
+    gacha: (v, p) => { for (let i = 0; i < 10; i++) noise(0.025, { f: 2800, q: 4, vol: 0.07, at: i * 0.07 }); tone(440, 0.25, { type: 'triangle', f1: 880, vol: 0.07, at: 0.75 });
+      for (const [f, d] of [[784, 0.95], [988, 1.02], [1175, 1.09], [1568, 1.16]]) tone(f, 0.5, { type: 'sine', vol: 0.06, at: d }); },
+    intro_donate: () => { tone(1047, 0.12, { type: 'square', vol: 0.05, lp: 3000 }); tone(1319, 0.12, { type: 'square', vol: 0.05, lp: 3000, at: 0.1 }); tone(1568, 0.35, { type: 'square', vol: 0.05, lp: 3000, at: 0.2 }); FX.coin(1, 0); },
+    intro_notify: () => { tone(1568, 0.09, { vol: 0.12 }); tone(2093, 0.16, { vol: 0.1, at: 0.11 }); },
+    intro_group: () => { tone(988, 0.07, { vol: 0.09 }); tone(1319, 0.09, { vol: 0.08, at: 0.08 }); },
+    intro_chat: () => { for (let i = 0; i < 4; i++) tone(1200 + i * 90, 0.05, { vol: 0.04, at: 0.15 + i * 0.45 }); },
+    intro_voice: () => { tone(660, 0.08, { vol: 0.08 }); },
+  });
   AU.FX = FX;
   AU.play = (k, v = 1, p = 0, extra) => { if (!ac || AU.muted || !FX[k]) return; try { FX[k](v, p, extra); } catch (e) {} };
   // ---- ambience: crickets, an owl, the music box (A minor, slow arpeggios with an echo) ----
@@ -159,6 +175,16 @@
     if (t > nextOwl) { if (nextOwl) { const p = R(-0.9, 0.9); tone(370, 0.35, { vol: 0.05, dest: amb, pan: p, vib: 4, lp: 900 }); tone(330, 0.6, { vol: 0.05, dest: amb, pan: p, at: 0.45, vib: 4, lp: 900 }); } nextOwl = t + R(22, 45); }
     const RD = S && S.raid; if (RD && RD.st === 'search' && t > (prev.radio || 0)) { if (prev.radio) { const u = RD.units[Math.floor(Math.random() * RD.units.length)], d = Math.hypot(u.x - S.x, u.y - S.y);
       if (d < 1800) FX.radio(Math.max(0.2, 1 - d / 1800), Math.max(-1, Math.min(1, (u.x - S.x) / 1500))); } prev.radio = t + R(9, 20); }
+    if (S && S.intro && !S.intro.over) { windG.gain.setTargetAtTime(0.004, t, 0.3); if (rainG) rainG.gain.setTargetAtTime(0, t, 0.3);   // v12: Kolya's room
+      if (t > (prev.key || 0)) { prev.key = t + (Math.random() < 0.15 ? R(0.5, 1.4) : R(0.07, 0.2)); noise(0.03, { f: R(2000, 3600), q: 3, vol: 0.035, dest: amb }); }
+      if (t > (prev.anime || 0)) { prev.anime = t + R(0.18, 0.4); const f = [523, 587, 659, 784, 880, 1047][Math.floor(Math.random() * 6)];
+        tone(f * (Math.random() < 0.3 ? 0.5 : 1), R(0.15, 0.32), { type: 'triangle', vol: 0.03, dest: amb, lp: 900, vib: 3 }); if (Math.random() < 0.25) tone(R(250, 420), 0.25, { type: 'sawtooth', vol: 0.012, dest: amb, lp: 700, vib: 8 }); }
+      if (t > (prev.ping || 0)) { if (prev.ping) tone(1760, 0.06, { vol: 0.03, dest: amb, at: 0 }); prev.ping = t + R(4, 9); }
+      return; }
+    if (window.SIM && S && SIM.FEST && !S.finale) { const F = SIM.FEST, d = Math.hypot((S.x || 0) - F.cx, (S.y || 0) - F.cy), k = prev.festK = Math.max(0, 1 - d / 1300);   // v12: the festival: a crowd and a tune
+      if (k > 0.02 && t > (prev.crowd || 0)) { prev.crowd = t + R(0.25, 0.6); noise(R(0.5, 1.1), { f: R(500, 1400), q: 0.6, vol: 0.05 * k, dest: amb, am: R(6, 14) }); if (Math.random() < 0.08) noise(0.6, { f: 1800, q: 0.4, vol: 0.06 * k, dest: amb, am: 15 }); }
+      if (k > 0.05 && AU.musicSrc !== 'none' && t > (prev.fnote || 0)) { const MAJ = [523, 659, 784, 659, 587, 698, 880, 698], i2 = prev.fi = ((prev.fi || 0) + 1) % 32; prev.fnote = t + 0.23;
+        tone(MAJ[i2 % 8] * (i2 >= 16 ? 1.122 : 1), 0.2, { type: 'triangle', vol: 0.05 * k, dest: amb }); if (i2 % 4 === 0) tone(MAJ[0] / 4 * (i2 >= 16 ? 1.122 : 1), 0.3, { type: 'square', vol: 0.03 * k, dest: amb, lp: 500 }); } }
     if (S && S.finale) { if (t > (prev.beat || 0)) { const b = prev.bi = ((prev.bi || 0) + 1) % 64, at = 0, BASS = [110, 87.3, 130.8, 98];   // a party groove: kick, hats, bass, stabs
         prev.beat = Math.max(t, (prev.beat || t)) + 0.25; const root = BASS[Math.floor(b / 16) % 4];
         if (b % 4 === 0 && S.finale.kind !== 'peace') tone(130, 0.18, { f1: 42, vol: 0.5, dest: partyBus, at });   // the kind ending: no kick, a softer groove
@@ -167,7 +193,7 @@
         if (b % 2 === 0) tone(root * (b % 8 === 6 ? 1.5 : 1), 0.22, { type: 'square', vol: 0.12, dest: partyBus, lp: 700, at });
         if (b % 8 === 2 || b % 8 === 7) for (const m of [2, 2.52, 3]) tone(root * m * 2, 0.16, { type: 'triangle', vol: 0.05, dest: partyBus, at }); }
       return; }
-    if (AU.musicSrc === 'none') { nextNote = 0; return; }
+    if (AU.musicSrc === 'none' || (prev.festK || 0) > 0.25) { nextNote = 0; return; }              // v12: the festival tune replaces the music box
     if (t > nextNote) { const bar = MEL[Math.floor(noteI / 8) % 4], f = bar[[0, 1, 2, 3, 2, 1, 2, 3][noteI % 8]] * (noteI % 32 >= 28 ? 0.5 : 1); noteI++;
       nextNote = (nextNote || t) + 0.46; if (nextNote < t) nextNote = t + 0.46;
       for (const [m, v] of [[1, 0.18], [2, 0.05], [3.01, 0.025]]) { tone(f * m, 1.6, { vol: v, dest: mus, at: nextNote - t - 0.46 > 0 ? 0 : 0 }); }

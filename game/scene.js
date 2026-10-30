@@ -208,7 +208,9 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
   // v10 costumes from Vera's chest: the ghost sheet over the walking legs, or a pumpkin helmet / a wizard hat / devil horns on the head.
   // The view (0 front … 4 back, mirrored for the left half) comes from the drawn atlas's yaw
   const cosView = (name) => { const m = /_(p|m)(\d+)w$/.exec(name); if (!m) return 1; const yw = (m[1] === 'p' ? 1 : -1) * +m[2]; return Math.max(0, Math.min(4, Math.round((90 - yw) / 45))); };
-  function costumeOver(cos, r, a, walking) { const f = r.af, v = cosView(f.name), fl = f.flip, u = { alpha: a, tint: ST.hp < 30 ? [1, 0.6, 0.6, 0.3] : [1, 1, 1, 0], rim: [0.3, fl ? 0.004 : -0.004, -0.004, 1], rimCol: [1, 0.7, 0.4] };
+  function costumeOver(cos0, r, a, walking) { const f = r.af, v = cosView(f.name), fl = f.flip, cos = cos0.split('_')[0], gold = /_gold$/.test(cos0), neon = /_neon$/.test(cos0);   // v12: gacha variants tint the base costume
+    const u = { alpha: a, tint: ST.hp < 30 ? [1, 0.6, 0.6, 0.3] : gold ? [1, 0.8, 0.22, 0.62] : neon ? [0.35, 1, 0.95, 0.58] : [1, 1, 1, 0], rim: [0.3, fl ? 0.004 : -0.004, -0.004, 1], rimCol: gold ? [1, 0.9, 0.4] : neon ? [0.4, 1, 1] : [1, 0.7, 0.4] };
+    if (neon) L.glow(f.X, f.Y - KH * 0.5, KH * 0.9, [0.3, 1, 0.95], 0.35 + 0.1 * Math.sin(T * 4), 2.5); if (gold) L.glow(f.X, f.Y - KH * 0.85, KH * 0.45, [1, 0.8, 0.3], 0.3 + 0.1 * Math.sin(T * 3), 2.5);
     if (cos === 'ghost') { const n = 'cos_ghost_' + v, md = (window.COSMETA || {}).ghost, g = md ? md[v] : { gf: 0.99, tf: 0.01, cx: 0.5 }; if (!has(n)) return;
       const Hs = KH * 1.04, sc = Hs / ((g.gf - g.tf) * A[n].h), w = A[n].w * sc, h = A[n].h * sc, gx = f.X, gy = f.Y + (walking ? -1.5 * Math.abs(Math.sin(Math.PI * 2 * ST.gph)) : 0);
       const x0 = fl ? gx - (1 - g.cx) * w : gx - g.cx * w, y0 = gy - g.gf * h, rot = walking ? 0.03 * Math.sin(Math.PI * 2 * ST.gph) : 0.012 * Math.sin(T * 1.7);
@@ -389,6 +391,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     let shk = 0; for (const e of ev) { const a = GT - e.t; if (a < 0) continue; if (e.k === 'bang' && a < 0.5) shk = Math.max(shk, 14 * (1 - a / 0.5) ** 2); if (e.k === 'hurt' && a < 0.3) shk = Math.max(shk, 6 * (1 - a / 0.3)); }
     if (window.SETTINGS && SETTINGS.shake === false) shk = 0;
     cx = ST.cam[0] + shk * Math.sin(GT * 91); cy = ST.cam[1] + shk * Math.sin(GT * 117);
+    if (ST.intro) { L.beginBG([0.02, 0.01, 0.02, 1]); L.beginComp(); L.finish(t, { bloom: [0.3, 0.26], vignette: 0.84, warm: 0.5, roll: 1, dither: 1 }); hud(); return; }   // v12: the prologue draws no street under it
     // ===== ground =====
     L.beginBG([0.03, 0.02, 0.03, 1]);
     const X0 = SIM.X0 - 1500, X1 = SIM.X1 + 1500;
@@ -400,6 +403,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     gTex('sidewalk_tex', X0, SIM.SWN[0], X1, SIM.SWN[1], 280);
     gTex('sidewalk_tex', X0, SIM.SWS[0], X1, SIM.SWS[1], 280);
     SIM.HOUSES.forEach((h) => gTex('sidewalk_tex', h.gate - 55, h.y1 + 50, h.gate + 55, SIM.SWN[0], 220, { grade: [0.9, 0.9, 0, 1] }));
+    festGround();                                                                    // v12: the festival plaza
     gTex('asphalt_tex', X0, SIM.ROAD[0], X1, SIM.ROAD[1], 520, { grade: [1, 1.05, 0, 1.05] });
     gSolid(X0, SIM.ROAD[0] - 10, X1, SIM.ROAD[0] + 4, [0.24, 0.2, 0.19]); gSolid(X0, SIM.ROAD[1] - 4, X1, SIM.ROAD[1] + 10, [0.26, 0.22, 0.2]);
     gSolid(X0, SIM.ROAD[0] + 4, X1, SIM.ROAD[0] + 12, [0.03, 0.02, 0.03], 0.6); gSolid(X0, SIM.ROAD[1] - 12, X1, SIM.ROAD[1] - 4, [0.03, 0.02, 0.03], 0.6);
@@ -426,6 +430,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     // light pools on the ground
     SIM.LAMPS.forEach(([x, y], i) => { if (SIM.lampLit(ST, i)) pool(x + (y < 0 ? 40 : -40), y + (y < 0 ? 40 : -40), 230, LAMPC, 0.42 * flick(i, 0.3) * relight(i)); });
     ALLEYBULBS.forEach(([x, y], i) => pool(x - 70, y, 190, [0.75, 0.9, 0.7], 0.3 * bulbF(i)));
+    festLights(false);
     // Elf's motion-sensor floodlight on her yard; the raid cars' flashing light bars on the asphalt
     if (ST.elf.lit >= 0) { const k = Math.min(1, (GT - ST.elf.lit) / 0.12) * (0.92 + 0.08 * Math.sin(GT * 50)); pool(SIM.HE.door[0] - 30, SIM.FACADE + 165, 410, [0.9, 0.95, 1], 0.6 * k); }
     if (ST.raid && ST.raid.st !== 'wait') ST.raid.cars.forEach((c, i) => { if (c.tex === 'car_police') { const f = flashRB(GT, i); if (f.r) pool(c.x + 30, c.y + 40, 300, [1, 0.08, 0.08], 0.32); if (f.b) pool(c.x - 30, c.y + 30, 300, [0.12, 0.3, 1], 0.36); }
@@ -454,7 +459,9 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     MD.forEach(([id, k, h]) => { if (!((ST.courier && (ST.courier.mod || 'kirill') === id && !['wait', 'come'].includes(ST.courier.st)) || k.pr.pizza)) return;
       const x = h.door[0] + 95, y = SIM.FACADE + 46; add([x - 14, y - 14, x + 14, y + 14], () => { const q = P(x, y); L.shadow(q[0], q[1], 20, 7, 0.45); pizzaStack(q[0], q[1] + 2, 48); }); });
     SIM.FENCES.forEach(([a, b]) => { if (vis(a, SIM.FENCE_Y, 1400) || vis(b, SIM.FENCE_Y, 1400)) add([a, SIM.FENCE_Y - 8, b, SIM.FENCE_Y + 8], () => fence(a, b, SIM.FENCE_Y)); });
-    { const a = Math.max(SIM.X0, (cx / C) - 400), b = Math.min(SIM.X1, (cx + W) / C + 2600); add([SIM.X0, 390, SIM.X1, 410], () => fence(Math.max(SIM.X0, a - 1400), b, 400)); }
+    { const a = Math.max(SIM.X0, (cx / C) - 400) - 1400, b = Math.min(SIM.X1, (cx + W) / C + 2600), G0 = SIM.FEST.gate;    // v12: a gate to the festival
+      if (a < G0[0]) add([SIM.X0, 390, G0[0], 410], () => fence(Math.max(SIM.X0, a), Math.min(b, G0[0]), 400)); if (b > G0[1]) add([G0[1], 390, SIM.X1, 410], () => fence(Math.max(G0[1], a), b, 400)); }
+    festWorld(add, vis);
     SIM.LAMPS.forEach(([x, y], i) => { if (vis(x, y)) add([x - 14, y - 14, x + 14, y + 14], () => lamp(x, y, i, MD.some((m) => m[1].lamps.includes(i)) || (ST.flyers2 || []).includes(i))); });
     SIM.TREES.forEach(([x, y, s], i) => { if (visTree(x, y, s)) add([x - 30 * s, y - 30 * s, x + 30 * s, y + 30 * s], () => tree(x, y, s, i)); });
     SIM.BUSHES.forEach(([x, y], i) => { if (vis(x, y)) { const hid = ST.hidden && ST.hideAt && Math.hypot(ST.hideAt[0] - x, ST.hideAt[1] - y) < 5; add([x - 40, y - 30, x + 40, y + 30], () => bush(x, y, i, hid)); } });
@@ -498,7 +505,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       add([c.x - 15, c.y - 15, c.x + 15, c.y + 15], () => { S.courHead = drawPerson('courier', c.x, c.y, { ang: an, gph: c.gph || 0, g: c.gA || 0, stride: 95, id: 'courier',
         carry, holdBehind: back, hold: carry ? (p) => pizzaStack(p[0], p[1] + 10, 46) : null }); }); } else S.courHead = null;
     if (ST.kids && ST.kids.list) ST.kids.list.forEach((q, i) => add([q.x - 12, q.y - 12, q.x + 12, q.y + 12], () => { const hd = drawPerson('kid', q.x, q.y, { k: 0.72, ang: q.ang, gph: q.gph || 0, g: q.gA || 0, stride: 62, id: 'kid' + i, seed: i }); if (i === 0) S.kidHead = hd; }));
-    add([ST.x - 16, ST.y - 16, ST.x + 16, ST.y + 16], () => { const a = ST.hidden ? 0.45 : (ST.hp <= 0 ? Math.max(0, 1 - (GT - (ST.koT || GT)) / 2) : 1);
+    if (!(ST.mg && ST.mg.k === 'stage')) add([ST.x - 16, ST.y - 16, ST.x + 16, ST.y + 16], () => { const a = ST.hidden ? 0.45 : (ST.hp <= 0 ? Math.max(0, 1 - (GT - (ST.koT || GT)) / 2) : 1);
       const q = P(ST.x, ST.y), r = drawKolya(q[0], q[1] + 4, a); S.kolHead = r.head; S.kolLed = r.led; S.kolFace = r.face; kolyaOverlays(q, r.head); });
     // separating-axis depth sort (smaller x or larger y = nearer the camera = drawn later)
     const cmp = (p, q) => { const a = p.b, b = q.b; if (a[2] <= b[0]) return 1; if (b[2] <= a[0]) return -1; if (a[3] <= b[1]) return -1; if (b[3] <= a[1]) return 1;
@@ -522,9 +529,11 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       if (RAIN > 0.003) L.solid(0, 0, W, H, [0.015, 0.02, 0.035], 0, 0, 0, 0.2 * RAIN);                                   // v10: overcast under the rain
       if (nAmt > 0.01) { G.draw(L.P.night, { u_o: ho0, u_d: d0, u_on: ST.light ? 1 : 0, u_amt: nAmt }, G.xf(0, 0, W, H));
         SIM.LAMPS.forEach(([x, y], i) => { const q = P(x, y); if (onScreen(q) && SIM.lampLit(ST, i)) pool(x + (y < 0 ? 40 : -40), y + (y < 0 ? 40 : -40), 210, LAMPC, 0.5 * nAmt * flick(i, 0.3) * relight(i)); });
+        festLights(true);
         (SIM.NDECOR || []).forEach(([n, x, y], i) => { if ((n === 'greenhouse' || n === 'shed') && onScreen(P(x, y))) { pool(x, y + 30, n === 'greenhouse' ? 170 : 110, LAMPC, 0.42 * nAmt * flick(i + 7, 0.2)); const g2 = P(x, y, n === 'greenhouse' ? 60 : 70); L.glow(g2[0], g2[1], 60, [1, 0.75, 0.4], 0.35, 2.5); } }); } }
 
     // ===== lights =====
+    festGlows(); festStrings();
     SIM.LAMPS.forEach(([x, y], i) => { const q = P(x, y); if (!onScreen(q) || !SIM.lampLit(ST, i)) return; const [hx, hy] = lampHead(q), k = relight(i);
       L.glow(hx, hy, 70, LAMPC, 0.9 * flick(i, 0.3) * k, 3); L.glow(hx, hy + 60, 190, LAMPC, 0.18 * flick(i, 0.3) * k, 2.2); });
     ALLEYBULBS.forEach(([x, y], i) => { const q = P(x, y, 100); if (!onScreen(q)) return; const f = bulbF(i); L.glow(q[0], q[1], 40, [0.85, 1, 0.75], 0.9 * f, 3); L.glow(q[0] - 40, q[1] + 60, 170, [0.6, 0.8, 0.6], 0.12 * f, 2.2); });
@@ -616,7 +625,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       G.blend('add'); L.solid(0, 0, W, H, [0.55, 0.6, 0.8], 0, 0, 0, 0.55 * f); G.blend(); }
     // ===== world-space UI (bubbles, prompts) =====
     behindMark();
-    bubbles();
+    bubbles(); festBubbles();
     hud();
   };
   let NOMASK = null; const noMask = () => { if (!NOMASK) { const cv = document.createElement('canvas'); cv.width = cv.height = 2; G.canvasTex('rain_nomask', cv, { mip: false }); NOMASK = 1; } return G.tex('rain_nomask'); };
@@ -753,7 +762,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     const t = pt(62); L.rrect(t[0] - 4, t[1] - 4, 8, 8, 3, [1, 0.5, 0.1], [0.8, 0.3, 0.05]);
     if (fl) L.star(t[0] + ca * 8, t[1] + sa * 8, 24, [1, 0.95, 0.7], 1); }
   // phone contacts (avatars and statuses)
-  const CONT = { 'Модеры 🎃': ['#b4501a', 'Кирилл, Райва, Эльф · чат', '🎃'], 'Кирилл': ['#7a4aa0', 'у окна', 'К'], 'Райва': ['#3a5aa0', 'в серверной', 'Р'], 'Эльф': ['#3a8a72', 'на крыльце', 'Э'], 'Скелет': ['#555555', 'занят · не в сети', 'С'], 'Тимофей': ['#222222', 'наблюдает 👁', 'Т'] };
+  const CONT = { 'Модеры 🎃': ['#b4501a', 'Кирилл, Райва, Эльф · чат', '🎃'], 'Кирилл': ['#7a4aa0', 'у окна', 'К'], 'Райва': ['#3a5aa0', 'в серверной', 'Р'], 'Эльф': ['#3a8a72', 'на крыльце', 'Э'], 'Скелет': ['#555555', 'занят · не в сети', 'С'], 'Тимофей': ['#222222', 'наблюдает (⊙_⊙)', 'Т'] };
   // the ending: a visual novel over the party pictures, then the stats card
   function finaleOverlay() { const F = ST.finale; if (!F) return; const line = F.lines[Math.min(F.i, F.lines.length - 1)], cg = line ? line.cg : 'cg_party5';
     if (S.finCg !== cg) { S.finPrev = S.finCg; S.finCg = cg; S.finT = T; }
@@ -761,18 +770,17 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       L.sprite(n, (W - w) / 2, (H - h) / 2, { w, h, u: { alpha: al } }); };
     const age = T - (S.finT || T), zoom = 1.02 + 0.025 * Math.min(1, age / 9);
     L.solid(0, 0, W, H, [0.02, 0.01, 0.02]); if (S.finPrev && age < 0.6) drawCg(S.finPrev, 1, 1.045); drawCg(cg, Math.min(1, (S.finPrev ? 0 : 0.35) + age / 0.6), zoom);
-    if (!F.end && line) { const pw = 1300, ph = 210, x = W / 2 - pw / 2, y = H - ph - 40; panel(x, y, pw, ph, 18, 0.9); L.uiBox('fin', x, y, pw, ph, 6);
-      L.label('finwho', line.who, x + 34, y + 38, { size: 32, col: '#ffb45a', out: '#120806' });
-      wrap(line.text, 30, pw - 80, 'normal').slice(0, 3).forEach((l, i) => L.label('fint' + i, l, x + 34, y + 92 + i * 40, { size: 30, col: '#f6e7c8', out: '#120806', weight: 'normal' }));
-      L.label('finnext', `${F.i + 1}/${F.lines.length}  ▶ клик или пробел`, x + pw - 30, y + ph - 26, { size: 18, col: '#c9a27a', out: '#120806', al: 1, a: 0.6 + 0.4 * Math.sin(T * 4) }); }
+    if (!F.end && line) { vnLine(F, line, GT - (F.at || F.t0), 'fin');                       // v12: the epilogue's stream chat and donation use the same lines as the prologue
+      L.label('finnext', `${F.i + 1}/${F.lines.length}  ▶ клик или пробел`, W - 60, H - 22, { size: 18, col: '#c9a27a', out: '#120806', al: 1, a: 0.6 + 0.4 * Math.sin(T * 4) }); }
     if (F.end) { L.solid(0, 0, W, H, [0.02, 0.01, 0.03], 0, 0, 0, 0.72); const st = ST.stats || {}, md = SIM.MODIDS.map((id) => ST[SIM.MODS[id].key]);
       L.label('fend', 'Конец', W / 2, 200, { size: 96, col: '#ffb45a', out: '#2a0a02', al: 0.5, font: SERIF });
       L.label('fend2', F.kind === 'peace' ? 'Добрая концовка: ни одной гадости модерам. Спасибо за игру!' : '«Сладость или гадость» — спасибо за игру!', W / 2, 290, { size: 34, col: '#f6e7c8', out: '#120806', al: 0.5 });
       const nAch = SIM.ACH.filter((a) => ST.ach && ST.ach[a.id]).length;
       const rows = [['Концовка', F.kind === 'peace' ? 'добрая (все простили)' : 'вечеринка-сюрприз'], ['Достижений за игру', nAch + ' из ' + SIM.ACH.length], ['Время на часах', SIM.clockStr(ST)], ['Домов закидано на 100 %', md.filter((k) => k.done >= 0).length + ' из 3'], ['Помирился подарком', md.filter((k) => k.sweet).length + ' из 3'],
         ['Яиц брошено', st.eggs || 0], ['Рулонов бумаги', st.tp || 0], ['Шариков выпущено', st.bb || 0], ['Попаданий в прохожих', st.hits || 0],
-        ['Задержаний', ST.raid ? ST.raid.arrests : 0], ['Покупок вируса', (ST.rai.junk || []).length], ['Трусов продано на аукционе', ST.kir.auction || 0], ['Деньги', ST.money + ' ₽']];
-      const x0 = W / 2 - 330, RH = 41; panel(x0 - 30, 330, 720, rows.length * RH + 40, 16, 0.85); L.uiBox('fendp', x0 - 30, 330, 720, rows.length * RH + 40, 4);
+        ['Задержаний', ST.raid ? ST.raid.arrests : 0], ['Покупок вируса', (ST.rai.junk || []).length], ['Трусов продано на аукционе', ST.kir.auction || 0],
+        ['Тыква на конкурсе', ST.fest && ST.fest.carve ? ST.fest.carve.place + '-е место' : '—'], ['Круток гачи', ST.fest ? ST.fest.gacha.pulls : 0], ['Деньги', ST.money + ' ₽']];
+      const x0 = W / 2 - 330, RH = 38; panel(x0 - 30, 330, 720, rows.length * RH + 40, 16, 0.85); L.uiBox('fendp', x0 - 30, 330, 720, rows.length * RH + 40, 4);
       rows.forEach(([k, v], i) => { L.label('fr' + i, k, x0, 370 + i * RH, { size: 26, col: '#e8dcc8', out: '#120806', weight: 'normal' }); L.label('fv' + i, String(v), x0 + 660, 370 + i * RH, { size: 26, col: '#ffd76a', out: '#120806', al: 1 }); });
       L.label('fexit', 'Клик — в главное меню', W / 2, H - 70, { size: 26, col: '#c9a27a', out: '#120806', al: 0.5, a: 0.6 + 0.4 * Math.sin(T * 3) }); } }
   // the wanted panel (top, left of centre) while the raid lasts
@@ -845,10 +853,193 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       if (onScr) bubble('say_' + e.who, e.text, hd[0], hd[1], Math.min(1, (e.dur - (GT - e.t)) * 3)); });
   }
 
+  // ===== v12: the festival plaza — paving, an arch in the fence, stalls, lantern poles with strings of bulbs, a crowd, scattered jack-o'-lanterns =====
+  const FCOL = [[1, 0.45, 0.1], [0.75, 0.3, 1], [0.35, 1, 0.45], [1, 0.85, 0.25], [1, 0.3, 0.55], [0.3, 0.8, 1]];
+  const FPUMP = [[2290, 650, 0.9], [2300, 720, 0.7], [2972, 860, 0.9], [2425, 1070, 0.8], [2700, 1075, 0.9], [2540, 1068, 0.8], [2420, 455, 0.7], [2560, 1075, 0.75], [2300, 1010, 1.1], [2800, 1075, 0.7], [2970, 760, 0.8]];
+  const FSTR = [[0, 1], [1, 4], [4, 2], [0, 3], [3, 2], [1, 2], [0, 2]];
+  function festGround() { const F = SIM.FEST; if (!onScreen(P(F.cx, F.cy), 1500)) return;
+    gTex('sidewalk_tex', F.x0, F.y0 + 6, F.x1, F.y1, 230, { grade: [1.05, 0.72, 0, 1] });
+    gTex('sidewalk_tex', F.gate[0] + 4, SIM.SWS[1] - 6, F.gate[1] - 4, F.y0 + 8, 230, { grade: [1.0, 0.75, 0, 1] });
+    for (let i = 0; i < 150; i++) { const x = F.x0 + 30 + (F.x1 - F.x0 - 60) * L.rnd(i, 3), y = F.y0 + 40 + (F.y1 - F.y0 - 60) * L.rnd(i, 5), q = P(x, y), c = FCOL[i % FCOL.length];
+      L.solid(q[0], q[1], 7, 4, c, L.rnd(i, 7) * 3, 3, 2, 0.75); } }
+  function festArch() { const F = SIM.FEST, a = P(F.gate[0], 400), b = P(F.gate[1], 400), hgt = 190;
+    for (const q of [a, b]) L.rrect(q[0] - 9, q[1] - hgt, 18, hgt, 5, [0.42, 0.24, 0.12], [0.22, 0.12, 0.06]);
+    const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - hgt + 10], len = Math.hypot(b[0] - a[0], b[1] - a[1]) + 30, ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+    L.solid(m[0] - len / 2, m[1] - 24, len, 48, [0.42, 0.12, 0.5], ang, len / 2, 24); L.solid(m[0] - len / 2 + 6, m[1] - 18, len - 12, 36, [0.85, 0.38, 0.08], ang, len / 2 - 6, 18);
+    const sw = textW('ПРАЗДНИК', 24) + 36; L.rrect(m[0] - 2, m[1] - 62, 4, 40, 2, [0.4, 0.22, 0.1], [0.3, 0.15, 0.06]); L.rrect(m[0] - sw / 2, m[1] - 106, sw, 44, 10, [0.95, 0.55, 0.12], [0.6, 0.25, 0.05]);
+    L.label('festarch', 'ПРАЗДНИК', m[0], m[1] - 84, { size: 24, col: '#fff6e0', out: '#3a0a30', al: 0.5 }); L.glow(m[0], m[1] - 84, 120, [1, 0.6, 0.2], 0.25, 2.5);
+    for (let i = 0; i < 7; i++) { const f = i / 6, x = a[0] + (b[0] - a[0]) * f, y = a[1] + (b[1] - a[1]) * f - hgt + 40 + 16 * Math.sin(f * Math.PI), c = FCOL[i % FCOL.length];
+      L.rrect(x - 5, y - 5, 10, 10, 5, c, c.map((v) => v * 0.6)); L.glow(x, y, 24, c, 0.5 * flick(i + 40), 3); }
+    for (const [q, i] of [[a, 0], [b, 1]]) { const h = 46; if (has('probe_prop')) { const w = L.hsz('probe_prop', h); L.sprite('probe_prop', q[0] - w / 2, q[1] - hgt - h + 6, { w, h }); } L.glow(q[0], q[1] - hgt - 20, 40, WARM, 0.5 * flick(60 + i), 3); } }
+  const poleTop = (x, y) => P(x, y, 205);
+  function festStrings() { const F = SIM.FEST; if (!onScreen(P(F.cx, F.cy), 1300)) return;
+    FSTR.forEach(([i0, i1], s) => { const a = poleTop(...SIM.FPOLES[i0]), b = poleTop(...SIM.FPOLES[i1]), n = 14, sag = 46;
+      const pt = (f) => [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f + sag * 4 * f * (1 - f)];
+      for (let k = 0; k < n; k++) { const p0 = pt(k / n), p1 = pt((k + 1) / n), d = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]); L.solid(p0[0], p0[1] - 1, d, 2, [0.12, 0.08, 0.06], Math.atan2(p1[1] - p0[1], p1[0] - p0[0]), 0, 1, 0.8); }
+      for (let k = 1; k < n; k++) { const [x, y] = pt(k / n), c = FCOL[(k + s) % FCOL.length], tw = 0.55 + 0.45 * Math.sin(T * 3 + k * 1.7 + s), pk = k % 3 === 0;
+        if (pk) L.solid(x - 5, y + 2, 10, 10, c.map((v) => v * 0.75), Math.PI / 4 + 0.15 * Math.sin(T * 2 + k), 5, 0, 0.9);
+        else { L.rrect(x - 3.5, y - 1, 7, 8, 3.5, c, c.map((v) => v * 0.55)); L.glow(x, y + 3, 20, c, 0.4 * tw, 3); } } }); }
+  function festLights(night) { const F = SIM.FEST; if (!onScreen(P(F.cx, F.cy), 1200)) return; const k = night ? 0.55 : 1;
+    SIM.FPOLES.forEach(([x, y], i) => pool(x + 30, y + 30, 210, FCOL[i % FCOL.length], 0.3 * k * flick(i + 20, 0.4)));
+    SIM.FSTALLS.forEach((st, i) => { const c = st[1] === 'gacha' ? [1, 0.45, 0.85] : st[1] === 'stage' ? [0.85, 0.5, 1] : WARM; pool(st[2] - 40, st[3] + 70, st[1] === 'stage' ? 280 : 220, c, (st[1] === 'gacha' ? 0.3 + 0.12 * Math.sin(T * 3) : st[1] === 'stage' ? 0.28 : 0.36) * k); });
+    pool(F.cx, F.cy, 520, [1, 0.6, 0.3], 0.16 * k);
+    if (ST.mg && ST.mg.k === 'stage') pool(SIM.STAGEP[0], SIM.STAGEP[1], 150, [1, 0.95, 0.8], 0.6 * k); }
+  function festGlows() { const F = SIM.FEST; if (!onScreen(P(F.cx, F.cy), 1200)) return;
+    SIM.FPOLES.forEach(([x, y], i) => { const q = P(x, y, 150); L.glow(q[0], q[1], 70, FCOL[(i + 1) % FCOL.length], 0.45 * flick(i + 30, 0.4), 3); });
+    const g = SIM.FSTALLS.find((s) => s[1] === 'gacha'), q = P(g[2], g[3], 150); L.glow(q[0], q[1], 120, [1, 0.5, 0.9], 0.35 + 0.15 * Math.sin(T * 2.6), 2.6); L.star(q[0] + 30 * Math.sin(T * 1.3), q[1] - 60, 26, [1, 0.9, 0.5], 0.6 + 0.4 * Math.sin(T * 5));
+    if (ST.mg && ST.mg.k === 'stage') { const s = P(SIM.STAGEP[0], SIM.STAGEP[1], 60); L.glow(s[0], s[1] - 60, 260, [1, 0.95, 0.8], 0.3, 2); } }
+  // the player's carved pumpkin: the strokes as glowing cuts (a canvas texture, redrawn only when they change)
+  const CARVESIG = {};
+  function carveTex(name, strokes, w, h, lw = 1) { const sig = strokes.length + ':' + strokes.reduce((a, s) => a + s.length, 0); if (CARVESIG[name] === sig) return; CARVESIG[name] = sig;
+    cvTex(name, w, h, (g) => { const X = (p) => (p[0] + 1) / 2 * w, Y = (p) => (p[1] + 1) / 2 * h; g.lineCap = 'round'; g.lineJoin = 'round';
+      for (const [col, wd, blur] of [['#2a0600', 30, 0], ['#3a0c00', 22, 0], ['#ff9a20', 15, 16], ['#fff1a8', 6, 6]]) { g.strokeStyle = col; g.lineWidth = wd * lw; g.shadowColor = '#ffcf50'; g.shadowBlur = blur * lw;
+        for (const s of strokes) { g.beginPath(); s.forEach((p, i) => (i ? g.lineTo(X(p), Y(p)) : g.moveTo(X(p), Y(p)))); if (s.length === 1) g.lineTo(X(s[0]) + 0.5, Y(s[0])); g.stroke(); } } }); }
+  function carvedPumpkin(name, strokes, cxp, cyp, rw, a = 1) { if (!has('ui_pumpkin')) return; const sw = rw * 1.08, sh = sw * A.ui_pumpkin.h / A.ui_pumpkin.w, cw = Math.round(Math.max(160, Math.min(600, rw * 1.5)));
+    L.sprite('ui_pumpkin', cxp - sw / 2, cyp - sh * 0.566, { w: sw, h: sh, u: { alpha: a } }); carveTex(name, strokes, cw, Math.round(cw * 0.967), Math.max(0.45, cw / 600 * (rw < 200 ? 1.6 : 1))); const rx = rw / 2, ry = rx * 0.967;
+    L.sprite(name, cxp - rx, cyp - ry, { w: rx * 2, h: ry * 2, u: { alpha: a } }); }
+  function festWorld(add, vis) { const F = SIM.FEST; if (!vis(F.cx, F.cy, 1400)) return;
+    add([F.gate[0] - 6, 392, F.gate[1] + 6, 408], festArch);
+    SIM.FSTALLS.forEach((st) => { const [n, id, x, y, r, w] = st, box = id === 'stage' ? [2835, 505, 2985, 690] : [x - r, y - r, x + r, y + r];
+      add(box, () => { propSprite(n, x, y, w, id === 'gacha' ? 0.9 : 0.8);
+        if (id === 'carve' && ST.fest && ST.fest.carve) { const q = P(x + 70, y + 90); carvedPumpkin('carve_booth', ST.fest.carve.strokes, q[0], q[1] - 30, 64); L.glow(q[0], q[1] - 30, 50, WARM, 0.5 * flick(70), 3); }
+        if (id === 'stage' && ST.mg && ST.mg.k === 'stage') { const q = P(ST.x, ST.y), r2 = drawKolya(q[0] - 30, q[1] - 40, 1); S.kolHead = r2.head; S.kolLed = r2.led; S.kolFace = r2.face; } }); });
+    SIM.FPOLES.forEach(([x, y]) => add([x - 14, y - 14, x + 14, y + 14], () => propSprite('fest_lanterns', x, y, 230, 0.93)));
+    FPUMP.forEach(([x, y, k], i) => add([x - 20, y - 20, x + 20, y + 20], () => pumpkin(x, y, k, false, true, i + 90)));
+    S.festHeads = S.festHeads || [];
+    SIM.FCROWD.forEach(([x, y, tex], i) => add([x - 15, y - 15, x + 15, y + 15], () => { const tgt = ST.mg && ST.mg.k === 'stage' ? SIM.STAGEP : [F.cx, F.cy], q0 = P(x, y), q1 = P(tgt[0], tgt[1]);
+      S.festHeads[i] = drawPerson(tex, x, y, { k: tex === 'kid' ? 0.72 : 0.93, ang: Math.atan2(q1[1] - q0[1], q1[0] - q0[0]), g: 0, id: 'fc' + i, seed: 60 + i }); })); }
+  function festBubbles() { const F = SIM.FEST; if (Math.hypot(ST.x - F.cx, ST.y - F.cy) > 950 || ST.mg) return;
+    let shown = 0; SIM.FCROWD.forEach((c, i) => { const per = 11, ph = (GT + i * 3.7) % per, hd = (S.festHeads || [])[i]; if (ph > 4.2 || !hd || shown >= 2 || hd[0] > W - 520 || hd[0] < 120) return;
+      const n = Math.floor((GT + i * 3.7) / per) * 7 + i * 3; shown++; bubble('fb' + i, SIM.FLINES[n % SIM.FLINES.length], hd[0], hd[1], Math.min(1, (4.2 - ph) * 3, ph * 4)); }); }
+  // ===== v12: the mini-game screens =====
+  const inRr = (r) => ST.ptr && ST.ptr[0] > r.x && ST.ptr[0] < r.x + r.w && ST.ptr[1] > r.y && ST.ptr[1] < r.y + r.h;
+  function fbtn(id, r, text, col = [0.95, 0.5, 0.12], on = true) { const h = on && inRr(r); L.rrect(r.x - 2, r.y - 2, r.w + 4, r.h + 4, 16, [0.55, 0.3, 0.12], [0.3, 0.14, 0.06], 0.95);
+    L.rrect(r.x, r.y, r.w, r.h, 14, on ? col.map((v) => Math.min(1, v * (h ? 1.18 : 1))) : [0.3, 0.25, 0.25], on ? col.map((v) => v * 0.55) : [0.18, 0.15, 0.15], 0.97);
+    L.uiBox(id, r.x, r.y, r.w, r.h, 2); L.label(id, text, r.x + r.w / 2, r.y + r.h / 2, { size: 28, col: on ? '#fff6e0' : '#9a8a80', out: '#2a0a02', al: 0.5 }); }
+  function mgFrame(title, sub) { const U = SIM.FUI, p = U.panel; L.solid(0, 0, W, H, [0.02, 0.01, 0.03], 0, 0, 0, 0.62); panel(p.x, p.y, p.w, p.h, 22, 0.94); L.uiBox('mgp', p.x, p.y, p.w, p.h, 6);
+    L.label('mgt', title, p.x + 40, p.y + 52, { size: 40, col: '#ffb45a', out: '#120806', font: SERIF }); if (sub) L.label('mgs', sub, p.x + 42, p.y + 96, { size: 22, col: '#d8c8b0', out: '#120806', weight: 'normal' });
+    const c = U.close, hv = inRr(c); L.rrect(c.x, c.y, c.w, c.h, 12, hv ? [0.8, 0.25, 0.15] : [0.4, 0.15, 0.1], [0.25, 0.08, 0.05], 0.95); L.label('mgx', '✕', c.x + c.w / 2, c.y + c.h / 2, { size: 30, col: '#ffe8d0', out: null, al: 0.5 }); }
+  function timerBar(x, y, w, f) { L.rrect(x, y, w, 16, 8, [0.2, 0.12, 0.1], [0.1, 0.06, 0.05], 0.95); L.rrect(x + 2, y + 2, Math.max(0, (w - 4) * f), 12, 6, f < 0.25 ? [1, 0.35, 0.2] : [1, 0.75, 0.3], f < 0.25 ? [0.7, 0.15, 0.05] : [0.85, 0.45, 0.1]); }
+  function resultCard(G2, lines, big) { const p = { x: W / 2 - 600, y: 230, w: 1200, h: 120 + lines.length * 46 + 110 }; L.solid(0, 0, W, H, [0.02, 0.01, 0.03], 0, 0, 0, 0.45);
+    panel(p.x, p.y, p.w, p.h, 22, 0.97); L.uiBox('mgres', p.x, p.y, p.w, p.h, 6); L.glow(W / 2, p.y + 60, 260, big ? [1, 0.8, 0.3] : [0.9, 0.5, 0.2], 0.35, 2.5);
+    L.label('mgrt', G2.res.title, W / 2, p.y + 64, { size: 48, col: big ? '#ffd76a' : '#ffb45a', out: '#2a0a02', al: 0.5, font: SERIF });
+    lines.forEach((l, i) => L.label('mgrl' + i, l, W / 2, p.y + 138 + i * 46, { size: 26, col: '#f6e7c8', out: '#120806', al: 0.5, weight: 'normal' }));
+    const ok = Object.assign({}, SIM.FUI.ok, { y: p.y + p.h - 96 }); fbtn('mgok', ok, 'Дальше'); }
+  const RIVALSTROKES = [[[[-0.42, -0.25], [-0.3, -0.42], [-0.18, -0.25], [-0.36, -0.3], [-0.24, -0.3]], [[0.18, -0.25], [0.3, -0.42], [0.42, -0.25], [0.24, -0.3], [0.36, -0.3]], [[-0.4, 0.15], [-0.2, 0.35], [0.2, 0.35], [0.4, 0.15]], [[-0.1, -0.05], [0, 0.05], [0.1, -0.05]]],
+    [[[-0.4, -0.3], [-0.2, -0.3]], [[0.2, -0.3], [0.4, -0.3]], [[-0.25, 0.05], [-0.25, 0.4], [-0.05, 0.4], [-0.05, 0.05], [-0.25, 0.05]], [[0.1, 0.05], [0.3, 0.05], [0.3, 0.4], [0.1, 0.4], [0.1, 0.22], [0.3, 0.22]]],
+    [[[-0.45, -0.2], [-0.35, -0.3], [-0.25, -0.2]], [[-0.15, -0.2], [-0.05, -0.3], [0.05, -0.2]], [[0.15, -0.2], [0.25, -0.3], [0.35, -0.2]], [[-0.3, 0.2], [0, 0.32], [0.3, 0.2]]]];
+  function carveOverlay(G2) { const C2 = SIM.CARVE, U = SIM.FUI, left = Math.max(0, 1 - (GT - G2.t0) / C2.dur);
+    mgFrame('Конкурс резьбы по тыкве', 'Рисуй мышкой прямо на тыкве — что хочешь: лицо, вайфу, логотип. Потом «Готово».');
+    L.glow(C2.cx, C2.cy, 420, [1, 0.55, 0.15], 0.25, 2.2); carvedPumpkin('carve_live', G2.strokes, C2.cx, C2.cy, C2.rx * 2);
+    if (!G2.res && ST.ptr) { const u = (ST.ptr[0] - C2.cx) / C2.rx, v = (ST.ptr[1] - C2.cy) / C2.ry; if (u * u + v * v < 0.92) { L.ring(ST.ptr[0], ST.ptr[1], 12, 12, [1, 0.9, 0.6], 0.9, 0.25); } }
+    const x = 1220; L.label('mgr0', 'Соперники', x, 190, { size: 30, col: '#ffb45a', out: '#120806' });
+    SIM.RIVALS.forEach(([nm, sc], i) => { const y = 228 + i * 150; L.rrect(x, y, 460, 134, 14, [0.2, 0.12, 0.14], [0.12, 0.07, 0.08], 0.95); carvedPumpkin('rival' + i, RIVALSTROKES[i], x + 70, y + 72, 100);
+      L.label('mgrn' + i, nm, x + 140, y + 46, { size: 22, col: '#f6e7c8', out: '#120806', weight: 'normal' }); L.label('mgrs' + i, G2.res ? '★ ' + sc.toFixed(1) : '★ ?', x + 140, y + 90, { size: 26, col: '#ffd76a', out: '#120806' }); });
+    timerBar(x, 690, 460, left); L.label('mgtm', Math.ceil(left * C2.dur) + ' с', x + 470, 698, { size: 22, col: '#f6e7c8', out: '#120806' });
+    fbtn('mgclear', U.clear, 'Стереть', [0.55, 0.35, 0.3], !G2.res); fbtn('mgdone', U.done, 'Готово!', [0.95, 0.5, 0.12], !G2.res);
+    if (G2.res) { const R = G2.res, lines = R.judges.map(([n, s, c]) => `${n}: ${s.toFixed(1)} — «${c}»`).concat([`Итог: ${R.score.toFixed(1)} · ${R.place}-е место из 4` + (R.prize ? ` · приз ${R.prize} ₽` : ''), R.line]);
+      resultCard(G2, lines, R.place === 1); } }
+  function applesOverlay(G2) { const AP = SIM.APPLE, left = Math.max(0, 1 - (GT - G2.t0) / AP.dur);
+    mgFrame('Яблоки из бочки', 'Кликай по яблокам, пока они над водой. Золотое — за три.');
+    const ellS = (rx, ry, col, col2, step = 6, dy = 0) => { for (let y = -ry; y < ry; y += step) { const f = (y + step / 2) / ry, w = rx * Math.sqrt(Math.max(0, 1 - f * f)), k = (y + ry) / (2 * ry);
+      L.solid(AP.cx - w, AP.cy + dy + y, w * 2, step + 0.5, [col[0] + (col2[0] - col[0]) * k, col[1] + (col2[1] - col[1]) * k, col[2] + (col2[2] - col[2]) * k]); } };   // pixel-stepped ellipses
+    ellS(AP.rx + 70, AP.ry + 58, [0.42, 0.24, 0.11], [0.3, 0.16, 0.07], 6, 26); ellS(AP.rx + 70, AP.ry + 58, [0.62, 0.38, 0.18], [0.45, 0.26, 0.11]);
+    for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283, q = [AP.cx + Math.cos(a) * (AP.rx + 36), AP.cy + Math.sin(a) * (AP.ry + 30)]; L.rrect(q[0] - 7, q[1] - 7, 14, 14, 3, [0.3, 0.3, 0.32], [0.18, 0.18, 0.2]); }
+    ellS(AP.rx + 8, AP.ry + 8, [0.1, 0.3, 0.52], [0.04, 0.12, 0.3]);
+    for (let i = 0; i < 6; i++) { const a = (GT * 0.4 + i / 6) % 1; L.ring(AP.cx + 200 * Math.sin(i * 2.1), AP.cy + 90 * Math.cos(i * 1.7), 60 + 160 * a, (60 + 160 * a) * 0.5, [0.6, 0.85, 1], 0.25 * (1 - a), 0.06); }
+    G2.apples.forEach((a, i) => { const up = SIM.appleUp(a, GT), q = SIM.applePos(a, GT), n = a.gold ? 'ui_apple_g' : 'ui_apple_r', z = up ? 1 : 0.62, s = 92 * z, al = up ? 1 : 0.45;
+      if (!has(n)) return; if (up) L.shadow(q[0], q[1] + 30, 40, 12, 0.35);
+      L.sprite(n, q[0] - s / 2, q[1] - s / 2 - (up ? 18 : 0), { w: s, h: s, u: { alpha: al, tint: a.gold ? [1, 0.82, 0.2, 0.75] : up ? [1, 1, 1, 0] : [0.3, 0.55, 1, 0.5] } });
+      if (a.gold && up) L.glow(q[0], q[1] - 18, 70, [1, 0.85, 0.3], 0.6, 3); });
+    if (G2.pop && GT - G2.pop.t < 0.8) { const a = (GT - G2.pop.t) / 0.8; L.label('mgpop', G2.pop.gold ? '+3!' : '+1', G2.pop.x[0], G2.pop.x[1] - 40 - 60 * a, { size: 40, col: G2.pop.gold ? '#ffd76a' : '#ffffff', out: '#2a0a02', al: 0.5, a: 1 - a }); }
+    timerBar(560, 920, 800, left); L.label('mgsc', 'Яблок: ' + G2.n, 1500, 190, { size: 40, col: '#ffd76a', out: '#120806', al: 1 });
+    if (G2.res) { const R = G2.res; resultCard(G2, [`Выловлено яблок: ${R.n}`, `+${R.prize} ₽ и +${R.hp} HP`, `Рекорд: ${R.best}`], R.n >= 10); } }
+  const ARROW = ['▲', '▶', '▼', '◀'];
+  function stageOverlay(G2) { const n = G2.seq.length, x0 = W / 2 - n * 46, y = H - 230;
+    panel(x0 - 30, y - 70, n * 92 + 60, 160, 20, 0.9); L.label('stt', 'Конкурс костюмов: держи позу!', W / 2, y - 40, { size: 26, col: '#ffb45a', out: '#120806', al: 0.5 });
+    G2.seq.forEach((d, i) => { const cx2 = x0 + i * 92 + 46, done = i < G2.i, cur = i === G2.i && GT >= G2.at, ok = G2.log[i];
+      L.rrect(cx2 - 38, y - 6, 76, 76, 14, done ? (ok ? [0.3, 0.75, 0.35] : [0.7, 0.2, 0.15]) : cur ? [1, 0.75, 0.3] : [0.25, 0.18, 0.2], done ? (ok ? [0.12, 0.4, 0.15] : [0.4, 0.08, 0.05]) : cur ? [0.8, 0.4, 0.08] : [0.12, 0.08, 0.1], 0.95);
+      L.label('sta' + i, i <= G2.i || done ? ARROW[d] : '?', cx2, y + 32, { size: 40, col: '#fff6e0', out: '#2a0a02', al: 0.5 });
+      if (cur) { const f = Math.max(0, 1 - (GT - G2.at) / G2.win); L.ring(cx2, y + 32, 48 + 40 * f, 48 + 40 * f, [1, 0.9, 0.5], 0.8, 0.05); } });
+    if (GT < G2.at && G2.i === 0) L.label('stc', String(Math.ceil(G2.at - GT)), W / 2, H / 2 - 120, { size: 120, col: '#ffd76a', out: '#2a0a02', al: 0.5, font: SERIF });
+    if (G2.flash && GT - G2.flash.t < 0.6) L.label('stf', G2.flash.ok ? 'ПОЗА!' : 'Мимо…', W / 2, H / 2 - 160 - 40 * (GT - G2.flash.t), { size: 64, col: G2.flash.ok ? '#ffd76a' : '#ff8a7a', out: '#2a0a02', al: 0.5, a: 1 - (GT - G2.flash.t) / 0.6 });
+    L.label('sth', `${G2.hits}/${n} · стрелки или WASD · Esc — уйти со сцены`, W / 2, y + 108, { size: 20, col: '#d8c8b0', out: '#120806', al: 0.5, weight: 'normal' });
+    if (G2.res) { const R = G2.res; resultCard(G2, [`Позы: ${R.hits} из ${n}` + (R.bonus ? ' + бонус за легендарный костюм' : ''), R.prize ? `Приз зрительских симпатий: ${R.prize} ₽` : 'Для победы нужно 6 поз из 8'], !!R.prize); } }
+  const RCOL = { 3: [0.3, 0.6, 1], 4: [0.75, 0.35, 1], 5: [1, 0.8, 0.25] };
+  function capsule(x, y, r, col, open = 0, a = 1) { const c2 = col.map((v) => v * 0.55);
+    if (open > 0) { const k = 1 - open; L.glow(x, y, r * (2.2 + 2 * open), col, 0.75 * open * a, 2.5);                 // opened: the shell flies apart, a star of the rarity's colour
+      if (k > 0.02) { L.rrect(x - r * k, y - r * k - open * r * 1.4, r * 2 * k, r * 2 * k, r * k, [0.95, 0.97, 1], [0.7, 0.75, 0.85], a * k); L.rrect(x - r * k, y - r * k + open * r * 1.2, r * 2 * k, r * 2 * k, r * k, col, c2, a * k); }
+      L.star(x, y, r * (0.9 + 0.5 * open), col.map((v) => Math.min(1, v + 0.25)), a * open); L.glow(x, y, r * 0.6, [1, 1, 1], 0.6 * open * a, 3); return; }
+    L.rrect(x - r, y - r, r * 2, r * 2, r, col, c2, a); clipOn(x - r - 2, y - r - 2, r * 2 + 4, r + 2); L.rrect(x - r, y - r, r * 2, r * 2, r, [0.95, 0.97, 1], [0.72, 0.78, 0.88], a * 0.92); clipOff();
+    L.solid(x - r, y - 2, r * 2, 4, [0.2, 0.12, 0.15], 0, 0, 0, a * 0.8); L.glow(x - r * 0.35, y - r * 0.45, r * 0.5, [1, 1, 1], 0.35 * a, 3); }
+  function gachaOverlay(G2) { const U = SIM.FUI, g = (ST.fest || {}).gacha || { pity: 0, pulls: 0 }, GA = SIM.GACHA;
+    mgFrame('Гача-автомат «Тыквенный баннер»', `★5 — ${String(GA.p5 * 100).replace('.', ',')} % · ★4 — ${Math.round(GA.p4 * 100)} % · гарант ★5 на ${GA.pity}-й крутке`);
+    if (has('fest_gacha')) { const h = 640, w = L.hsz('fest_gacha', h); L.glow(420, 560, 380, [1, 0.45, 0.85], 0.3 + 0.1 * Math.sin(T * 2), 2.4); L.sprite('fest_gacha', 420 - w / 2, 230, { w, h }); }
+    const x = 820; L.label('gb0', 'На баннере (★5):', x, 236, { size: 28, col: '#ffd76a', out: '#120806' });
+    [['pumpkin', 'Костюм «Золотая тыква»', [1, 0.78, 0.2, 0.6]], ['ghost', 'Костюм «Неоновый призрак»', [0.35, 1, 0.95, 0.6]]].forEach(([c, nm, tint], i) => { const n = 'cos_' + c + '_0', bx = x + i * 440, by = 262;
+      L.rrect(bx, by, 420, 140, 16, [0.3, 0.2, 0.08], [0.16, 0.1, 0.04], 0.95); L.glow(bx + 70, by + 70, 90, tint.slice(0, 3), 0.4 + 0.2 * Math.sin(T * 3 + i), 2.5);
+      if (has(n)) { const hh = 110, ww = Math.min(120, L.hsz(n, hh)); L.sprite(n, bx + 70 - ww / 2, by + 20, { w: ww, h: hh * ww / L.hsz(n, hh), u: { alpha: 1, tint } }); }
+      const own = ((ST.fest || {}).cos || []).includes(c === 'pumpkin' ? 'pumpkin_gold' : 'ghost_neon');
+      L.label('gbn' + i, nm, bx + 140, by + 52, { size: 22, col: '#fff3dc', out: '#120806', weight: 'normal' }); L.label('gbo' + i, own ? '✓ есть' : '★★★★★', bx + 140, by + 96, { size: 22, col: own ? '#9fe09f' : '#ffd76a', out: '#120806' }); });
+    L.label('gpity', `До гаранта: ${Math.max(0, GA.pity - g.pity)} · круток всего: ${g.pulls} · деньги: ${ST.money} ₽`, x, 438, { size: 24, col: '#f6e7c8', out: '#120806', weight: 'normal' });
+    const R = G2.res2, busy = R && GT - R.t < (R.n === 10 ? 2.4 : 1.7);
+    if (R) { const age = GT - R.t;
+      if (R.n === 1) { const it = R.items[0], col = RCOL[it.r], op = Math.max(0, Math.min(1, (age - 0.9) / 0.35)), sh = age < 0.9 ? Math.sin(age * 40) * 8 * Math.min(1, age * 3) : 0, cx2 = x + 420, cy2 = 600;
+        capsule(cx2 + sh, cy2 - Math.max(0, 1 - age * 2.5) * 200, 70, col, op); if (op > 0.5) { for (let k = 0; k < it.r * 2; k++) { const an = k / (it.r * 2) * 6.283 + age; L.star(cx2 + Math.cos(an) * 150 * op, cy2 + Math.sin(an) * 90 * op, 18, col, op); }
+          L.label('gr1', '★'.repeat(it.r), cx2, cy2 + 120, { size: 40, col: it.r === 5 ? '#ffd76a' : it.r === 4 ? '#d9a0ff' : '#9ac8ff', out: '#120806', al: 0.5, a: op }); L.label('gr2', it.name, cx2, cy2 + 168, { size: 30, col: '#fff3dc', out: '#120806', al: 0.5, a: op }); } }
+      else R.items.forEach((it, i) => { const col = RCOL[it.r], bx = x + (i % 5) * 176, by = 470 + Math.floor(i / 5) * 156, d = i * 0.14, op = Math.max(0, Math.min(1, (age - 0.5 - d) / 0.3));
+        L.rrect(bx, by, 164, 146, 14, col.map((v) => v * 0.5), col.map((v) => v * 0.2), 0.95 * Math.max(0.25, op)); capsule(bx + 82, by + 52, 34, col, op, Math.max(0.3, op));
+        if (op > 0) { L.label('grs' + i, '★'.repeat(it.r), bx + 82, by + 104, { size: 20, col: it.r === 5 ? '#ffd76a' : '#e8dcff', out: '#120806', al: 0.5, a: op });
+          wrap(it.name.replace(/^Костюм /, ''), 17, 150, 'normal').slice(0, 2).forEach((l, j) => L.label('grn' + i + '_' + j, l, bx + 82, by + 126 + j * 18, { size: 17, col: '#fff3dc', out: '#120806', al: 0.5, weight: 'normal', a: op })); } }); }
+    else L.label('ghint', 'Крути! Выпадают яйца, бумага, петарды, слайм, деньги — и легендарные костюмы.', x, 560, { size: 24, col: '#d8c8b0', out: '#120806', weight: 'normal' });
+    if (G2.warn && GT - G2.warn.t < 2) L.label('gwarn', G2.warn.text, x + 420, 780, { size: 26, col: '#ff8a7a', out: '#120806', al: 0.5 });
+    fbtn('g1', U.g1, `×1 · ${GA.cost1} ₽`, [0.3, 0.55, 0.95], !busy && ST.money >= GA.cost1); fbtn('g10', U.g10, `×10 · ${GA.cost10} ₽`, [0.95, 0.65, 0.15], !busy && ST.money >= GA.cost10); }
+  function mgOverlay() { const G2 = ST.mg; if (!G2) return; if (G2.k === 'carve') carveOverlay(G2); else if (G2.k === 'apples') applesOverlay(G2); else if (G2.k === 'stage') stageOverlay(G2); else if (G2.k === 'gacha') gachaOverlay(G2); }
+  // ===== v12: the visual-novel lines of the prologue and the epilogue (narration, a stream chat, a donation alert, a phone notification, the mods' chat, a voice note) =====
+  const CHATNICKS = ['тыквенный_кот', 'ModHater2007', 'аниме_бабушка', 'Skelet_fan', 'гача_страдалец', 'lurker_404', 'ведьма_на_минималках'], NICKC = ['#ff9a5a', '#9ad0ff', '#ff8ad8', '#a8f0a0', '#ffd76a', '#c8a8ff', '#ffb0b0'];
+  function vnLine(F, line, age, id) { const k = line.k || '', pw = 1300, ph = 210, bx = W / 2 - pw / 2, by = H - ph - 40;
+    if (/^cg_pro2|^cg_epi/.test(line.cg)) { L.rrect(36, 30, 330, 50, 12, [0.75, 0.1, 0.12], [0.45, 0.04, 0.06], 0.92); L.label(id + 'live', '● LIVE · КоляРеакт · ' + (312 + Math.floor(T * 0.7) % 40), 52, 55, { size: 22, col: '#ffffff', out: null }); }
+    if (k === 'chat') { const msgs = line.text.split('\n'), x = W - 600, y0 = 120; panel(x, y0, 560, 70 + msgs.length * 92, 18, 0.88); L.label(id + 'ct', 'Чат трансляции', x + 24, y0 + 36, { size: 24, col: '#ffb45a', out: '#120806' });
+      msgs.forEach((m, i) => { const a = Math.max(0, Math.min(1, (age - 0.15 - i * 0.45) / 0.25)); if (a <= 0) return; const ni = (i * 3 + m.length) % CHATNICKS.length, y = y0 + 80 + i * 92;
+        L.label(id + 'cn' + i, CHATNICKS[ni] + ':', x + 24, y, { size: 21, col: NICKC[ni], out: '#120806', a });
+        wrap(m, 24, 500, 'normal').slice(0, 2).forEach((l, j) => L.label(id + 'cm' + i + '_' + j, l, x + 24, y + 30 + j * 28, { size: 24, col: '#f6e7c8', out: '#120806', weight: 'normal', a })); }); return; }
+    if (k === 'donate') { const a = Math.min(1, age / 0.3), s = 0.7 + 0.3 * ease(a) + (age < 0.6 ? 0.05 * Math.sin(age * 30) : 0), w = 900 * s, h = 230 * s, x = W / 2 - w / 2, y = 150;
+      L.glow(W / 2, y + h / 2, 520, [1, 0.8, 0.3], 0.35 * a, 2.2); L.rrect(x - 4, y - 4, w + 8, h + 8, 26, [1, 0.85, 0.3], [0.8, 0.45, 0.08], a); L.rrect(x, y, w, h, 22, [0.3, 0.12, 0.35], [0.14, 0.05, 0.18], a);
+      for (let i = 0; i < 10; i++) { const an = i * 0.628 + T; L.star(W / 2 + Math.cos(an) * (w / 2 + 30), y + h / 2 + Math.sin(an) * (h / 2 + 24), 20, [1, 0.9, 0.5], 0.7 * a); }
+      L.label(id + 'dh', '💸 ' + line.who, W / 2, y + 70 * s, { size: 46 * s, col: '#ffd76a', out: '#2a0a02', al: 0.5, a });
+      L.label(id + 'dt', line.text, W / 2, y + 150 * s, { size: 38 * s, col: '#ffffff', out: '#2a0a02', al: 0.5, a }); return; }
+    if (k === 'notify') { const a = Math.min(1, age / 0.35), y = -140 + 200 * ease(a), w = Math.max(820, textW(line.text, 28) + 170), x = W / 2 - w / 2; L.rrect(x, y, w, 120, 24, [0.96, 0.94, 0.98], [0.82, 0.8, 0.86], 0.97);
+      L.rrect(x + 22, y + 22, 76, 76, 18, [1, 0.55, 0.15], [0.8, 0.3, 0.05]); L.label(id + 'ni', '🎃', x + 60, y + 60, { size: 40, col: '#ffffff', out: null, al: 0.5 });
+      L.label(id + 'nh', line.who + ' · сейчас', x + 120, y + 42, { size: 22, col: '#555060', out: null, weight: 'normal' }); L.label(id + 'nt', line.text, x + 120, y + 80, { size: 28, col: '#1a1420', out: null }); return; }
+    if (k === 'group') { const msgs = line.text.split('\n'), x = W - 700, y0 = 150; panel(x, y0, 640, 90 + msgs.length * 104, 22, 0.92); L.label(id + 'gt', line.who, x + 26, y0 + 40, { size: 28, col: '#ffb45a', out: '#120806' });
+      msgs.forEach((m, i) => { const a = Math.max(0, Math.min(1, (age - 0.2 - i * 0.7) / 0.25)); if (a <= 0) return; const j = m.indexOf(': '), nm = m.slice(0, j), tx = m.slice(j + 2), y = y0 + 84 + i * 104;
+        const col = { 'Кирилл': [0.48, 0.29, 0.63], 'Райва': [0.23, 0.35, 0.63], 'Эльф': [0.23, 0.54, 0.45] }[nm] || [0.3, 0.3, 0.3];
+        L.rrect(x + 22, y, 596, 92, 16, col, col.map((v) => v * 0.6), 0.95 * a); L.label(id + 'gn' + i, nm, x + 40, y + 26, { size: 21, col: '#ffe0b0', out: null, a });
+        wrap(tx, 23, 560, 'normal').slice(0, 2).forEach((l, q) => L.label(id + 'gm' + i + '_' + q, l, x + 40, y + 56 + q * 26, { size: 23, col: '#ffffff', out: null, weight: 'normal', a })); }); return; }
+    if (k === 'voice') { const w = 980, x = W / 2 - w / 2, y = 120, pr = window.__vprog || 0, playing = window.__vplaying; panel(x, y, w, 150, 75, 0.94);
+      L.rrect(x + 26, y + 26, 98, 98, 49, [0.23, 0.54, 0.45], [0.1, 0.3, 0.25]); L.label(id + 'va', 'Э', x + 75, y + 75, { size: 48, col: '#ffffff', out: null, al: 0.5, font: SERIF });
+      for (let i = 0; i < 40; i++) { const hgt = 10 + 46 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.6)), on = i / 40 < pr; L.rrect(x + 150 + i * 17, y + 75 - hgt / 2, 9, hgt, 4, on ? [1, 0.7, 0.3] : [0.55, 0.45, 0.4], on ? [0.9, 0.45, 0.1] : [0.35, 0.28, 0.25]); }
+      L.label(id + 'vn', line.who + (playing ? '  ▶ играет' : ''), x + 150, y + 22, { size: 20, col: '#ffb45a', out: '#120806' });
+      L.label(id + 'vd', '0:' + String(Math.floor(16 * (playing ? pr : 1))).padStart(2, '0'), x + w - 40, y + 75, { size: 24, col: '#f6e7c8', out: '#120806', al: 1 }); }
+    if (!line.who) { L.solid(0, H - 230, W, 170, [0.02, 0.01, 0.03], 0, 0, 0, 0.72); wrap(line.text, 34, 1500, 'normal').slice(0, 2).forEach((l, i) => L.label(id + 'nar' + i, l, W / 2, H - 170 + i * 46, { size: 34, col: '#f6e7c8', out: '#120806', al: 0.5, weight: 'normal', font: SERIF })); return; }
+    panel(bx, by, pw, ph, 18, 0.9); L.uiBox(id, bx, by, pw, ph, 6); L.label(id + 'who', k === 'voice' ? 'Эльф (голосовое)' : line.who, bx + 34, by + 38, { size: 32, col: '#ffb45a', out: '#120806' });
+    wrap(line.text, 30, pw - 80, 'normal').slice(0, 3).forEach((l, i) => L.label(id + 't' + i, l, bx + 34, by + 92 + i * 40, { size: 30, col: '#f6e7c8', out: '#120806', weight: 'normal' })); }
+  function introOverlay() { const I = ST.intro; if (!I) return; const line = I.lines[Math.min(I.i, I.lines.length - 1)], cg = line ? line.cg : 'cg_pro6';
+    if (S.inCg !== cg) { S.inPrev = S.inCg; S.inCg = cg; S.inT = T; } const age = T - (S.inT || T), lage = GT - (I.at || 0);
+    const drawCg = (n, al, z, dx) => { if (!n || !has(n)) return; const a = A[n], k = Math.max(W / a.w, H / a.h) * z, w = a.w * k, h = a.h * k; L.sprite(n, (W - w) / 2 + dx, (H - h) / 2, { w, h, u: { alpha: al } }); };
+    L.solid(0, 0, W, H, [0.02, 0.01, 0.02]); const z = 1.03 + 0.03 * Math.min(1, age / 10), dx = -14 * Math.min(1, age / 10);
+    if (S.inPrev && age < 0.7) drawCg(S.inPrev, 1, 1.06, -14); drawCg(cg, Math.min(1, (S.inPrev ? 0 : 0.2) + age / 0.7), z, dx);
+    if (!has(cg)) L.label('inload', 'Загрузка…', W / 2, H / 2, { size: 30, col: '#c9a27a', out: '#120806', al: 0.5 });
+    if (line && !I.over) vnLine(I, line, lage, 'in');
+    if (line && line.k && line.k !== 'voice' && line.k !== 'notify' && line.k !== 'donate') {}
+    if (!I.over) { const sk = SIM.INTRO_SKIP, hv = inRr(sk); L.rrect(sk.x, sk.y, sk.w, sk.h, 14, hv ? [0.5, 0.3, 0.15] : [0.18, 0.1, 0.08], [0.08, 0.04, 0.03], 0.85); L.uiBox('inskip', sk.x, sk.y, sk.w, sk.h, 2);
+      L.label('inskip', 'Пропустить ▸▸ Esc', sk.x + sk.w / 2, sk.y + sk.h / 2, { size: 22, col: '#f6e7c8', out: null, al: 0.5 });
+      L.label('innext', `${I.i + 1}/${I.lines.length}  ▶ клик или пробел`, W - 60, H - 22, { size: 18, col: '#c9a27a', out: '#120806', al: 1, a: 0.6 + 0.4 * Math.sin(T * 4) }); } }
   // ===== HUD =====
   const HUDT = { orange: [0.95, 0.5, 0.12], dark: [0.07, 0.05, 0.06] };
   function panel(x, y, w, h, r = 12, a = 0.88, border = true) { if (border) L.rrect(x - 2, y - 2, w + 4, h + 4, r + 2, [0.55, 0.3, 0.12], [0.3, 0.14, 0.06], a); L.rrect(x, y, w, h, r, [0.11, 0.07, 0.07], [0.05, 0.03, 0.04], a); }
   function hud() {
+    if (ST.intro) { introOverlay(); return; }                                      // v12: the prologue replaces the whole HUD
     if (ST.finale) { finaleOverlay(); return; }                                     // the ending replaces the whole HUD
     const lay = SIM.HUD, K = ST.kir;
     // HP (top-left)
@@ -865,7 +1056,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     minimap(W - 170, 240, 120);
     quests(W - 410, 400);
     // hotbar
-    if (!ST.dlg) { lay.slots.forEach((r, i) => { const n = SIM.SLOTS[i], act = ST.slot === i + 1, cnt = slotCount(n);
+    if (!ST.dlg && !ST.mg) { lay.slots.forEach((r, i) => { const n = SIM.SLOTS[i], act = ST.slot === i + 1, cnt = slotCount(n);
         L.rrect(r.x - (act ? 4 : 2), r.y - (act ? 4 : 2), r.w + (act ? 8 : 4), r.h + (act ? 8 : 4), 12, act ? [1, 0.7, 0.25] : [0.45, 0.25, 0.1], act ? [0.9, 0.4, 0.08] : [0.25, 0.12, 0.05], 0.95);
         L.rrect(r.x, r.y, r.w, r.h, 10, [0.14, 0.09, 0.09], [0.06, 0.04, 0.05], 0.95); L.uiBox('slot' + i, r.x, r.y, r.w, r.h, 2);
         if (has('icon_' + n)) { const tn = 'icon_' + n, k = Math.min((r.w - 14) / A[tn].w, (r.h - 14) / A[tn].h), iw = A[tn].w * k, ih = A[tn].h * k;
@@ -907,7 +1098,8 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     if (ST.hidden) L.label('hid', 'спрятался', kh[0], kh[1] - 20, { size: 20, col: '#cfe8c0', out: '#0a1406', al: 0.5 });
     raidHud();
     // hover hint under the cursor
-    if (S.state && ST.ptr && !ST.dlg && !ST.phone && !ST.chalk) { const c = [ST.ptr[0] + cx, ST.ptr[1] + cy], hit = SIM.pick(ST, c); if (hit) { const s = HOVER[hit.k] || ''; if (s) { const w = textW(s, 20) + 26; L.rrect(ST.ptr[0] + 18, ST.ptr[1] + 14, w, 32, 10, [0.1, 0.06, 0.06], [0.05, 0.03, 0.03], 0.85); L.uiBox('hover', ST.ptr[0] + 18, ST.ptr[1] + 14, w, 32, 2); L.label('hover', s, ST.ptr[0] + 31, ST.ptr[1] + 30, { size: 20, col: '#ffd9a0', out: '#120806' }); } } }
+    if (S.state && ST.ptr && !ST.dlg && !ST.phone && !ST.chalk && !ST.mg) { const c = [ST.ptr[0] + cx, ST.ptr[1] + cy], hit = SIM.pick(ST, c); if (hit) { const s = hit.k === 'fest' ? (SIM.FSTALLS.find((q) => q[1] === hit.id) || [])[6] || '' : HOVER[hit.k] || ''; if (s) { const w = textW(s, 20) + 26; L.rrect(ST.ptr[0] + 18, ST.ptr[1] + 14, w, 32, 10, [0.1, 0.06, 0.06], [0.05, 0.03, 0.03], 0.85); L.uiBox('hover', ST.ptr[0] + 18, ST.ptr[1] + 14, w, 32, 2); L.label('hover', s, ST.ptr[0] + 31, ST.ptr[1] + 30, { size: 20, col: '#ffd9a0', out: '#120806' }); } } }
+    mgOverlay();
     if (ST.dlg) dialog();
     if (ST.phone) phone();
     achPopups();
@@ -917,6 +1109,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
   // Steam-like achievement cards, bottom right above the phone button: slide in, hold, slide out
   const TIERC = { 3: [[1, 0.8, 0.3], '#ffd76a', 'золото'], 2: [[0.8, 0.85, 0.95], '#dfe6f2', 'серебро'], 1: [[0.85, 0.55, 0.3], '#e8a070', 'бронза'] };
   function achIcon(id, x, y, sz, a = 1, grey = false) { const i = SIM.ACH.findIndex((q) => q.id === id); if (i < 0 || !has('ach_icons')) return;
+    if (i >= 15) { if (has('ach_icons2')) L.sprite('ach_icons2', x, y, { w: sz, h: sz, src: [(i - 15) / 5, 0, (i - 14) / 5, 1], u: { alpha: a, grade: grey ? [0.15, 0.7, 0, 1] : [1, 1, 0, 1] } }); return; }
     L.sprite('ach_icons', x, y, { w: sz, h: sz, src: [(i % 5) / 5, Math.floor(i / 5) / 3, (i % 5 + 1) / 5, (Math.floor(i / 5) + 1) / 3], u: { alpha: a, grade: grey ? [0.15, 0.7, 0, 1] : [1, 1, 0, 1] } }); }
   function achPopups() { const list = ST.ev.filter((e) => e.k === 'ach' && GT - e.t < 5.6 && GT >= e.t).slice(-3);
     list.forEach((e, k) => { const a = GT - e.t, d = SIM.ACHI[e.id]; if (!d) return; const sl = a < 0.35 ? 1 - ease(a / 0.35) : a > 5.1 ? ease((a - 5.1) / 0.5) : 0, al = 1 - sl;
@@ -944,6 +1137,8 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     items.push(['★', 'Украшения для двора', true]);
     items.push(['', ST.q.vera === 0 ? 'Поговорить с Верой' : ST.q.vera === 1 ? `Найти пропавшие тыквы (${ST.vp.filter((v) => v >= 0).length}/3)` : 'Тыквы вернулись к Вере', ST.q.vera === 2]);
     if (ST.q.vera === 2) items.push(['', 'Костюм из сундука Веры (по желанию)', !!ST.costume]);
+    { const F = ST.fest || {}, n = [F.carves, F.apples, F.stage, F.gacha && F.gacha.pulls].filter(Boolean).length;           // v12
+      items.push(['☆', 'Праздник на площади', true]); items.push(['', !F.seen ? 'Найти праздник: ворота в южном заборе' : `Мини-игры: ${n}/4 (тыква, яблоки, сцена, гача)`, n >= 4]); }
     items.push(['☆', 'Странные огни', true]);
     items.push(['', 'Осмотреть источник света на окраине района', ST.q.strange > 0]);
     if (K.done >= 0 && (K.auction > 0 || K.revengeAt < 0)) { items.push(['☠', 'Месть Кирилла', true]); items.push(['', `Трусы на аукционе: продано лотов ${K.auction}`, false]); }
@@ -1038,28 +1233,38 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
           const un = ST.msgs.filter((m) => !m.read && (n === SIM.CONTACTS[0] ? m.group : m.from === n && !m.group)).length; if (un) { g.fillStyle = '#e02020'; g.beginPath(); g.arc(x + b.w - 22, y + 62, 12, 0, 6.3); g.fill(); T2(String(un), x + b.w - 22, y + 68, 15, '#fff', 'center'); } }); }
       if (ph.app === 'dm') { const n = ph.who, c = CONT[n] || ['#444', '', '?'], list = (ST.dm || {})[n] || [];
         g.fillStyle = c[0]; g.beginPath(); g.arc(p.w / 2 - 70, 148, 20, 0, 6.3); g.fill(); T2(c[2], p.w / 2 - 70, 155, 18, '#fff', 'center'); T2(n, p.w / 2 - 40, 156, 24, '#fff'); T2(c[1], p.w / 2 - 40, 178, 14, '#a898c0', 'left', 'normal');
-        const lim = items.some((q) => q.id === 'loan' || q.id === 'repay') ? p.h - 202 : p.h - 142; let y = lim;
+        const lim = items.some((q) => q.id === 'loan' || q.id === 'repay' || q.id === 'vplay') ? p.h - 202 : p.h - 142; let y = lim;
         const FC = { 'Кирилл': '#ffb45a', 'Райва': '#7ab0ff', 'Эльф': '#9af0d0', 'Скелет': '#c8c8c8', 'Тимофей': '#d0a0ff' };
-        for (const m of [...list].reverse()) { const nm = !m.me && m.from ? 20 : 0, lines = wrap(m.text, 17, p.w - 150, 'normal'), h = 18 + nm + lines.length * 21, w = Math.min(p.w - 110, Math.max(nm ? textW(m.from, 15) : 0, ...lines.map((l) => textW(l, 17))) + 30); y -= h + 8; if (y < 196) break;
+        for (const m of [...list].reverse().slice(Math.min(Math.max(0, list.length - 3), Math.floor((ph.scroll || 0) / 3)))) { const nm = !m.me && m.from ? 20 : 0, lines = wrap(m.text, 17, p.w - 150, 'normal'), h = 18 + nm + lines.length * 21, w = Math.min(p.w - 110, Math.max(nm ? textW(m.from, 15) : 0, ...lines.map((l) => textW(l, 17))) + 30); y -= h + 8; if (y < 196) break;
           const x = m.me ? p.w - 36 - w : 36; g.fillStyle = m.me ? '#3a6a4a' : '#2e2440'; rr(x, y, w, h, 14); g.fill(); if (nm) T2(m.from, x + 15, y + 22, 15, FC[m.from] || '#ffb45a');   // the group chat: who said it
           lines.forEach((l, i) => T2(l, x + 15, y + 26 + nm + i * 21, 17, '#f0e6ff', 'left', 'normal')); }
         if (!list.length) T2(SIM.LOANS[n] ? 'Можно написать или попросить в долг' : 'Напиши что-нибудь…', p.w / 2, 320, 16, '#8a7aa0', 'center', 'normal');
+        btn('vplay', window.__vplaying ? '❚❚ Голосовое Эльфа играет…' : '▶ Голосовое Эльфа · 0:16', '#9af0d0');   // v12: the voice note from the prologue
         btn('loan', `Попросить в долг ${SIM.LOANS[n] || 0} ₽`, '#ffb45a'); const Ln = (ST.loans || {})[n]; if (Ln) btn('repay', `Вернуть долг ${Ln.amt} ₽`, ST.money >= Ln.amt ? '#8ad06a' : '#5a4a4a');
         field('Напиши сообщение и нажми Enter…'); }
       if (ph.app === 'dev') { g.fillStyle = '#05080a'; rr(24, 116, p.w - 48, p.h - 260, 18); g.fill(); T2('>_ консоль разработчика', 44, 146, 18, '#5aff8a', 'left', 'bold');
         let y = p.h - 170; const L2 = []; g.font = `14px ui-monospace, Menlo, Consolas, monospace`;
         const mwrap = (str, maxW) => { const out = []; let line = ''; for (const w of str.split(' ')) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > maxW && line) { out.push(line); line = '  ' + w; } else line = t; } out.push(line); return out; };   // wrap in the monospace font it is drawn with
         for (const m of [...(ST.devLog || [])].reverse()) { const lines = mwrap((m.me ? '> ' : '') + (m.me ? m.text : TR(m.text)), p.w - 96); for (let i = lines.length - 1; i >= 0; i--) L2.push([lines[i], m.me]); }
-        for (const [l, me] of L2) { if (y < 170) break; g.fillStyle = me ? '#ffd76a' : '#9affb4'; g.textAlign = 'left'; g.fillText(l, 42, y); y -= 19; }
+        const off = Math.min(Math.max(0, L2.length - 8), ph.scroll || 0);                    // v12: the wheel scrolls back through the log (every command of help fits)
+        for (const [l, me] of L2.slice(off)) { if (y < 170) break; g.fillStyle = me ? '#ffd76a' : '#9affb4'; g.textAlign = 'left'; g.fillText(l, 42, y); y -= 19; }
+        if (L2.length > 24) { g.fillStyle = '#4a7a5a'; g.textAlign = 'right'; g.fillText(off ? TR('↓ колесо вниз — к новым') : TR('↑ колесо вверх — к старым'), p.w - 44, 146); }
         field('команда, например: money 5000 · help'); }
       if (ph.app === 'map') phoneMap(g, p, ph, rr, T2);
       if (ph.app === 'ach') phoneAch(g, p, ph, rr, T2);
-      if (ph.app === 'chats') { T2('Чаты', p.w / 2, 156, 26, '#fff', 'center'); let y = p.h - 50; const list = [...ST.msgs].reverse(), MOD = { 'Кирилл': ['#3a2a46', '#ffb45a'], 'Райва': ['#22304a', '#7ab0ff'], 'Эльф': ['#1e3a34', '#9af0d0'] };
-        for (const m of list) { const lines = wrap(m.text, 18, p.w - 120, 'normal'), h = 34 + lines.length * 22; y -= h + 10; if (y < 175) break; const cl = MOD[m.from] || ['#2a2a40', '#9ac8ff'];
-          g.fillStyle = cl[0]; rr(36, y, p.w - 72, h, 14); g.fill(); T2(m.group ? TR(m.from) + TR('  · Модеры 🎃') : m.from, 52, y + 24, 17, cl[1]);
-          lines.forEach((l, i) => T2(l, 52, y + 48 + i * 22, 17, '#f0e6ff', 'left', 'normal')); }
+      if (ph.app === 'chats') { T2('Чаты', p.w / 2, 150, 26, '#fff', 'center');                   // v12: a list of conversations, each opens its own thread
+        const dm = ST.dm || {}, rows = items.filter((q) => q.id.startsWith('dm_'));
+        if (!rows.length) T2('Пока никто не писал', p.w / 2, 320, 16, '#8a7aa0', 'center', 'normal');
+        rows.forEach((b, i) => { const n = b.id.slice(3), x = b.x - p.x, y = b.y - p.y, c = CONT[n] || ['#4a3a5a', '', n.slice(0, 1)], th = dm[n] || [], last = th[th.length - 1];
+          g.fillStyle = i % 2 ? '#22182a' : '#2a1e32'; rr(x, y, b.w, b.h, 14); g.fill(); g.fillStyle = c[0]; g.beginPath(); g.arc(x + 40, y + b.h / 2, 26, 0, 6.3); g.fill();
+          T2(c[2], x + 40, y + b.h / 2 + 9, 24, '#fff', 'center'); T2(n, x + 80, y + 30, 20, '#f6e7c8');
+          if (last) { const pre = (last.me ? TR('Вы: ') : n === SIM.CONTACTS[0] && last.from ? TR(last.from) + ': ' : '') + TR(last.text); let s2 = pre; g.font = 'normal 15px ' + FONT;
+            while (s2.length > 4 && g.measureText(s2).width > b.w - 130) s2 = s2.slice(0, -2); if (s2 !== pre) s2 = s2.trimEnd() + '…'; T2(s2, x + 80, y + 56, 15, '#b8a8d0', 'left', 'normal');
+            T2(SIM.clockStr({ gt: last.gt || 0 }), x + b.w - 14, y + 30, 13, '#8a7aa0', 'right', 'normal'); }
+          const un = ST.msgs.filter((m) => !m.read && (n === SIM.CONTACTS[0] ? m.group : m.from === n && !m.group)).length; if (un) { g.fillStyle = '#e02020'; g.beginPath(); g.arc(x + b.w - 22, y + 56, 12, 0, 6.3); g.fill(); T2(String(un), x + b.w - 22, y + 62, 15, '#fff', 'center'); } });
+        const tot = SIM.chatList(ST).length; if (tot > 7) T2(TR('колесо — ещё чаты') + ` (${Math.min(tot, (ph.scroll || 0) + 7)}/${tot})`, p.w / 2, p.h - 150, 13, '#8a7aa0', 'center', 'normal');
         const v = ST.rai.virus; if (v && v.st === 'download') { const f = Math.min(1, (GT - v.t0) / 3.2); g.fillStyle = 'rgba(10,6,16,0.92)'; rr(40, 300, p.w - 80, 190, 18); g.fill();
-          T2('Загрузка «КотоМем.apk»', p.w / 2, 350, 21, '#ffffff', 'center'); T2('😺 ' + Math.round(f * 100) + ' %', p.w / 2, 392, 26, '#9ad0ff', 'center');
+          T2('Загрузка «КотоМем.apk»', p.w / 2, 350, 21, '#ffffff', 'center'); T2('(=^･ω･^=) ' + Math.round(f * 100) + ' %', p.w / 2, 392, 26, '#9ad0ff', 'center');
           g.fillStyle = '#2a2a3a'; rr(70, 420, p.w - 140, 22, 11); g.fill(); g.fillStyle = '#5ac0ff'; rr(70, 420, (p.w - 140) * f, 22, 11); g.fill(); T2('не выключайте телефон', p.w / 2, 470, 14, '#a090b0', 'center', 'normal'); } }
       if (ph.app === 'shop') { T2('«Неожиданные находки»', p.w / 2, 140, 22, '#ffb45a', 'center'); T2('Баланс: ' + ST.money + ' ₽', p.w / 2, 168, 18, '#f0e6ff', 'center', 'normal');
         SIM.SHOP.forEach((it, i) => { const y = 182 + i * 47; g.fillStyle = i % 2 ? '#22182a' : '#2a1e32'; rr(30, y - 3, p.w - 60, 44, 10); g.fill();
@@ -1067,10 +1272,10 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
           btn('buy_' + it.id, 'Купить', ST.money >= it.price ? '#ff8c2a' : '#5a4a4a'); }); }
       if (ph.app === 'pizza') { T2('Пиццерия «Тыква»', p.w / 2, 170, 26, '#ffb45a', 'center');
         const tg = ST.target ? SIM.MODS[ST.target] : null, tk = tg ? ST[tg.key] : null;
-        ['Доставка за 15 минут или пицца бесплатно (почти).', '', 'Адрес: Тыквенный пер., ' + (tg ? 'дом ' + tg.gen : '— сначала постучи к модеру'), 'Заказ: 10 × «Пепперони»', 'Оплата: при получении 😏'].flatMap((l) => l ? wrap(l, 19, p.w - 90, 'normal') : ['']).forEach((l, i) => T2(l, p.w / 2, 260 + i * 34, 19, '#f0e6ff', 'center', 'normal'));
+        ['Доставка за 15 минут или пицца бесплатно (почти).', '', 'Адрес: Тыквенный пер., ' + (tg ? 'дом ' + tg.gen : '— сначала постучи к модеру'), 'Заказ: 10 × «Пепперони»', 'Оплата: при получении (￢‿￢)'].flatMap((l) => l ? wrap(l, 19, p.w - 90, 'normal') : ['']).forEach((l, i) => T2(l, p.w / 2, 260 + i * 34, 19, '#f0e6ff', 'center', 'normal'));
         const done = !tg || tk.pr.pizza || ST.courier || tk.done >= 0; btn('order_pizza', !tg ? 'Нет адреса' : done ? 'Заказ уже в пути / доставлен' : 'Заказать 10 пицц: ' + tg.dat, done ? '#5a4a4a' : '#ff8c2a'); }
       if (ph.app === 'orders') { T2('Мои покупки', p.w / 2, 156, 26, '#fff', 'center'); const J = ST.rai.junk;
-        if (!J.length) T2('Покупок пока нет 🙂', p.w / 2, 300, 19, '#c8b8e0', 'center', 'normal');
+        if (!J.length) T2('Покупок пока нет (^_^)', p.w / 2, 300, 19, '#c8b8e0', 'center', 'normal');
         else { J.slice(-9).reverse().forEach((j, i) => { const y = 200 + i * 58; g.fillStyle = i % 2 ? '#22182a' : '#2a1e32'; rr(30, y - 4, p.w - 60, 50, 10); g.fill();
             wrap(j.name, 16, p.w - 170, 'bold').slice(0, 2).forEach((l, k2) => T2(l, 46, y + 18 + k2 * 18, 15, '#f6e7c8')); T2('−' + j.price + ' ₽', p.w - 46, y + 26, 16, '#ff7a6a', 'right'); });
           T2('Итого списано: ' + J.reduce((a, j) => a + j.price, 0) + ' ₽', p.w / 2, p.h - 64, 18, '#ffb45a', 'center'); T2('(я этого не заказывал…)', p.w / 2, p.h - 40, 14, '#a090b0', 'center', 'normal'); } }
@@ -1212,13 +1417,13 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     const near = (s) => { s.x = 2620; s.y = -420; for (let i = 0; i < 240; i++) SIM.step(s, {}); };
     const states = [
       ['start', base()],
-      ['dialog', base((s) => { near(s); s.dlg = { who: 'kirill', text: '«Сладость или гадость?» Конфеты только для подписчиков с бустом. Ты не подписчик, и вообще уже очень поздно, иди домой.', choices: [['Подарить подарок', 'gift'], ['Тогда гадость! 😈', 'prank'], ['Уйти', 'close']] }; })],
+      ['dialog', base((s) => { near(s); s.dlg = { who: 'kirill', text: '«Сладость или гадость?» Конфеты только для подписчиков с бустом. Ты не подписчик, и вообще уже очень поздно, иди домой.', choices: [['Подарить подарок', 'gift'], ['Тогда гадость! (¬‿¬)ψ', 'prank'], ['Уйти', 'close']] }; })],
       ['phone_home', base((s) => { s.phone = { app: 'home', t: -9 }; })], ['phone_shop', base((s) => { s.money = 99999; s.phone = { app: 'shop', t: -9 }; })],
-      ['phone_chats', base((s) => { for (let i = 0; i < 6; i++) s.msgs.push({ from: 'Кирилл', text: 'Лот №' + i + ': трусы Коли с надписью «Пятница» — проданы за 4999 ₽ 😏 Деньги, конечно, оставлю себе.', gt: 0, read: false }); s.phone = { app: 'chats', t: -9 }; })],
+      ['phone_chats', base((s) => { for (let i = 0; i < 6; i++) s.msgs.push({ from: 'Кирилл', text: 'Лот №' + i + ': трусы Коли с надписью «Пятница» — проданы за 4999 ₽ ( ˘ ▽˘) Деньги, конечно, оставлю себе.', gt: 0, read: false }); s.phone = { app: 'chats', t: -9 }; })],
       ['phone_map', base((s) => { s.phone = { app: 'map', t: -9 }; })],
-      ['dialog_raiva', base((s) => { s.x = SIM.HR.door[0]; s.y = SIM.FACADE + 70; for (let i = 0; i < 240; i++) SIM.step(s, {}); s.rai.st = 'door'; s.dlg = { who: 'raiva', text: '«Сладость или гадость?» У меня сервер упал, логи сами себя не прочитают. Иди домой, Коля, и вообще уже поздно.', choices: [['Подарить подарок', 'gift'], ['Тогда гадость! 😈', 'prank'], ['Уйти', 'close']] }; })],
+      ['dialog_raiva', base((s) => { s.x = SIM.HR.door[0]; s.y = SIM.FACADE + 70; for (let i = 0; i < 240; i++) SIM.step(s, {}); s.rai.st = 'door'; s.dlg = { who: 'raiva', text: '«Сладость или гадость?» У меня сервер упал, логи сами себя не прочитают. Иди домой, Коля, и вообще уже поздно.', choices: [['Подарить подарок', 'gift'], ['Тогда гадость! (¬‿¬)ψ', 'prank'], ['Уйти', 'close']] }; })],
       ['phone_orders', base((s) => { s.money = -12345; s.rai.virus = { st: 'active', t1: -100 }; SIM.JUNK.forEach((j) => s.rai.junk.push({ name: j[0], price: j[1], gt: 0 })); s.phone = { app: 'orders', t: -9 }; })],
-      ['dialog_elf', base((s) => { s.x = SIM.HE.door[0]; s.y = SIM.FACADE + 70; for (let i = 0; i < 240; i++) SIM.step(s, {}); s.elf.st = 'door'; s.dlg = { who: 'elf', text: '«Сладость или гадость?» Нет. Конфеты для тех, кто не спамит в чате. Иди домой, Коля, и вообще уже поздно.', choices: [['Подарить подарок', 'gift'], ['Тогда гадость! 😈', 'prank'], ['Уйти', 'close']] }; })],
+      ['dialog_elf', base((s) => { s.x = SIM.HE.door[0]; s.y = SIM.FACADE + 70; for (let i = 0; i < 240; i++) SIM.step(s, {}); s.elf.st = 'door'; s.dlg = { who: 'elf', text: '«Сладость или гадость?» Нет. Конфеты для тех, кто не спамит в чате. Иди домой, Коля, и вообще уже поздно.', choices: [['Подарить подарок', 'gift'], ['Тогда гадость! (¬‿¬)ψ', 'prank'], ['Уйти', 'close']] }; })],
       ['elf_flood', base((s) => { s.elf.refused = true; s.x = SIM.HE.door[0] - 250; s.y = -380; for (let i = 0; i < 90; i++) SIM.step(s, { up: 1 }); for (let i = 0; i < 30; i++) SIM.step(s, {}); })],
       ['raid', base((s) => { s.elf.done = 0; s.raid = SIM.newRaid(s); s.raid.t0 = s.t; s.x = 4000; s.y = -60; for (let i = 0; i < 120 * 12; i++) SIM.step(s, {}); s.raid.grace = 0; s.x = 3900; s.y = 0;
         s.raid.units.forEach((u, i) => { u.x = 3500 + i * 120; u.y = [-262, 232, 0, -300][i]; u.wa = 0; }); for (let i = 0; i < 100; i++) SIM.step(s, {}); s.money = 99999; })],
@@ -1227,7 +1432,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
         for (let i = 0; i < 3; i++) s.toasts.push({ text: 'Флаер «Кирилл раздаёт конфеты БЕСПЛАТНО!» (5/5) — очень длинное сообщение', t: s.t, kind: i ? 'info' : 'big' }); })],
       ['phone_dev', base((s) => { SIM.runDev(s, 'help'); SIM.runDev(s, 'money 5000'); s.phone = { app: 'dev', t: -9 }; })],
       ['phone_contacts', base((s) => { s.loans = { 'Скелет': { amt: 1500, over: true } }; s.phone = { app: 'contacts', t: -9 }; })],
-      ['phone_dm', base((s) => { s.dm['Тимофей'] = [{ me: true, text: 'Тимофей, привет! Ты где вообще?', gt: 0 }, { text: 'Я везде. Вижу тебя у дома Райвы. Сзади камера, кстати 👁 Очень длинный ответ, чтобы проверить перенос строк в пузыре.', gt: 0 }]; s.phone = { app: 'dm', who: 'Тимофей', t: -9 }; })],
+      ['phone_dm', base((s) => { s.dm['Тимофей'] = [{ me: true, text: 'Тимофей, привет! Ты где вообще?', gt: 0 }, { text: 'Я везде. Вижу тебя у дома Райвы. Сзади камера, кстати (◉_◉) Очень длинный ответ, чтобы проверить перенос строк в пузыре.', gt: 0 }]; s.phone = { app: 'dm', who: 'Тимофей', t: -9 }; })],
       ['finale', base((s) => { SIM.runDev(s, 'finale'); s.finale.i = 4; })],
       ['finale_end', base((s) => { SIM.runDev(s, 'finale'); s.finale.end = true; s.finale.i = s.finale.lines.length; s.stats = { eggs: 99999, tp: 999, bb: 99999, hits: 999 }; s.money = -99999; })],
       ['match', base((s) => { s.x = 2150; s.y = -230; s.gt = 14 * 60; s.face = [1, 1]; const hp = SIM.proj(s.x, s.y); s.cam = [hp[0] - W / 2 + 120, hp[1] - H / 2 - 60]; })],

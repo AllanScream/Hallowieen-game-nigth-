@@ -1,0 +1,7 @@
+A game UI art sheet of separate items on a transparent background, wide gaps between them, HD pixel art matching Image 1 (crisp pixel clusters, dark red-brown outline), front views (NOT isometric), very colourful:
+1. (top left, the biggest, about 560 px tall) ONE huge round orange pumpkin seen straight from the front, with a short curly stem, deep vertical ribs, completely UNCARVED smooth front (no face), soft warm lighting, a slight shine — it will be used as a carving canvas.
+2. a shiny red apple with a leaf and a green apple, seen slightly from above, each about 120 px.
+3. three closed round gacha capsules (each a two-tone sphere: white top half and a coloured bottom half): one blue, one purple, one gold with sparkles, each about 140 px.
+4. the same three capsules OPEN (the two halves apart with light bursting out): blue, purple, gold, each about 160 px.
+5. a big shining golden five-pointed star and a smaller silver star.
+No text, no letters, no numbers.

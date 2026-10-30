@@ -1,0 +1,8 @@
+A game prop sheet of exactly 6 separate Halloween street festival props in a 3 x 2 grid, each centred in its own cell with wide empty gaps, every prop seen from the same high 3/4 isometric game camera (2:1 dimetric, about 30 degrees down), the same scale family, HD pixel art matching Image 1 (crisp pixel clusters, 3-5 flat tones per material, dark red-brown outline), very colourful and festive:
+1. a wooden market stall with an orange-and-purple striped awning, string lights, and a table covered with carved jack-o'-lanterns of many funny faces, a small carving knife set and a basket of uncarved pumpkins (the pumpkin carving contest booth).
+2. a big round wooden barrel tub full of blue water with floating shiny red and green apples, water splashes, a folded towel and a little stool (apple bobbing).
+3. a tall cute GACHA capsule machine: a big glass pumpkin-shaped dome full of colourful capsules (blue, purple, gold), a bright pink and gold body with star decorations and glowing rarity stars, a big crank handle, a capsule exit slot with a shining golden capsule, blinking bulbs around it.
+4. a small wooden stage with purple velvet curtains, a row of footlights, string lights and a big pumpkin-shaped spotlight, a few gold stars hanging (costume contest).
+5. a candy and cotton-candy stall with glass jars of colourful sweets, pink and blue cotton candy, caramel apples and a striped awning.
+6. a festival lantern pole with many hanging round paper lanterns in orange, purple and green and a pennant garland.
+Transparent background, no shadow, no ground, no text, no letters, no numbers.

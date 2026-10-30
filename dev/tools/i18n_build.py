@@ -4,7 +4,8 @@ sys.path.insert(0, 'art/i18n')
 from en_a import EN as A
 from en_b import EN as B, EXTRA
 from en_c import EXTRA as EXTRA_C                                         # v11: the contacts' answers and Elf's lines (tools/dm_build.py)
-EXTRA = EXTRA + EXTRA_C
+from en_v12 import EXTRA as EXTRA_12                                      # v12: the prologue, the festival, the console
+EXTRA = EXTRA + EXTRA_C + EXTRA_12
 ks = json.load(open('art/i18n/ks_v9.json', encoding='utf-8'))
 EN = dict(A); EN.update(B)
 pairs, seen = [], set()

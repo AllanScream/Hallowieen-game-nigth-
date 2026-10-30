@@ -4,8 +4,10 @@
 
 A pixel-art isometric Halloween game (Russian and English — switch in the main menu). Kolya walks to the houses of his moderators — Kirill, Raiva and Elf — and asks for a «treat». Refused? Then it's a trick: eggs, toilet paper, a rotten pumpkin, firecrackers, slime on the door handle, ten pizzas… Every moderator takes revenge in their own way, and at the end of the night a surprise waits for Kolya at home.
 
+It all starts in Kolya's room: a reaction stream, a «egg the mods, dare you?» donation, a Halloween reminder and Elf's voice note in the mods' chat. And beyond the south fence there is a festival: pumpkin carving, apple bobbing, a costume contest and a gacha machine.
+
 **Play in the browser:** https://allanscream.github.io/Hallowieen-game-nigth-/
-(needs a WebGL2 browser: Chrome, Edge, Firefox; the first load is about 22 MB). Pick **English** in the main menu.
+(needs a WebGL2 browser: Chrome, Edge, Firefox; the first load is about 26 MB). Pick **English** in the main menu.
 
 ![Main menu](docs/screenshots/en_01_menu.jpg)
 
@@ -17,6 +19,10 @@ A pixel-art isometric Halloween game (Russian and English — switch in the main
 | Elf's revenge: a police and army raid | Rain, thunderstorms and the ghost costume |
 | ![Vera's chest](docs/screenshots/06_costumes.jpg) | ![Backyards](docs/screenshots/07_backyards.jpg) |
 | Costumes from Vera's chest | The backyards behind the houses |
+| ![The costume contest](docs/screenshots/en_05_stage.jpg) | ![The prologue](docs/screenshots/en_06_prologue.jpg) |
+| The festival: the costume contest | The prologue: the mods' chat |
+| ![Pumpkin carving](docs/screenshots/10_carving.jpg) | ![The gacha machine](docs/screenshots/11_gacha.jpg) |
+| Pumpkin carving: draw anything | The «Pumpkin Banner» gacha machine |
 
 ## Run it on your computer (Windows)
 
@@ -45,6 +51,8 @@ Opening `game/index.html` with a double click won't work: browsers don't let Web
 
 ## What's inside
 
+- A prologue in scenes in Kolya's room (the «KolyaReacts» stream, a donation, Elf's voice note) — in your first new game, again from «About» → «Watch the prologue». After both endings an epilogue at the stream, where the chat talks about the night.
+- A festival on the plaza: pumpkin carving (free drawing with the mouse, three judges, rivals), apple bobbing, a costume contest (poses with the arrows), a gacha machine (★3/★4/★5, pity at pull 20, the legendary «Golden Pumpkin» and «Neon Ghost» costumes), a candy stall.
 - Russian and English (buttons in the main menu and in the settings).
 - Main menu music — «お菓子の森» by whiteelv, in the game — a music box; both can be changed in the settings. A voice message waits in the menu.
 - A street of 7 houses, a dark alley, open backyards (greenhouses, sheds, trampolines, swings, wickets between the plots) and a wood, 8 passers-by in costumes, a black cat, Vera's candy bowl.
@@ -54,11 +62,11 @@ Opening `game/index.html` with a double click won't work: browsers don't let Web
 - Tricks anywhere: firecrackers stun passers-by and the patrol, chalk, an alarm-clock decoy, the doorbell and slime on any door.
 - Passers-by hold grudges: after three hits they chase you and take revenge (eggs back, «damages», a toilet-paper mummy).
 - Three revenges: an underpants auction (Kirill), a virus on your phone (Raiva), a police and army raid (Elf).
-- The phone: the moderators' group chat, contacts who answer what you write (each in their own way, sometimes with swearing), debts and a developer console (`help`).
+- The phone: a list of conversations (each contact has their own thread), the mods' group chat with Elf's voice note, contacts who answer what you write — gacha, anime, the stream, the festival, the weather, «help» with a real hint and two dozen more topics (each in their own way, with kaomoji, sometimes with swearing), debts and a developer console (`help`, the wheel scrolls).
 - Kolya is drawn in 32 walking directions (hands free, with the flashlight, with the rifle), throws and carrying the pumpkin — in 16.
 - Main menu, 6 save slots, volume and night darkness settings.
 - Two visual-novel endings: the surprise party and the kind one (everyone forgiven, not a single trick).
-- 15 achievements: a Steam-like popup and an «Achievements» app on the phone.
+- 20 achievements: a Steam-like popup and an «Achievements» app on the phone.
 
 ## Layout
 
@@ -68,7 +76,7 @@ game/        the playable build: index.html, engine and game scripts, assets/ (p
   scene.js   rendering: isometry, light, weather, interface, character atlases
   audio.js   sound synthesized with WebAudio on the fly (the menu music is a file)
   i18n.js    on-the-fly translation (canvas, labels, menu); lang_en.js — the RU→EN dictionary
-serve.py     local server (takes the first free port from 8011, no cache)
+serve.py     local server (takes the first free port from 8012, no cache)
 docs/        screenshots for this page
 dev/         development sources
   tools/     art pipeline and checks: mannequin poses, atlas slicing, packing, automated tests

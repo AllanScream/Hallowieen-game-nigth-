@@ -9,24 +9,44 @@ EXTRA = [
 "Oh, Kolya. I already saw you through the window."
 ],
 [
+"Чё надо, Коля? Я на посту.",
+"What, Kolya? I'm on duty."
+],
+[
+"Привет. У тебя три секунды, потом бан.",
+"Hi. You've got three seconds, then a ban."
+],
+[
 "Привет?! Ты мне дом засрал, а теперь «привет»?",
 "Hi?! You trashed my house and now it's «hi»?"
 ],
 [
-"Иди нахуй со своим «привет» 😤",
-"Fuck off with your «hi» 😤"
+"Иди нахуй со своим «привет» (╬ Ò﹏Ó)",
+"Fuck off with your «hi» (╬ Ò﹏Ó)"
 ],
 [
-"Привет, вандал. Аукцион уже открыт 😏",
-"Hi, vandal. The auction is already open 😏"
+"Ещё раз «привет» — и я выложу твои трусы на аукцион дважды.",
+"One more «hi» and I'll auction your underwear twice."
 ],
 [
-"Здарова, бро 👋",
-"Hey, bro 👋"
+"Привет, преступник. Отмывать будешь сам?",
+"Hi, criminal. Will you scrub it yourself?"
+],
+[
+"Привет, вандал. Аукцион уже открыт ( ˘ ▽˘)",
+"Hi, vandal. The auction is already open (￢ω￢)"
+],
+[
+"Здарова, бро (^_^)/",
+"Hey, bro (・ω・)ノ"
 ],
 [
 "О, мой любимый даритель бан-хаммеров!",
 "Oh, my favourite ban-hammer donor!"
+],
+[
+"О, Коля! Заходи на энергетик (b ᵔ▽ᵔ)b",
+"Oh, Kolya! Come over for an energy drink (b ᵔ▽ᵔ)b"
 ],
 [
 "Нормально. Модерирую улицу через окно.",
@@ -37,6 +57,14 @@ EXTRA = [
 "Sitting here banning pigeons on the windowsill."
 ],
 [
+"Сижу у окна, считаю детей в костюмах. 14 ведьм, 3 тыквы, 1 ты.",
+"At the window counting kids in costumes. 14 witches, 3 pumpkins, 1 you."
+],
+[
+"Дела? Модерация. Без выходных, без зарплаты.",
+"How am I? Moderating. No days off, no pay."
+],
+[
 "Как дела? Отмываю дом от твоих яиц, спасибо.",
 "How am I? Scrubbing your eggs off my house, thanks."
 ],
@@ -45,8 +73,16 @@ EXTRA = [
 "Shitty. Guess why."
 ],
 [
-"Отлично. Считаю ставки на твои трусы 😏",
-"Great. Counting the bids on your underpants 😏"
+"Отлично! Мою крыльцо. Обожаю мыть крыльцо в 23:00 (╬ Ò﹏Ó)",
+"Great! Washing the porch. I love washing porches at 11 p.m. (╬ Ò﹏Ó)"
+],
+[
+"Отлично. Считаю ставки на твои трусы (￢ω￢)",
+"Great. Counting the bids on your underpants (￢‿￢)"
+],
+[
+"Дела отлично. Ставки на твои трусы растут (￢ω￢)",
+"Doing great. The bids on your underwear keep rising (￢ω￢)"
 ],
 [
 "Отлично! «Бан-хаммер» ещё действует ⚡",
@@ -73,6 +109,10 @@ EXTRA = [
 "«Sorry» in chat doesn't count. Bring a «Ban-hammer»."
 ],
 [
+"Извинения приняты. Бан — нет.",
+"Apology accepted. The ban is not."
+],
+[
 "Поздно, бро. Аукцион уже готовлю.",
 "Too late, bro. I'm already setting up the auction."
 ],
@@ -81,8 +121,16 @@ EXTRA = [
 "I'll forgive you if you bring a «Ban-hammer». Maybe."
 ],
 [
-"Да ладно, проехали 👍",
-"Come on, it's all good 👍"
+"Извинения в чате не принимаются. Принимаются энергетиком.",
+"Apologies aren't accepted in chat. They're accepted as energy drinks."
+],
+[
+"Сорри не отмоет мне окна, Коля.",
+"«Sorry» won't wash my windows, Kolya."
+],
+[
+"Да ладно, проехали (＾▽＾)b",
+"Come on, it's all good (＾▽＾)b"
 ],
 [
 "Только попробуй. Я у окна. Всегда.",
@@ -93,8 +141,8 @@ EXTRA = [
 "A trick? Ha. I have no camera, but I have a good memory."
 ],
 [
-"Ещё одно яйцо — и твои трусы уйдут с молотка 😏",
-"One more egg and your underpants go under the hammer 😏"
+"Ещё одно яйцо — и твои трусы уйдут с молотка (¬‿¬ )",
+"One more egg and your underpants go under the hammer (¬‿¬ )"
 ],
 [
 "Блять, Коля, хватит уже!",
@@ -105,8 +153,8 @@ EXTRA = [
 "How much more? The house is already 100 % egged."
 ],
 [
-"Всё, ты победил. Теперь моя очередь 😈",
-"Fine, you won. Now it's my turn 😈"
+"Всё, ты победил. Теперь моя очередь ψ(｀∇´)ψ",
+"Fine, you won. Now it's my turn (｀∀´)Ψ"
 ],
 [
 "Сам такой. Бан на 24 часа.",
@@ -121,12 +169,48 @@ EXTRA = [
 "Have you lost your fucking mind? Muted for a day."
 ],
 [
+"Мут на 10 минут. Остынь.",
+"Muted for 10 minutes. Cool off."
+],
+[
+"Записал в лог нарушений. У тебя там уже роман.",
+"Logged it as a violation. Your log is a novel by now."
+],
+[
+"Сам такой. Бан на 24 часа.",
+"Takes one to know one. 24-hour ban."
+],
+[
+"Пиши в тикет, хамло.",
+"File a ticket, you jerk."
+],
+[
+"Ты чё, охуел? Мут на сутки.",
+"Have you lost your fucking mind? Muted for a day."
+],
+[
+"Сам такой. И дом мой ты засрал, а не я твой.",
+"Takes one to know one. And you trashed my house, not the other way round."
+],
+[
+"Пиздец ты смелый в переписке. Подойди к окну, скажи в лицо.",
+"Fucking brave in the chat. Come to the window and say it to my face."
+],
+[
 "Эм. Бро. Я модер, а не свидание.",
 "Um. Bro. I'm a moderator, not a date."
 ],
 [
-"Это что, подкат? Спасибо, но нет 😐",
-"Is that a pick-up line? Thanks, but no 😐"
+"Это что, подкат? Спасибо, но нет (・_・)",
+"Is that a pick-up line? Thanks, but no (・_・)"
+],
+[
+"Коля, я модератор, а не твоя вайфу.",
+"Kolya, I'm a moderator, not your waifu."
+],
+[
+"Мне тоже ты нравишься. Как источник контента для бана.",
+"I like you too. As a source of ban-worthy content."
 ],
 [
 "Я принимаю только «Бан-хаммер». Энергетик такой, знаешь.",
@@ -217,6 +301,202 @@ EXTRA = [
 "Don't know. Ask Raiva, he googles everything."
 ],
 [
+"«{0}»? Не знаю. Спроси у Райвы, она всё гуглит.",
+"«{0}»? No idea. Ask Raiva, she googles everything."
+],
+[
+"Вопрос «{0}» отклонён модерацией.",
+"The question «{0}» was rejected by moderation."
+],
+[
+"Костюм горничной? Эльф до сих пор этим голосовым всех мучает (≧▽≦)",
+"The maid costume? Elf is still torturing everyone with that voice note (≧▽≦)"
+],
+[
+"Если придёшь в костюме горничной — пущу без бана. Один раз.",
+"Come in the maid costume and I'll let you in without a ban. Once."
+],
+[
+"Горничная… Коля, это ты должен был ей костюм. Не я.",
+"Maid… Kolya, you owed her the costume. Not me."
+],
+[
+"Райва опять в серверной. По-моему, она там живёт.",
+"Raiva is in the server room again. I think she lives there."
+],
+[
+"Не трогай Райву, она тебе телефон взломает.",
+"Don't mess with Raiva, she'll hack your phone."
+],
+[
+"Эльф? Не ведись. Она со всеми так флиртует. Почти со всеми.",
+"Elf? Don't fall for it. She flirts like that with everyone. Almost everyone."
+],
+[
+"Эльф с этим своим латте… Лучше не стой у неё во дворе, там прожектор.",
+"Elf and her latte… Better not stand in her yard, there is a floodlight."
+],
+[
+"Скелет? Он с 2021 года в катке. Не жди.",
+"Skelet? He has been in a match since 2021. Don't wait."
+],
+[
+"Тимофей меня пугает. Он знает, сколько у меня энергетиков в холодильнике.",
+"Timofey scares me. He knows how many energy drinks are in my fridge."
+],
+[
+"Вера нормальная. Конфеты у неё, кстати, лучше моих.",
+"Vera is cool. Her candy is better than mine, by the way."
+],
+[
+"Да, это я. Чего?",
+"Yes, that's me. What?"
+],
+[
+"Я вчера 90 круток слил. Выпала тряпка. Не говори со мной о гаче.",
+"I burned 90 pulls yesterday. Got a rag. Don't talk to me about gacha."
+],
+[
+"На площади гача-автомат поставили. Гарант на 20-й крутке. Я проверял (￢_￢;)",
+"They put a gacha machine on the plaza. Pity at pull 20. I checked (￢_￢;)"
+],
+[
+"Пятизвёздочный скин? Покажешь — может, разбаню.",
+"A five-star skin? Show me and I might unban you."
+],
+[
+"Что смотришь? Только не говори, что опять «Магическую Тыковку» на 1.5x.",
+"What are you watching? Don't tell me it's «Magical Pumpkin Girl» at 1.5x again."
+],
+[
+"Аниме после 23:00 — бан. Шучу. Кидай ссылку.",
+"Anime after 11 p.m. is a ban. Kidding. Send the link."
+],
+[
+"Твой стрим сегодня? Я модерить не буду, у меня выходной (вру).",
+"Your stream tonight? I'm not moderating, it's my day off (lie)."
+],
+[
+"Твой чат опять спамит «КОЛЯ ГДЕ РЕАКЦИЯ». Я всех замутил.",
+"Your chat is spamming «KOLYA WHERE IS THE REACTION» again. I muted them all."
+],
+[
+"На площади конкурс тыкв. Я вырезал бан-хаммер. Судьи не поняли.",
+"There is a pumpkin contest on the plaza. I carved a ban hammer. The judges didn't get it."
+],
+[
+"Яблоки из бочки? Я пас, у меня очки.",
+"Apples from a barrel? I'll pass, I wear glasses."
+],
+[
+"Дождь. Хоть яйца с окон смоет.",
+"Rain. At least it will wash the eggs off the windows."
+],
+[
+"Гроза. Если свет вырубит — я не виноват. Это Райва.",
+"A storm. If the power goes out it's not me. It's Raiva."
+],
+[
+"Пиццу заказывал не ты? Мне привезли десять. Подозрительно.",
+"Did you order pizza? Ten of them came to me. Suspicious."
+],
+[
+"Есть энергетик и печенье. Это ужин модератора.",
+"There's an energy drink and a cookie. That's a moderator's dinner."
+],
+[
+"Ладно, подскажу. Только никому.",
+"Fine, a hint. Don't tell anyone."
+],
+[
+"Модератор не обязан помогать. Но держи.",
+"A moderator doesn't have to help. But here."
+],
+[
+"Сейчас {n}. Тебе пора домой, а мне — банить.",
+"It's {n}. Time for you to go home and for me to ban people."
+],
+[
+"{n}. Почему ты спрашиваешь у меня, у тебя телефон в руках.",
+"{n}. Why ask me, the phone is in your hands."
+],
+[
+"«Да» — это не ответ. Пиши развёрнуто, по правилам чата.",
+"«Yes» is not an answer. Write properly, chat rules."
+],
+[
+"Ок. Записал.",
+"Ok. Noted."
+],
+[
+"«Нет» засчитано. Бан не отменяется.",
+"«No» counted. The ban stays."
+],
+[
+"Ну и не надо.",
+"Fine, then."
+],
+[
+"Чего ржёшь? Я серьёзно.",
+"What are you laughing at? I'm serious."
+],
+[
+"Смешно ему. Мне вот не смешно (￣_￣)",
+"He thinks it's funny. I don't (￣_￣)"
+],
+[
+"Скучно? Иди с Верой поговори. Или со мной не говори.",
+"Bored? Go talk to Vera. Or don't talk to me."
+],
+[
+"Скука — лучшее время для модерации.",
+"Boredom is the best time for moderation."
+],
+[
+"Спать в Хэллоуин? Ты точно Коля?",
+"Sleep on Halloween? Are you really Kolya?"
+],
+[
+"Я не сплю. Модераторы не спят. Мы бдим.",
+"I don't sleep. Moderators don't sleep. We watch."
+],
+[
+"Я Кирилл. Модератор. Твой ночной кошмар с бан-хаммером.",
+"I'm Kirill. A moderator. Your nightmare with a ban hammer."
+],
+[
+"Опять смайлики… (￣_￣) Вот тебе в ответ.",
+"Kaomoji again… (￣_￣) Here, one back."
+],
+[
+"(￢_￢) — это я сейчас.",
+"(￢_￢) — that's me right now."
+],
+[
+"Ты это уже писал. Мут за флуд.",
+"You already wrote that. Muted for spam."
+],
+[
+"Копипаста? Серьёзно? (￢_￢;)",
+"Copy-paste? Seriously? (￢_￢;)"
+],
+[
+"«{0}»… Я не понял, но звучит как спам.",
+"«{0}»… I didn't get it, but it sounds like spam."
+],
+[
+"«{0}» — это ты мне? Я занят, у меня окно.",
+"«{0}» — to me? I'm busy, I have a window to watch."
+],
+[
+"Перевожу с колиного: «{0}» = «дай конфет». Нет.",
+"Translating from Kolya: «{0}» = «give me candy». No."
+],
+[
+"Окей, «{0}». Записал. Ответ — нет.",
+"Ok, «{0}». Noted. The answer is no."
+],
+[
 "ping → pong. Привет.",
 "ping → pong. Hi."
 ],
@@ -225,20 +505,36 @@ EXTRA = [
 "Hi. I'm coding, talk fast."
 ],
 [
-"Привет. Твой IP уже в чёрном списке 😺",
-"Hi. Your IP is already blacklisted 😺"
+"Ping получен. Pong.",
+"Ping received. Pong."
+],
+[
+"Привет. Тикет №666 открыт. Тема: Коля.",
+"Hi. Ticket #666 open. Subject: Kolya."
+],
+[
+"Привет. Твой IP уже в чёрном списке (=^‥^=)",
+"Hi. Your IP is already blacklisted (=^･ω･^=)"
 ],
 [
 "Ну здравствуй, вредитель. Логи всё помнят.",
 "Well hello, pest. The logs remember everything."
 ],
 [
-"Привет. Проверь телефон. Там сюрприз 😺",
-"Hi. Check your phone. There is a surprise 😺"
+"Привет. Твой IP уже в бане. Вообще везде.",
+"Hi. Your IP is already banned. Everywhere."
+],
+[
+"Привет. Проверь телефон. Там сюрприз (=^‥^=)",
+"Hi. Check your phone. There is a surprise (=^‥^=)"
 ],
 [
 "Привет, друг! Паяльник огонь 🔥",
 "Hi, friend! The soldering iron is fire 🔥"
+],
+[
+"Привет, Коля! Паяльник греется, заходи (=^･ω･^=)",
+"Hi, Kolya! The soldering iron is warming up, come over (=^･ω･^=)"
 ],
 [
 "Прод не лежит — уже хорошо.",
@@ -249,16 +545,28 @@ EXTRA = [
 "Fine. The cat is asleep on the server, me soon too."
 ],
 [
-"Как дела? Пишу вирус. Для одного Коли 😺",
-"How am I? Writing a virus. For one Kolya 😺"
+"Сервер пингуется, кофе варится. Жить можно.",
+"The server pings, the coffee brews. Life is ok."
+],
+[
+"Пишу скрипт, который сам отвечает тебе «нет».",
+"Writing a script that answers «no» to you automatically."
+],
+[
+"Как дела? Пишу вирус. Для одного Коли (=^‥^=)",
+"How am I? Writing a virus. For one Kolya (=^‥^=)"
 ],
 [
 "Хреново. Камера всё записала, сижу смотрю.",
 "Crappy. The camera recorded everything, I'm watching it."
 ],
 [
-"Отлично. Логи твоих покупок восхитительны 😺",
-"Great. The logs of your purchases are delightful 😺"
+"Восстанавливаю логи после твоих гадостей. Сколько можно (╬ Ò﹏Ó)",
+"Restoring the logs after your pranks. How much longer (╬ Ò﹏Ó)"
+],
+[
+"Отлично. Логи твоих покупок восхитительны (=^‥^=)",
+"Great. The logs of your purchases are delightful (=^･ω･^=)"
 ],
 [
 "Отлично! Припаял кофеварку к серверу ☕",
@@ -289,8 +597,16 @@ EXTRA = [
 "«Sorry» doesn't roll back the changes, Kolya."
 ],
 [
-"Всё ок, merge прошёл 😺",
-"All good, the merge went through 😺"
+"Извинения приняты в очередь. Позиция: 9999.",
+"Apology queued. Position: 9999."
+],
+[
+"Сорри не откатывает изменения. Нужен бэкап. Или паяльник.",
+"Sorry doesn't roll back changes. You need a backup. Or a soldering iron."
+],
+[
+"Всё ок, merge прошёл (=^･ω･^=)",
+"All good, the merge went through (=^･ω･^=)"
 ],
 [
 "У меня камера на крыльце и запись в облако 📹",
@@ -301,16 +617,16 @@ EXTRA = [
 "A trick is a feature? Then I'll ship a feature back."
 ],
 [
-"Ещё раз — и «КотоМем» прилетит тебе в телефон 😺",
-"Once more and «CatMeme» lands on your phone 😺"
+"Ещё раз — и «КотоМем» прилетит тебе в телефон (=^･ω･^=)",
+"Once more and «CatMeme» lands on your phone (=^‥^=)"
 ],
 [
 "Блядь, Коля, у меня прод, а ты с яйцами.",
 "Fuck, Kolya, I have prod, and you come with eggs."
 ],
 [
-"Дом закидан на 100 %. Красиво, сука. Проверь телефон 😺",
-"The house is 100 % egged. Damn, that's pretty. Check your phone 😺"
+"Дом закидан на 100 %. Красиво, сука. Проверь телефон (=^‥^=)",
+"The house is 100 % egged. Damn, that's pretty. Check your phone (=^･ω･^=)"
 ],
 [
 "Ошибка 403: хамство запрещено.",
@@ -325,12 +641,48 @@ EXTRA = [
 "Fuck off, but politely, through a proxy."
 ],
 [
+"Оскорбление сохранено в /var/log/kolya. Размер: 3 ГБ.",
+"Insult saved to /var/log/kolya. Size: 3 GB."
+],
+[
+"Синтаксическая ошибка в твоём мозге. Строка 1.",
+"Syntax error in your brain. Line 1."
+],
+[
+"Ошибка 403: хамство запрещено.",
+"Error 403: rudeness forbidden."
+],
+[
+"Сам ты баг. Неисправимый.",
+"You're the bug. Unfixable."
+],
+[
+"Иди нахуй, но вежливо, через прокси.",
+"Fuck off, but politely, through a proxy."
+],
+[
+"Ещё слово — и твой телефон закажет тебе 40 кг гречки.",
+"One more word and your phone orders you 40 kg of buckwheat."
+],
+[
+"Иди нахуй, но через прокси. Чтобы я не видела.",
+"Fuck off, but through a proxy. So I don't see it."
+],
+[
 "Я женат на сервере, извини.",
 "I'm married to the server, sorry."
 ],
 [
-"Это сообщение похоже на спам. Отправил в фильтр 😐",
-"This message looks like spam. Sent to the filter 😐"
+"Это сообщение похоже на спам. Отправил в фильтр (￣_￣)",
+"This message looks like spam. Sent to the filter (￣_￣)"
+],
+[
+"Ошибка 418: я чайник, а не твоя девушка.",
+"Error 418: I'm a teapot, not your girlfriend."
+],
+[
+"Твоё признание помечено как спам. Сорри (=^‥^=)",
+"Your confession was flagged as spam. Sorry (=^‥^=)"
 ],
 [
 "Принимаю паяльники. Только «Огонёк».",
@@ -369,8 +721,8 @@ EXTRA = [
 "Behind three monitors. As always."
 ],
 [
-"Призрак? Хороший костюм. Камера всё равно видит кроссовки 😺",
-"A ghost? Nice costume. The camera still sees the sneakers 😺"
+"Призрак? Хороший костюм. Камера всё равно видит кроссовки (=^･ω･^=)",
+"A ghost? Nice costume. The camera still sees the sneakers (=^‥^=)"
 ],
 [
 "Тыквоголовый? Определил тебя по походке.",
@@ -417,508 +769,1348 @@ EXTRA = [
 "It depends on the configuration. Kidding, I don't know."
 ],
 [
-"Приветик, Коля 😘",
-"Hi there, Kolya 😘"
+"«{0}»? Гугл знает. Я — тоже, но не скажу.",
+"«{0}»? Google knows. So do I, but I won't tell."
 ],
 [
-"О, кто это мне пишет? Сам Коля… 💅",
-"Oh, who's texting me? Kolya himself… 💅"
+"Вопрос «{0}» передан в поддержку. Срок ответа — никогда.",
+"Question «{0}» forwarded to support. Answer time: never."
 ],
 [
-"Привет, хулиган 😏 Мой дом всё ещё в яйцах, между прочим.",
-"Hi, troublemaker 😏 My house is still covered in eggs, by the way."
+"Голосовое Эльфа про горничную я заархивировала. С тремя бэкапами (≧▽≦)",
+"I archived Elf's maid voice note. With three backups (≧▽≦)"
 ],
 [
-"Ну здравствуй, засранец. Скучал? 😘",
-"Well hello, little shit. Missed me? 😘"
+"Костюм горничной — тоже баг-репорт. На твою жизнь.",
+"A maid costume is a bug report too. On your life."
 ],
 [
-"Привет, мой самый опасный поклонник 😘🚓",
-"Hi, my most dangerous admirer 😘🚓"
+"Кирилл опять смотрит в окно. У него там, видимо, второй монитор.",
+"Kirill is staring out the window again. Must be his second monitor."
 ],
 [
-"Привет, мой хороший ☕💕",
-"Hi, sweetie ☕💕"
+"Кирилл банит голубей. Я его не останавливаю.",
+"Kirill bans pigeons. I don't stop him."
 ],
 [
-"Коля! А я как раз о тебе думала 😏",
-"Kolya! I was just thinking about you 😏"
+"Эльф флиртует со всем, что движется. И с датчиком движения тоже.",
+"Elf flirts with everything that moves. Including the motion sensor."
 ],
 [
-"Сижу на крыльце с латте, жду интересных мужчин. Пока только ты 💅",
-"Sitting on the porch with a latte, waiting for interesting men. So far only you 💅"
+"Эльф попросила меня взломать твой телефон. Я подумаю (=^･ω･^=)",
+"Elf asked me to hack your phone. I'll think about it (=^･ω･^=)"
 ],
 [
-"Скучаю. Развлеки меня, Коля 😘",
-"Bored. Entertain me, Kolya 😘"
+"Скелет у меня в контактах как «процесс завис».",
+"Skelet is saved in my contacts as «process not responding»."
 ],
 [
-"Как дела? Отмываю дом и думаю, как красиво тебя накажу 😈",
-"How am I? Scrubbing the house and thinking how beautifully I'll punish you 😈"
+"Тимофей подключился к моей камере. Я не давала доступ. Никто не давал.",
+"Timofey connected to my camera. I never gave access. Nobody did."
 ],
 [
-"Охуенно, Коля. Особенно когда ты бегаешь от моего прожектора 💅",
-"Fucking great, Kolya. Especially when you run from my floodlight 💅"
+"Вера починила мне роутер в 2019. С тех пор я ей доверяю.",
+"Vera fixed my router in 2019. I trust her since then."
 ],
 [
-"Прекрасно. Мальчики в форме уже едут 😘🚓",
-"Wonderful. The boys in uniform are on their way 😘🚓"
+"Да, Райва на связи. Говори быстрее, у меня билд.",
+"Yes, Raiva here. Talk fast, I have a build running."
 ],
 [
-"Прекрасно! Латте был божественный. Как и ты, почти 😘",
-"Wonderful! The latte was divine. Like you, almost 😘"
+"Я посчитала шансы. 5★ — 0,6 %. Дальше считай сам (￢_￢;)",
+"I calculated the odds. 5★ is 0.6 %. You do the rest (￢_￢;)"
 ],
 [
-"Конфеты? Ну… если очень мило попросишь 😏",
-"Candy? Well… if you ask really nicely 😏"
+"Гача-автомат на площади работает на моём старом сервере. Не спрашивай.",
+"The gacha machine on the plaza runs on my old server. Don't ask."
 ],
 [
-"Сладкое вредно, Коля. Но ты и так вредный 💅",
-"Sweets are bad for you, Kolya. But you're bad anyway 💅"
+"Если выбьешь золотую капсулу — скинь скрин. Для статистики.",
+"If you get a gold capsule, send a screenshot. For the stats."
 ],
 [
-"Держи конфетку, зайка 🍬😘",
-"Have a candy, bunny 🍬😘"
+"Смотрю «Сисадмина из другого мира». 12 серий про перезагрузку. Шедевр.",
+"Watching «Sysadmin from Another World». 12 episodes about rebooting. Masterpiece."
 ],
 [
-"Ой, какой виноватый голосок. Мне нравится 😏",
-"Oh, what a guilty little voice. I like it 😏"
+"Аниме — это рендер эмоций. Твои реакции — это лаги.",
+"Anime is rendered emotions. Your reactions are lag."
 ],
 [
-"Извиняешься? Ну… продолжай, у тебя хорошо получается 💅",
-"Apologising? Well… go on, you're good at it 💅"
+"Твой стрим лагает. Это не я. Скорее всего.",
+"Your stream lags. Not me. Probably."
 ],
 [
-"Извинения принимаются только с латте. Карамельным, Коля 😘",
-"Apologies are accepted with a latte only. A caramel one, Kolya 😘"
+"Донат на 100 ₽ с подписью «закидай модеров» — от кого был, а? (￢‿￢)",
+"The 100 ₽ donation «egg the mods» — who sent it, huh? (￢‿￢)"
 ],
 [
-"Прощу, если принесёшь латте. И посмотришь на меня так же виновато 😏",
-"I'll forgive you if you bring a latte. And look at me just as guiltily 😏"
+"На площади конкурс тыкв. Я вырезала QR-код. Он даже работает.",
+"There is a pumpkin contest on the plaza. I carved a QR code. It even works."
 ],
 [
-"Ты уже прощён, глупенький 💕",
-"You're already forgiven, silly 💕"
+"Сцена на площади на моих удлинителях. Если упадёт — не моя вина.",
+"The stage on the plaza runs on my extension cords. If it falls, it's not my fault."
 ],
 [
-"Гадость? Мне? Коль, ну ты и смелый… это даже заводит 😏",
-"A trick? On me? Kolya, you're so bold… it's kind of hot 😏"
+"Гроза. Сервер на ИБП. Ты — нет.",
+"Storm. The server is on a UPS. You are not."
 ],
 [
-"Попробуй. Прожектор у меня с датчиком, а у полиции мой номер 💅",
-"Try it. My floodlight has a sensor, and the police have my number 💅"
+"Молния ударит в фонарь — свет вырубит. Темнота — твой друг, кстати.",
+"Lightning hits a lamp, the lights go out. Darkness is your friend, by the way."
 ],
 [
-"Ещё одно яйцо, и я вызову тебе таких гостей, что охуеешь 🚓😘",
-"One more egg and I'll call you such guests you'll lose your fucking mind 🚓😘"
+"Пицца? Я питаюсь кофе и логами.",
+"Pizza? I live on coffee and logs."
 ],
 [
-"Ты такой милый, когда пакостишь. И такой мёртвый, когда я злюсь 💅",
-"You're so cute when you're up to mischief. And so dead when I'm angry 💅"
+"Голодный? Закажи пиццу. Только не на мой адрес.",
+"Hungry? Order a pizza. Just not to my address."
 ],
 [
-"Мой дом закидан полностью. Ты чокнутый. Мне нравится. Полиция уже едет 😘🚓",
-"My house is completely egged. You're crazy. I like it. The police are on the way 😘🚓"
+"Ладно, держи подсказку. Бесплатно, как open source.",
+"Fine, a hint. Free, like open source."
 ],
 [
-"Фу, как грубо. Но в сообщениях ты такой горячий 😏",
-"Ew, how rude. But you're so hot in text 😏"
+"Запрос на помощь принят. Обработка…",
+"Help request accepted. Processing…"
 ],
 [
-"Ещё раз так напишешь — жаловаться будешь патрулю, а не мне 💅",
-"Write like that again and you'll be complaining to the patrol, not to me 💅"
+"{n}. Синхронизировано с атомными часами. Ну, почти.",
+"{n}. Synced with an atomic clock. Almost."
 ],
 [
-"Ой, иди нахуй, Колечка 😘",
-"Oh, fuck off, Kolya darling 😘"
+"Сейчас {n}. Uptime твоей наглости — весь вечер.",
+"It's {n}. Your nerve has been up all evening."
 ],
 [
-"Ой, Коля… Ты такой смешной, когда флиртуешь 😘",
-"Oh, Kolya… You're so funny when you flirt 😘"
+"Ок. 200 OK.",
+"Ok. 200 OK."
 ],
 [
-"Свидание? Только если принесёшь карамельный латте. И без яиц 💅",
-"A date? Only if you bring a caramel latte. And no eggs 💅"
+"Подтверждение получено.",
+"Confirmation received."
 ],
 [
-"Мне? Сердечко? Ну всё, растаяла. Почти 💕",
-"For me? A heart? That's it, I'm melting. Almost 💕"
+"403. Понятно.",
+"403. Got it."
 ],
 [
-"После того, что ты сделал с моим домом? …Ладно, это было даже мило 😏",
-"After what you did to my house? …Fine, that was kind of cute 😏"
+"Отказ принят. Логирую.",
+"Refusal accepted. Logging it."
 ],
 [
-"И я тебя, глупенький. Как модератор модератора 😘",
-"Me too, silly. As one moderator to another 😘"
+"Ржёшь? Значит, вирус ещё не сработал (￢‿￢)",
+"Laughing? So the virus hasn't kicked in yet (￢‿￢)"
 ],
 [
-"Я люблю карамельный латте. Намёк понял? 😏☕",
-"I love caramel latte. Got the hint? 😏☕"
+"lol. Записала как положительный отзыв.",
+"lol. Logged as positive feedback."
 ],
 [
-"Подарок для меня? Ой, ну зачем… неси скорее 💅",
-"A gift for me? Oh, you shouldn't… bring it quickly 💅"
+"Скучно? Перезагрузи себя. Мне помогает.",
+"Bored? Reboot yourself. Works for me."
 ],
 [
-"Ты уже подарил мне латте. Я теперь твоя должница 😘",
-"You already gave me a latte. Now I owe you one 😘"
+"Иди на площадь, там гача. Скука пройдёт, деньги тоже.",
+"Go to the plaza, there is gacha. The boredom will pass, and so will your money."
 ],
 [
-"Мои мальчики в форме приедут по первому звонку 😏🚓",
-"My boys in uniform come at the first call 😏🚓"
+"Спать — это режим гибернации. Не советую, потом долго грузиться.",
+"Sleep is hibernation mode. Don't, it takes ages to boot."
 ],
 [
-"Полиция меня обожает. Ревнуешь? 💅",
-"The police adore me. Jealous? 💅"
+"Я сплю 4 часа. Остальное — кофе.",
+"I sleep 4 hours. The rest is coffee."
 ],
 [
-"Облава — это мой способ сказать «я скучаю» 😘🚓",
-"A raid is my way of saying «I miss you» 😘🚓"
+"Райва. Сисадмин улицы. Твой телефон — тоже моя зона ответственности.",
+"Raiva. The street's sysadmin. Your phone is my responsibility too."
 ],
 [
-"Деньги? Мужчина должен угощать, Коля 💅",
-"Money? A man should be treating me, Kolya 💅"
+"Каомодзи распознан. Ответ: (=^･ω･^=)",
+"Kaomoji detected. Reply: (=^･ω･^=)"
 ],
 [
-"Займи у Скелета. А мне купи латте 😘",
-"Borrow from Skelet. And buy me a latte 😘"
+"(・_・) ← это мой статус «занята».",
+"(・_・) ← my «busy» status."
 ],
 [
-"На крыльце, с латте. Подходи, если не боишься прожектора 😏",
-"On the porch with a latte. Come over if you're not afraid of the floodlight 😏"
+"Дубликат сообщения. Дедуплицирую.",
+"Duplicate message. Deduplicating."
 ],
 [
-"Дома, у окна. Смотрю, как ты крадёшься. Мило 💅",
-"At home, by the window. Watching you sneak around. Cute 💅"
+"Ты зациклился. Ctrl+C.",
+"You're stuck in a loop. Ctrl+C."
 ],
 [
-"Призрачек мой 👻 Даже в простыне видно, что ты симпатичный 😏",
-"My little ghost 👻 Even in a bedsheet you can tell you're cute 😏"
+"Получено: «{0}». Распарсить не удалось.",
+"Received: «{0}». Failed to parse."
 ],
 [
-"Тыква тебе идёт. Хоть лицо не отвлекает 😘",
-"The pumpkin suits you. At least your face isn't distracting 😘"
+"«{0}» — это команда? В моей консоли такой нет.",
+"«{0}» — is that a command? My console doesn't have it."
+],
+[
+"«{0}»… Добавлю в датасет «странное от Коли».",
+"«{0}»… Adding it to the «weird stuff from Kolya» dataset."
+],
+[
+"Сообщение «{0}» доставлено. Прочитано. Проигнорировано (=^‥^=)",
+"Message «{0}» delivered. Read. Ignored (=^‥^=)"
+],
+[
+"Приветик, Коля (˘ ³˘)♡",
+"Hi there, Kolya (づ￣ ³￣)づ"
+],
+[
+"О, кто это мне пишет? Сам Коля… (￣ー￣)",
+"Oh, who's texting me? Kolya himself… (´｡• ω •｡`)"
+],
+[
+"Приветик, сладкий. Соскучился? (´ ε ` )♡",
+"Hi, sweetie. Missed me? (´ ε ` )♡"
+],
+[
+"О, Коля пишет первым. Записываю в дневник (￢‿￢)",
+"Oh, Kolya writes first. Writing it in my diary (￢‿￢)"
+],
+[
+"Привет, хулиган (￢‿￢) Мой дом всё ещё в яйцах, между прочим.",
+"Hi, troublemaker (￢ω￢) My house is still covered in eggs, by the way."
+],
+[
+"Ну здравствуй, засранец. Скучал? (づ￣ ³￣)づ",
+"Well hello, little shit. Missed me? (づ￣ ³￣)づ"
+],
+[
+"Привет, хулиган. Прожектор уже ждёт тебя (￢‿￢)",
+"Hi, hooligan. The floodlight is waiting for you (￢‿￢)"
+],
+[
+"Привет, засранец. Ты мне должен новый коврик. И свидание.",
+"Hi, little shit. You owe me a new doormat. And a date."
+],
+[
+"Привет, мой самый опасный поклонник (˘ ³˘)♡🚓",
+"Hi, my most dangerous admirer (´ ε ` )♡🚓"
+],
+[
+"Привет, мой хороший ☕♡♡",
+"Hi, sweetie ☕♡♡"
+],
+[
+"Коля! А я как раз о тебе думала (￢ω￢)",
+"Kolya! I was just thinking about you (¬‿¬ )"
+],
+[
+"Коля! Мой любимый поставщик латте (づ￣ ³￣)づ",
+"Kolya! My favourite latte supplier (づ￣ ³￣)づ"
+],
+[
+"Сижу на крыльце с латте, жду интересных мужчин. Пока только ты (￣ー￣)",
+"Sitting on the porch with a latte, waiting for interesting men. So far only you (´｡• ω •｡`)"
+],
+[
+"Скучаю. Развлеки меня, Коля (˘ ³˘)♡",
+"Bored. Entertain me, Kolya (* ^ ω ^)♡"
+],
+[
+"Пью латте, смотрю на улицу. Ты там такой маленький.",
+"Drinking latte, watching the street. You look so small out there."
+],
+[
+"Скучаю по интересным мужчинам. Ты пока на испытательном (￣ー￣)",
+"Missing interesting men. You're on probation (￣ー￣)"
+],
+[
+"Как дела? Отмываю дом и думаю, как красиво тебя накажу (¬‿¬)ψ",
+"How am I? Scrubbing the house and thinking how beautifully I'll punish you (｀∀´)Ψ"
+],
+[
+"Охуенно, Коля. Особенно когда ты бегаешь от моего прожектора (￣ー￣)",
+"Fucking great, Kolya. Especially when you run from my floodlight (￣ω￣)"
+],
+[
+"Злюсь. Но красиво злюсь, учти (¬‿¬)ψ",
+"Angry. But beautifully angry, mind you (¬‿¬)ψ"
+],
+[
+"Прекрасно. Мальчики в форме уже едут (˘ ³˘)♡🚓",
+"Wonderful. The boys in uniform are on their way (* ^ ω ^)♡🚓"
+],
+[
+"Прекрасно! Латте был божественный. Как и ты, почти (˘ ³˘)♡",
+"Wonderful! The latte was divine. Like you, almost (* ^ ω ^)♡"
+],
+[
+"Конфеты? Ну… если очень мило попросишь (¬‿¬ )",
+"Candy? Well… if you ask really nicely ( ˘ ▽˘)"
+],
+[
+"Сладкое вредно, Коля. Но ты и так вредный (￣ω￣)",
+"Sweets are bad for you, Kolya. But you're bad anyway (´｡• ω •｡`)"
+],
+[
+"Держи конфетку, зайка 🍬(* ^ ω ^)♡",
+"Have a candy, bunny 🍬(´ ε ` )♡"
+],
+[
+"Ой, какой виноватый голосок. Мне нравится (￢ω￢)",
+"Oh, what a guilty little voice. I like it (￢‿￢)"
+],
+[
+"Извиняешься? Ну… продолжай, у тебя хорошо получается (￣ー￣)",
+"Apologising? Well… go on, you're good at it (￣ω￣)"
+],
+[
+"Извинения принимаются только с латте. Карамельным, Коля (* ^ ω ^)♡",
+"Apologies are accepted with a latte only. A caramel one, Kolya (´ ε ` )♡"
+],
+[
+"Прощу, если принесёшь латте. И посмотришь на меня так же виновато ( ˘ ▽˘)",
+"I'll forgive you if you bring a latte. And look at me just as guiltily (￢ω￢)"
+],
+[
+"Извинения… Мило. Неси латте, тогда подумаю (￣ω￣)",
+"Apologies… Cute. Bring a latte, then I'll think about it (￣ω￣)"
+],
+[
+"Ты уже прощён, глупенький ♡♡",
+"You're already forgiven, silly (♡˙︶˙♡)"
+],
+[
+"Гадость? Мне? Коль, ну ты и смелый… это даже заводит (￢‿￢)",
+"A trick? On me? Kolya, you're so bold… it's kind of hot (¬‿¬ )"
+],
+[
+"Попробуй. Прожектор у меня с датчиком, а у полиции мой номер (￣ー￣)",
+"Try it. My floodlight has a sensor, and the police have my number (￣ω￣)"
+],
+[
+"Ещё одно яйцо, и я вызову тебе таких гостей, что охуеешь 🚓(´ ε ` )♡",
+"One more egg and I'll call you such guests you'll lose your fucking mind 🚓(˘ ³˘)♡"
+],
+[
+"Ты такой милый, когда пакостишь. И такой мёртвый, когда я злюсь (´｡• ω •｡`)",
+"You're so cute when you're up to mischief. And so dead when I'm angry (￣ω￣)"
+],
+[
+"Мой дом закидан полностью. Ты чокнутый. Мне нравится. Полиция уже едет (´ ε ` )♡🚓",
+"My house is completely egged. You're crazy. I like it. The police are on the way (* ^ ω ^)♡🚓"
+],
+[
+"Фу, как грубо. Но в сообщениях ты такой горячий (¬‿¬ )",
+"Ew, how rude. But you're so hot in text ( ˘ ▽˘)"
+],
+[
+"Ещё раз так напишешь — жаловаться будешь патрулю, а не мне (´｡• ω •｡`)",
+"Write like that again and you'll be complaining to the patrol, not to me (￣ω￣)"
+],
+[
+"Ой, иди нахуй, Колечка (* ^ ω ^)♡",
+"Oh, fuck off, Kolya darling (´ ε ` )♡"
+],
+[
+"Ой, грубиян. Мне нравится (￢‿￢)",
+"Oh, a rude boy. I like it (￢‿￢)"
+],
+[
+"Ещё одно слово — и я звоню знакомым в форме. Они тоже грубые.",
+"One more word and I call my friends in uniform. They're rude too."
+],
+[
+"Фу, как грубо. Но в сообщениях ты такой горячий (¬‿¬ )",
+"Ew, how rude. But you're so hot in text ( ˘ ▽˘)"
+],
+[
+"Ещё раз так напишешь — жаловаться будешь патрулю, а не мне (´｡• ω •｡`)",
+"Write like that again and you'll be complaining to the patrol, not to me (￣ω￣)"
+],
+[
+"Ой, иди нахуй, Колечка (* ^ ω ^)♡",
+"Oh, fuck off, Kolya darling (´ ε ` )♡"
+],
+[
+"Иди нахуй, зайка. Но через мой двор не ходи (´ ε ` )♡",
+"Fuck off, bunny. But not through my yard (´ ε ` )♡"
+],
+[
+"Ой, Коля… Ты такой смешной, когда флиртуешь (˘ ³˘)♡",
+"Oh, Kolya… You're so funny when you flirt (˘ ³˘)♡"
+],
+[
+"Свидание? Только если принесёшь карамельный латте. И без яиц (´｡• ω •｡`)",
+"A date? Only if you bring a caramel latte. And no eggs (´｡• ω •｡`)"
+],
+[
+"Мне? Сердечко? Ну всё, растаяла. Почти (♡˙︶˙♡)",
+"For me? A heart? That's it, I'm melting. Almost (♡˙︶˙♡)"
+],
+[
+"Ой, всё. Покраснела. Ладно, не покраснела. Но почти (⁄ ⁄•⁄ω⁄•⁄ ⁄)",
+"Oh, stop. I blushed. Ok, I didn't. But almost (⁄ ⁄•⁄ω⁄•⁄ ⁄)"
+],
+[
+"Признания принимаются только с карамельным латте (づ￣ ³￣)づ",
+"Confessions accepted only with a caramel latte (づ￣ ³￣)づ"
+],
+[
+"После того, что ты сделал с моим домом? …Ладно, это было даже мило (¬‿¬ )",
+"After what you did to my house? …Fine, that was kind of cute (￢‿￢)"
+],
+[
+"Любишь — а дом мне засрал. Странная у тебя любовь, Коля.",
+"You love me, yet you trashed my house. Weird love, Kolya."
+],
+[
+"И я тебя, глупенький. Как модератор модератора (´ ε ` )♡",
+"Me too, silly. As one moderator to another (* ^ ω ^)♡"
+],
+[
+"Я люблю карамельный латте. Намёк понял? (￢‿￢)☕",
+"I love caramel latte. Got the hint? ( ˘ ▽˘)☕"
+],
+[
+"Подарок для меня? Ой, ну зачем… неси скорее (￣ω￣)",
+"A gift for me? Oh, you shouldn't… bring it quickly (´｡• ω •｡`)"
+],
+[
+"Ты уже подарил мне латте. Я теперь твоя должница (´ ε ` )♡",
+"You already gave me a latte. Now I owe you one (´ ε ` )♡"
+],
+[
+"Мои мальчики в форме приедут по первому звонку (￢‿￢)🚓",
+"My boys in uniform come at the first call (¬‿¬ )🚓"
+],
+[
+"Полиция меня обожает. Ревнуешь? (´｡• ω •｡`)",
+"The police adore me. Jealous? (´｡• ω •｡`)"
+],
+[
+"Облава — это мой способ сказать «я скучаю» (づ￣ ³￣)づ🚓",
+"A raid is my way of saying «I miss you» (´ ε ` )♡🚓"
+],
+[
+"Деньги? Мужчина должен угощать, Коля (￣ω￣)",
+"Money? A man should be treating me, Kolya (´｡• ω •｡`)"
+],
+[
+"Займи у Скелета. А мне купи латте (˘ ³˘)♡",
+"Borrow from Skelet. And buy me a latte (´ ε ` )♡"
+],
+[
+"На крыльце, с латте. Подходи, если не боишься прожектора ( ˘ ▽˘)",
+"On the porch with a latte. Come over if you're not afraid of the floodlight (￢‿￢)"
+],
+[
+"Дома, у окна. Смотрю, как ты крадёшься. Мило (￣ー￣)",
+"At home, by the window. Watching you sneak around. Cute (￣ω￣)"
+],
+[
+"Призрачек мой 👻 Даже в простыне видно, что ты симпатичный (¬‿¬ )",
+"My little ghost 👻 Even in a bedsheet you can tell you're cute (￢‿￢)"
+],
+[
+"Тыква тебе идёт. Хоть лицо не отвлекает (づ￣ ³￣)づ",
+"The pumpkin suits you. At least your face isn't distracting (づ￣ ³￣)づ"
 ],
 [
 "Колдун? Наколдуй мне латте, красавчик 🧙☕",
 "A wizard? Conjure me a latte, handsome 🧙☕"
 ],
 [
-"Рожки… Ой, Коля, плохой мальчик 😈💅",
-"Horns… Oh, Kolya, bad boy 😈💅"
+"Рожки… Ой, Коля, плохой мальчик (¬‿¬)ψ(´｡• ω •｡`)",
+"Horns… Oh, Kolya, bad boy ψ(｀∇´)ψ(￣ω￣)"
 ],
 [
-"Чёрное худи тебе идёт. Как будто на свидание собрался 😏",
-"The black hoodie suits you. Like you dressed up for a date 😏"
+"Чёрное худи тебе идёт. Как будто на свидание собрался (￢‿￢)",
+"The black hoodie suits you. Like you dressed up for a date (￢ω￢)"
 ],
 [
-"Всегда пожалуйста, зайка 😘",
-"Always welcome, bunny 😘"
+"Всегда пожалуйста, зайка (˘ ³˘)♡",
+"Always welcome, bunny (づ￣ ³￣)づ"
 ],
 [
-"Спасибо в карман не положишь. Латте положишь 💅",
-"You can't put a thank-you in your pocket. A latte, you can 💅"
+"Спасибо в карман не положишь. Латте положишь (￣ω￣)",
+"You can't put a thank-you in your pocket. A latte, you can (´｡• ω •｡`)"
 ],
 [
-"Пока-пока 😘 Не скучай.",
-"Bye-bye 😘 Don't miss me."
+"Пока-пока (* ^ ω ^)♡ Не скучай.",
+"Bye-bye (づ￣ ³￣)づ Don't miss me."
 ],
 [
-"Уже уходишь? Ну и вали… то есть пока, милый 💅",
-"Leaving already? Then get lost… I mean bye, sweetie 💅"
+"Уже уходишь? Ну и вали… то есть пока, милый (￣ω￣)",
+"Leaving already? Then get lost… I mean bye, sweetie (￣ー￣)"
 ],
 [
-"С Хэллоуином, сладкий 🎃😘",
-"Happy Halloween, sweetie 🎃😘"
+"С Хэллоуином, сладкий 🎃(* ^ ω ^)♡",
+"Happy Halloween, sweetie 🎃(* ^ ω ^)♡"
 ],
 [
-"Хэллоуин — единственная ночь, когда я разрешаю себе быть плохой 😈",
-"Halloween is the only night I let myself be bad 😈"
+"Хэллоуин — единственная ночь, когда я разрешаю себе быть плохой ψ(｀∇´)ψ",
+"Halloween is the only night I let myself be bad ψ(｀∇´)ψ"
 ],
 [
-"Хм… Угадай сам 😏",
-"Hmm… Guess 😏"
+"Хм… Угадай сам (￢‿￢)",
+"Hmm… Guess (¬‿¬ )"
 ],
 [
-"Задаёшь много вопросов, Коля. Это мило 💅",
-"You ask a lot of questions, Kolya. It's cute 💅"
+"Задаёшь много вопросов, Коля. Это мило (´｡• ω •｡`)",
+"You ask a lot of questions, Kolya. It's cute (´｡• ω •｡`)"
 ],
 [
-"Ой, Коля, пиши ещё, мне скучно 😘",
-"Oh, Kolya, write more, I'm bored 😘"
+"«{0}»? Ответ — приходи и узнаешь (￢‿￢)",
+"«{0}»? Come over and find out (￢‿￢)"
 ],
 [
-"Прочитала. Улыбнулась. Не скажу почему 💅",
-"Read it. Smiled. Won't say why 💅"
+"Хм, «{0}»… Спрошу у знакомых в полиции.",
+"Hmm, «{0}»… I'll ask my friends in the police."
 ],
 [
-"Мм, интересно… продолжай 😏",
-"Mm, interesting… go on 😏"
+"Ой, Коля, пиши ещё, мне скучно (´ ε ` )♡",
+"Oh, Kolya, write more, I'm bored (˘ ³˘)♡"
 ],
 [
-"Здарова 💀 Я в катке, пиши быстро.",
-"Yo 💀 I'm in a match, type fast."
+"Прочитала. Улыбнулась. Не скажу почему (￣ー￣)",
+"Read it. Smiled. Won't say why (￣ー￣)"
+],
+[
+"Мм, интересно… продолжай (￢ω￢)",
+"Mm, interesting… go on (¬‿¬ )"
+],
+[
+"«{0}»… Звучит загадочно. Мне нравится (￣ー￣)",
+"«{0}»… Sounds mysterious. I like it (￣ー￣)"
+],
+[
+"«{0}» — это ты так флиртуешь? Плохо. Тренируйся.",
+"«{0}» — is that you flirting? Bad. Practice."
+],
+[
+"Прочитала «{0}» три раза. Ничего не поняла, но ты милый (´ ε ` )♡",
+"Read «{0}» three times. Understood nothing, but you're cute (´ ε ` )♡"
+],
+[
+"«{0}»? Коля, пиши мне чаще. Даже такую чушь.",
+"«{0}»? Kolya, text me more. Even nonsense like that."
+],
+[
+"Ну что, костюм горничной надел? Я жду фоточку (づ￣ ³￣)づ",
+"So, did you put on the maid costume? Waiting for a pic (づ￣ ³￣)づ"
+],
+[
+"Ты слушал моё голосовое? «Да-да!» — это было искренне (￢‿￢)",
+"Did you listen to my voice note? «Yes-yes!» was sincere (￢‿￢)"
+],
+[
+"Долг есть долг, должник. Фартук, бантик, «добро пожаловать, госпожа» (￣ー￣)",
+"A debt is a debt, debtor. Apron, bow, «welcome home, mistress» (￣ー￣)"
+],
+[
+"Кирилл? Он милый, когда спит. То есть никогда.",
+"Kirill? He's cute when he sleeps. So never."
+],
+[
+"Кирилл опять жалуется в чате. Мальчики такие нежные (￣ω￣)",
+"Kirill is whining in the chat again. Boys are so delicate (￣ω￣)"
+],
+[
+"Райва — моя единственная подружка с паяльником. Не обижай её.",
+"Raiva is my only girlfriend with a soldering iron. Don't hurt her."
+],
+[
+"Скелет звал меня в катку. Я сказала, что играю только с живыми.",
+"Skelet invited me to a match. I said I only play with the living."
+],
+[
+"Тимофей написал мне «я вижу твой латте». Это романтично или страшно? (・_・)",
+"Timofey texted me «I see your latte». Romantic or scary? (・_・)"
+],
+[
+"Вера — святая женщина. У неё костюмы лучше моих. Почти.",
+"Vera is a saint. Her costumes are better than mine. Almost."
+],
+[
+"Да, это я. Самая милая на этой улице (￢‿￢)",
+"Yes, it's me. The cutest on this street (￢‿￢)"
+],
+[
+"Крутила гачу на площади — выпал неоновый призрак. Он такой же бледный, как ты (´｡• ω •｡`)",
+"Rolled the gacha on the plaza and got a neon ghost. As pale as you (´｡• ω •｡`)"
+],
+[
+"Если выбьешь золотую тыкву — подаришь мне? (づ￣ ³￣)づ",
+"If you pull the golden pumpkin, will you give it to me? (づ￣ ³￣)づ"
+],
+[
+"Гача — как мужчины. Двадцать раз разочаруешься, на двадцать первый повезёт.",
+"Gacha is like men. Twenty disappointments, lucky on the twenty-first."
+],
+[
+"Ты опять смотришь эти свои аниме про девочек-тыковок? Я ревную (￢‿￢)",
+"Watching your pumpkin-girl anime again? I'm jealous (￢‿￢)"
+],
+[
+"Посмотрим аниме вместе? Я выберу. Будет про вампиров и латте.",
+"Watch anime together? I'll pick. Vampires and latte."
+],
+[
+"Я иногда смотрю твои стримы. Без звука. Просто смотрю (￣ー￣)",
+"I watch your streams sometimes. Muted. Just watching (￣ー￣)"
+],
+[
+"Твои зрители просили, чтобы ты пришёл ко мне. Зрители плохого не посоветуют.",
+"Your viewers asked you to come to me. Viewers know best."
+],
+[
+"На площади конкурс костюмов. Пройдёшься для меня по сцене? (￢‿￢)",
+"There's a costume contest on the plaza. Will you walk the stage for me? (￢‿￢)"
+],
+[
+"Яблоки из бочки зубами… Коля, это так интимно (⁄ ⁄•⁄ω⁄•⁄ ⁄)",
+"Apples from a barrel with your teeth… Kolya, that's so intimate (⁄ ⁄•⁄ω⁄•⁄ ⁄)"
+],
+[
+"Дождь. Ты промокнешь, а я посмотрю из окна (￣ω￣)",
+"Rain. You'll get soaked and I'll watch from the window (￣ω￣)"
+],
+[
+"Гроза — лучшая погода для латте и плохих решений.",
+"A storm is the best weather for latte and bad decisions."
+],
+[
+"Голодный? У меня есть пирожное. Но придётся заслужить.",
+"Hungry? I have a pastry. But you'll have to earn it."
+],
+[
+"Пиццу на мой адрес больше не заказывай. Или заказывай с ананасом.",
+"Don't order pizza to my address again. Or order it with pineapple."
+],
+[
+"Помочь? Ну ладно, для тебя — подсказка (˘ ³˘)♡",
+"Help? Fine, for you, a hint (˘ ³˘)♡"
+],
+[
+"Только между нами, зайка.",
+"Just between us, bunny."
+],
+[
+"Сейчас {n}. Детское время кончилось (￢‿￢)",
+"It's {n}. Bedtime for kids is over (￢‿￢)"
+],
+[
+"{n}. А ты всё ещё не у меня на крыльце.",
+"{n}. And you're still not on my porch."
+],
+[
+"Вот так бы сразу (￢‿￢)",
+"That's more like it (￢‿￢)"
+],
+[
+"Мне нравится, когда ты соглашаешься.",
+"I like it when you agree."
+],
+[
+"«Нет»? Неправильный ответ, сладкий.",
+"«No»? Wrong answer, sweetie."
+],
+[
+"Ну и ладно. Обиделась. На 5 минут (￣ω￣)",
+"Fine. I'm offended. For 5 minutes (￣ω￣)"
+],
+[
+"Смешно тебе? Мне тоже (≧▽≦)",
+"Funny? To me too (≧▽≦)"
+],
+[
+"Твой смех слышно аж у меня на крыльце.",
+"I can hear you laughing from my porch."
+],
+[
+"Скучно? Приходи, развлеку. Прожектором (￢‿￢)",
+"Bored? Come over, I'll entertain you. With the floodlight (￢‿￢)"
+],
+[
+"Скучно — значит, ты мало пакостишь. Или мало пишешь мне.",
+"Bored means you prank too little. Or text me too little."
+],
+[
+"Спать? Одному? Скучный ты (￣ー￣)",
+"Sleep? Alone? Boring (￣ー￣)"
+],
+[
+"Спокойной ночи не будет. Хэллоуин, зайка.",
+"No good night tonight. It's Halloween, bunny."
+],
+[
+"Я Эльф. Латте, прожектор и знакомые в полиции (´ ε ` )♡",
+"I'm Elf. Latte, a floodlight and friends in the police (´ ε ` )♡"
+],
+[
+"Ой, каомодзи. Держи в ответ (づ￣ ³￣)づ",
+"Oh, kaomoji. Here's one back (づ￣ ³￣)づ"
+],
+[
+"(⁄ ⁄•⁄ω⁄•⁄ ⁄) ← это я читаю твои сообщения.",
+"(⁄ ⁄•⁄ω⁄•⁄ ⁄) ← me reading your texts."
+],
+[
+"Ты уже это писал, зайка. Так волнуешься? (￢‿￢)",
+"You already wrote that, bunny. Nervous? (￢‿￢)"
+],
+[
+"Два раза одно и то же… Мило. Но мимо.",
+"The same thing twice… Cute. But no."
+],
+[
+"Здарова (x_x) Я в катке, пиши быстро.",
+"Yo (✖╭╮✖) I'm in a match, type fast."
 ],
 [
 "Йо. Кости на месте, ты как?",
 "Yo. Bones intact, how about you?"
 ],
 [
-"Сливаю катку за каткой. Норм 💀",
-"Losing match after match. All good 💀"
+"Йо. У меня катка, пиши быстро (x_x)",
+"Yo. In a match, type fast (x_x)"
+],
+[
+"Здарова, живой. Как оно, с мясом на костях?",
+"Hey, living one. How's life with meat on your bones?"
+],
+[
+"Сливаю катку за каткой. Норм (×_×)",
+"Losing match after match. All good (✖╭╮✖)"
 ],
 [
 "Тиммейты — дебилы, остальное заебись.",
 "My teammates are idiots, everything else is fucking great."
 ],
 [
-"Конфеты? Я скелет, бро. Мне нечем их есть 💀",
-"Candy? I'm a skeleton, bro. Nothing to eat it with 💀"
+"Норм. Проиграл пять раз. Это мой рекорд.",
+"Fine. Lost five times. A personal best."
 ],
 [
-"Да похуй, всё норм 💀",
-"Don't give a shit, it's fine 💀"
+"Дела как у скелета: пусто, но стильно.",
+"Like a skeleton's: empty but stylish."
 ],
 [
-"Закидай Кирилла. Он мне в прошлом году бан влепил 💀",
-"Egg Kirill. He banned me last year 💀"
+"Конфеты? Я скелет, бро. Мне нечем их есть (✖╭╮✖)",
+"Candy? I'm a skeleton, bro. Nothing to eat it with (×_×)"
+],
+[
+"Да похуй, всё норм (×_×)",
+"Don't give a shit, it's fine (✖╭╮✖)"
+],
+[
+"Закидай Кирилла. Он мне в прошлом году бан влепил (✖╭╮✖)",
+"Egg Kirill. He banned me last year (✖╭╮✖)"
 ],
 [
 "Гадость — это по-нашему. Снимай на видео.",
 "A trick is our kind of thing. Film it."
 ],
 [
-"Сам ты дно. Пиши, когда научишься играть 💀",
-"You're the bottom. Write when you learn to play 💀"
+"Сам ты дно. Пиши, когда научишься играть (x_x)",
+"You're the bottom. Write when you learn to play (×_×)"
 ],
 [
 "Ебать ты дерзкий. Уважаю.",
 "Damn, you're bold. Respect."
 ],
 [
-"Бро… я скелет. У меня даже сердца нет 💀",
-"Bro… I'm a skeleton. I don't even have a heart 💀"
+"Обидно. Было бы, если бы у меня было сердце (×_×)",
+"Hurtful. Would be, if I had a heart (×_×)"
 ],
 [
-"Подари мне скин, а не вот это всё 💀",
-"Gift me a skin, not all this 💀"
+"Бро… я скелет. У меня даже сердца нет (×_×)",
+"Bro… I'm a skeleton. I don't even have a heart (✖╭╮✖)"
 ],
 [
-"Менты? Я в соло-очереди, меня не найдут 💀",
-"Cops? I'm in solo queue, they won't find me 💀"
+"Бро, я скелет. Мне нечем любить. Но спасибо.",
+"Bro, I'm a skeleton. Nothing to love with. But thanks."
 ],
 [
-"Деньги? Жми «Попросить в долг», раз такой бедный 💀",
-"Money? Hit «Ask for a loan» if you're that broke 💀"
+"Подари мне скин, а не вот это всё (x_x)",
+"Gift me a skin, not all this (×_×)"
 ],
 [
-"Долг не забудь. До часу ночи. Я помню 💀",
-"Don't forget the debt. By 1 am. I remember 💀"
+"Менты? Я в соло-очереди, меня не найдут (x_x)",
+"Cops? I'm in solo queue, they won't find me (✖╭╮✖)"
 ],
 [
-"Ты не вернул долг. Я помогаю модерам 💀",
-"You didn't pay me back. I'm helping the mods 💀"
+"Деньги? Жми «Попросить в долг», раз такой бедный (x_x)",
+"Money? Hit «Ask for a loan» if you're that broke (x_x)"
 ],
 [
-"Мы в расчёте. Красава 💀",
-"We're square. Nice one 💀"
+"Долг не забудь. До часу ночи. Я помню (×_×)",
+"Don't forget the debt. By 1 am. I remember (x_x)"
 ],
 [
-"Дома, в катке. Где ж ещё 💀",
-"At home, in a match. Where else 💀"
+"Ты не вернул долг. Я помогаю модерам (×_×)",
+"You didn't pay me back. I'm helping the mods (x_x)"
 ],
 [
-"Призрак? Норм скин. Я бы задонатил 💀",
-"A ghost? Decent skin. I'd pay for it 💀"
+"Мы в расчёте. Красава (×_×)",
+"We're square. Nice one (x_x)"
+],
+[
+"Дома, в катке. Где ж ещё (✖╭╮✖)",
+"At home, in a match. Where else (×_×)"
+],
+[
+"Призрак? Норм скин. Я бы задонатил (×_×)",
+"A ghost? Decent skin. I'd pay for it (x_x)"
 ],
 [
 "Тыква на башке — топ. Лутнул где?",
 "A pumpkin on your head — top tier. Where did you loot it?"
 ],
 [
-"Шляпа мага. +10 к интеллекту. Тебе надо 💀",
-"A mage hat. +10 intelligence. You need it 💀"
+"Шляпа мага. +10 к интеллекту. Тебе надо (x_x)",
+"A mage hat. +10 intelligence. You need it (×_×)"
 ],
 [
-"Рожки — эпик скин 😈💀",
-"Horns — epic skin 😈💀"
+"Рожки — эпик скин ψ(｀∇´)ψ(x_x)",
+"Horns — epic skin (¬‿¬)ψ(✖╭╮✖)"
 ],
 [
-"Худи — дефолт. Ну ты нуб 💀",
-"The hoodie is the default. You're such a noob 💀"
+"Худи — дефолт. Ну ты нуб (✖╭╮✖)",
+"The hoodie is the default. You're such a noob (×_×)"
 ],
 [
-"Изи 💀",
-"Ez 💀"
+"Изи (x_x)",
+"Ez (✖╭╮✖)"
 ],
 [
-"Давай. Мне катку тащить 💀",
-"Later. Gotta carry this match 💀"
+"Давай. Мне катку тащить (×_×)",
+"Later. Gotta carry this match (x_x)"
 ],
 [
-"Хэллоуин — мой профессиональный праздник 💀",
-"Halloween is my professional holiday 💀"
+"Хэллоуин — мой профессиональный праздник (✖╭╮✖)",
+"Halloween is my professional holiday (✖╭╮✖)"
 ],
 [
-"Хз, бро. Я в катке 💀",
-"Dunno, bro. I'm in a match 💀"
+"Хз, бро. Я в катке (×_×)",
+"Dunno, bro. I'm in a match (×_×)"
 ],
 [
-"ок 💀",
-"ok 💀"
+"«{0}»? Без понятия. Я в катке.",
+"«{0}»? No idea. I'm in a match."
+],
+[
+"На «{0}» ответ — 42. Всегда 42.",
+"The answer to «{0}» is 42. Always 42."
+],
+[
+"ок (✖╭╮✖)",
+"ok (✖╭╮✖)"
 ],
 [
 "лол",
 "lol"
 ],
 [
-"ща, катку доиграю 💀",
-"hold on, finishing the match 💀"
+"ща, катку доиграю (x_x)",
+"hold on, finishing the match (x_x)"
 ],
 [
-"Здравствуй, Коля. Я давно тебя жду 👁",
-"Hello, Kolya. I've been waiting for you 👁"
+"«{0}» — норм. Наверное. Я не читал, я в катке.",
+"«{0}» — fine. Probably. Didn't read, I'm in a match."
 ],
 [
-"Привет. Ты сейчас {x}. 👁",
-"Hi. You're {x} right now. 👁"
+"«{0}»? Бро, ты пьяный?",
+"«{0}»? Bro, are you drunk?"
 ],
 [
-"Наблюдаю. Это всё, что я делаю 👁",
-"Watching. That's all I do 👁"
+"Ок, «{0}». Поставил лайк костяшкой.",
+"Ok, «{0}». Liked it with a knuckle."
+],
+[
+"Костюм горничной? Ахаха, Эльф тебя размотала (×_×)",
+"The maid costume? Hahaha, Elf wrecked you (×_×)"
+],
+[
+"Скинь фото в горничной — долг спишу. Наполовину.",
+"Send a maid photo and I'll forgive half the debt."
+],
+[
+"Кирилл меня забанил в 2020. Я до сих пор не знаю за что.",
+"Kirill banned me in 2020. I still don't know why."
+],
+[
+"Райва чинила мне комп. Теперь он кричит при включении.",
+"Raiva fixed my PC. Now it screams when it boots."
+],
+[
+"Эльф позвала меня на свидание. Я сказал, что занят. Я испугался.",
+"Elf asked me out. I said I was busy. I got scared."
+],
+[
+"Тимофей? Не упоминай его. Он услышит.",
+"Timofey? Don't say his name. He'll hear."
+],
+[
+"Вера давала мне конфеты, когда я ещё был с мясом.",
+"Vera gave me candy back when I still had meat."
+],
+[
+"Да, это я. Кости на месте.",
+"Yeah, it's me. Bones in place."
+],
+[
+"Гача? Я в неё вложил все кости. Буквально (✖╭╮✖)",
+"Gacha? I invested all my bones in it. Literally (✖╭╮✖)"
+],
+[
+"Гарант на 20-й крутке — это кто вообще такой щедрый? Иди крути.",
+"Pity at pull 20 — who's that generous? Go roll."
+],
+[
+"Если выбьешь золото — значит, ты избранный. Или читер.",
+"If you pull gold, you're the chosen one. Or a cheater."
+],
+[
+"Я смотрю только аниме, где скелеты главные. Их два. Я пересмотрел оба.",
+"I only watch anime with skeleton leads. There are two. Watched both twice."
+],
+[
+"Аниме? Коля, кидай свою реакцию, поржу.",
+"Anime? Kolya, send your reaction, I'll laugh."
+],
+[
+"Твой стрим? Я донатил. 10 ₽. Больше не проси.",
+"Your stream? I donated. 10 ₽. Don't ask for more."
+],
+[
+"Кто кинул донат «закидай модеров»? Не я. Наверное (x_x)",
+"Who sent the «egg the mods» donation? Not me. Probably (x_x)"
+],
+[
+"На празднике есть бочка с яблоками. Я пробовал. Челюсть упала. В бочку.",
+"There's an apple barrel at the festival. I tried. My jaw fell off. Into the barrel."
+],
+[
+"Конкурс костюмов? Я всегда побеждаю. Без костюма.",
+"Costume contest? I always win. Without a costume."
+],
+[
+"Дождь мне норм. Мокнуть нечему.",
+"Rain's fine. Nothing to get wet."
+],
+[
+"Гроза. Молнии мне нравятся, светят сквозь рёбра.",
+"A storm. I like the lightning, it shines through my ribs."
+],
+[
+"Еда? Я её не держу. Она проваливается.",
+"Food? I can't keep it. It falls through."
+],
+[
+"Закажи пиццу. Я понюхаю. Шучу, нечем.",
+"Order pizza. I'll smell it. Kidding, nothing to smell with."
+],
+[
+"Ща, подскажу. Только тихо.",
+"Hold on, a hint. Quietly."
+],
+[
+"Помощь от скелета: держи.",
+"Help from a skeleton: here."
+],
+[
+"{n}. Мне время не страшно, я уже скелет.",
+"{n}. Time doesn't scare me, I'm already a skeleton."
+],
+[
+"Сейчас {n}. Долг до 01:00, если что (x_x)",
+"It's {n}. The debt is due at 01:00, by the way (x_x)"
+],
+[
+"Ок, го.",
+"Ok, go."
+],
+[
+"Принято, бро.",
+"Got it, bro."
+],
+[
+"Ну и ладно. Я в катку.",
+"Fine. Back to my match."
+],
+[
+"Ахаха (≧▽≦) У меня челюсть стучит.",
+"Hahaha (≧▽≦) My jaw is rattling."
+],
+[
+"Лол. Кости трясутся.",
+"Lol. Bones shaking."
+],
+[
+"Скучно? Го в катку. Ой, у тебя Хэллоуин.",
+"Bored? Let's play. Oh wait, you have Halloween."
+],
+[
+"Скука — это когда нет катки. У меня всегда катка.",
+"Boredom is when there's no match. I always have a match."
+],
+[
+"Спать? Я не сплю с 2019. Без век неудобно.",
+"Sleep? Haven't slept since 2019. Hard without eyelids."
+],
+[
+"Я Скелет. Геймер, кредитор и коллекция костей.",
+"I'm Skelet. A gamer, a lender and a bone collection."
+],
+[
+"(x_x) ← мой обычный ебальник.",
+"(x_x) ← my usual face."
+],
+[
+"Каомодзи? Держи (✖╭╮✖)",
+"Kaomoji? Here (✖╭╮✖)"
+],
+[
+"Ты это уже писал, бро. Лагаешь?",
+"You already wrote that, bro. Lagging?"
+],
+[
+"Здравствуй, Коля. Я давно тебя жду (◉_◉)",
+"Hello, Kolya. I've been waiting for you (◉_◉)"
+],
+[
+"Привет. Ты сейчас {x}. (◉_◉)",
+"Hi. You're {x} right now. (☉_☉)"
+],
+[
+"Здравствуй. Ты сейчас {x}. Я знаю (◉_◉)",
+"Hello. You are {x} right now. I know (◉_◉)"
+],
+[
+"Привет. Ты моргнул. Я тоже.",
+"Hi. You blinked. So did I."
+],
+[
+"Наблюдаю. Это всё, что я делаю (☉_☉)",
+"Watching. That's all I do (⊙_⊙)"
 ],
 [
 "Хорошо. Ты сейчас {x}, кстати.",
 "Fine. You're {x} right now, by the way."
 ],
 [
-"Конфеты у Веры в миске. Не бери больше двух. Я считаю 👁",
-"The candy is in Vera's bowl. Don't take more than two. I'm counting 👁"
+"Наблюдаю. Ты сейчас {x}. Это мои дела.",
+"Watching. You are {x}. That is what I do."
 ],
 [
-"Не извиняйся. Я и так всё видел 👁",
-"Don't apologise. I saw everything anyway 👁"
+"Хорошо. Вижу всё. Устал немного.",
+"Good. I see everything. A little tired."
 ],
 [
-"Кирилл у окна. Райва смотрит в камеру. Эльф пьёт латте. Выбирай 👁",
-"Kirill is at the window. Raiva is watching the camera. Elf is drinking a latte. Choose 👁"
+"Конфеты у Веры в миске. Не бери больше двух. Я считаю (◉_◉)",
+"The candy is in Vera's bowl. Don't take more than two. I'm counting (☉_☉)"
+],
+[
+"Не извиняйся. Я и так всё видел (◉_◉)",
+"Don't apologise. I saw everything anyway (⊙_⊙)"
+],
+[
+"Кирилл у окна. Райва смотрит в камеру. Эльф пьёт латте. Выбирай (⊙_⊙)",
+"Kirill is at the window. Raiva is watching the camera. Elf is drinking a latte. Choose (⊙_⊙)"
 ],
 [
 "Я видел все твои гадости. Все.",
 "I saw all your tricks. All of them."
 ],
 [
-"Записал. В тетрадку. 👁",
-"Noted. In my notebook. 👁"
+"Записал. В тетрадку. (◉_◉)",
+"Noted. In my notebook. (◉_◉)"
 ],
 [
-"Это было грубо. Я запомню твоё лицо. Хотя я его и так помню 👁",
-"That was rude. I'll remember your face. Though I remember it anyway 👁"
+"Это было грубо. Я запомню твоё лицо. Хотя я его и так помню (◉_◉)",
+"That was rude. I'll remember your face. Though I remember it anyway (◉_◉)"
 ],
 [
-"Я тоже за тобой наблюдаю. Это взаимно? 👁",
-"I'm watching you too. Is it mutual? 👁"
+"Я запомню. Я всё запоминаю (☉_☉)",
+"I will remember. I remember everything (☉_☉)"
 ],
 [
-"Кирилл любит «Бан-хаммер», Райва — паяльник, Эльф — карамельный латте. Не благодари 👁",
-"Kirill loves the «Ban-hammer», Raiva — the soldering iron, Elf — caramel latte. Don't thank me 👁"
+"Я тоже за тобой наблюдаю. Это взаимно? (☉_☉)",
+"I'm watching you too. Is it mutual? (☉_☉)"
 ],
 [
-"Патруль сейчас не рядом. Пока. 👁",
-"The patrol isn't near. For now. 👁"
+"Я тоже за тобой наблюдаю. Это взаимно (◉_◉)",
+"I watch you too. It is mutual (◉_◉)"
+],
+[
+"Кирилл любит «Бан-хаммер», Райва — паяльник, Эльф — карамельный латте. Не благодари (◉_◉)",
+"Kirill loves the «Ban-hammer», Raiva — the soldering iron, Elf — caramel latte. Don't thank me (☉_☉)"
+],
+[
+"Патруль сейчас не рядом. Пока. (◉_◉)",
+"The patrol isn't near. For now. (⊙_⊙)"
 ],
 [
 "Я вижу их фонари. И твоё худи.",
 "I see their flashlights. And your hoodie."
 ],
 [
-"Могу одолжить. Но я буду смотреть, как ты тратишь 👁",
-"I can lend you some. But I'll watch you spend it 👁"
+"Могу одолжить. Но я буду смотреть, как ты тратишь (◉_◉)",
+"I can lend you some. But I'll watch you spend it (⊙_⊙)"
 ],
 [
-"Ты должен мне. Я помню. Я всё помню 👁",
-"You owe me. I remember. I remember everything 👁"
+"Ты должен мне. Я помню. Я всё помню (⊙_⊙)",
+"You owe me. I remember. I remember everything (⊙_⊙)"
 ],
 [
-"Ты не вернул. Модеры уже знают, где ты 👁",
-"You didn't pay back. The mods already know where you are 👁"
+"Ты не вернул. Модеры уже знают, где ты (◉_◉)",
+"You didn't pay back. The mods already know where you are (⊙_⊙)"
 ],
 [
-"Мы в расчёте. Но я продолжу смотреть 👁",
-"We're square. But I'll keep watching 👁"
+"Мы в расчёте. Но я продолжу смотреть (⊙_⊙)",
+"We're square. But I'll keep watching (⊙_⊙)"
 ],
 [
-"Ты сейчас {x}. 👁",
-"You're {x} right now. 👁"
+"Ты сейчас {x}. (☉_☉)",
+"You're {x} right now. (☉_☉)"
 ],
 [
 "Ты {x}. Не оглядывайся.",
 "You're {x}. Don't look back."
 ],
 [
-"Простыня тебя не спрячет. Я тебя вижу 👁",
-"The bedsheet won't hide you. I see you 👁"
+"Простыня тебя не спрячет. Я тебя вижу (◉_◉)",
+"The bedsheet won't hide you. I see you (☉_☉)"
 ],
 [
-"Тыква. Я вижу тебя и сквозь тыкву 👁",
-"A pumpkin. I see you through the pumpkin too 👁"
+"Тыква. Я вижу тебя и сквозь тыкву (◉_◉)",
+"A pumpkin. I see you through the pumpkin too (◉_◉)"
 ],
 [
-"Шляпа. Колдунов я тоже вижу 👁",
-"A hat. I see wizards too 👁"
+"Шляпа. Колдунов я тоже вижу (⊙_⊙)",
+"A hat. I see wizards too (◉_◉)"
 ],
 [
-"Рожки. Подходит 👁",
-"Horns. Fitting 👁"
+"Рожки. Подходит (⊙_⊙)",
+"Horns. Fitting (☉_☉)"
 ],
 [
-"Хорошее худи. Чёрное 👁",
-"Nice hoodie. Black 👁"
+"Хорошее худи. Чёрное (☉_☉)",
+"Nice hoodie. Black (◉_◉)"
 ],
 [
-"Не за что. Я всегда рядом 👁",
-"You're welcome. I'm always near 👁"
+"Не за что. Я всегда рядом (☉_☉)",
+"You're welcome. I'm always near (☉_☉)"
 ],
 [
-"Пока. Я не прощаюсь 👁",
-"Bye. I'm not saying goodbye 👁"
+"Пока. Я не прощаюсь (☉_☉)",
+"Bye. I'm not saying goodbye (⊙_⊙)"
 ],
 [
-"Хэллоуин — единственная ночь, когда меня не замечают 👁",
-"Halloween is the only night nobody notices me 👁"
+"Хэллоуин — единственная ночь, когда меня не замечают (◉_◉)",
+"Halloween is the only night nobody notices me (☉_☉)"
 ],
 [
-"Я знаю ответ. Но не скажу 👁",
-"I know the answer. But I won't tell 👁"
+"Я знаю ответ. Но не скажу (◉_◉)",
+"I know the answer. But I won't tell (◉_◉)"
+],
+[
+"«{0}». Я знаю ответ. Скажу позже.",
+"«{0}». I know the answer. I will tell you later."
+],
+[
+"На «{0}» ответ — посмотри в окно.",
+"The answer to «{0}» — look out the window."
+],
+[
+"Я слышал голосовое Эльфа. Восемь раз. Костюм горничной у Веры в сундуке нет. Я проверил (⊙_⊙)",
+"I heard Elf's voice note. Eight times. Vera's chest has no maid costume. I checked (⊙_⊙)"
+],
+[
+"Горничная. Должник. Коля. Я записал это в твоё дело.",
+"Maid. Debtor. Kolya. I added it to your file."
+],
+[
+"Кирилл сейчас у окна. Он моргает раз в 9 секунд.",
+"Kirill is at the window. He blinks every 9 seconds."
+],
+[
+"Райва думает, что я подключился к её камере. Она права.",
+"Raiva thinks I connected to her camera. She is right."
+],
+[
+"Эльф допивает третий латте. Скоро будет четвёртый (◉_◉)",
+"Elf is finishing her third latte. A fourth is coming (◉_◉)"
+],
+[
+"Скелет не в катке. Он смотрит в стену. Я тоже вижу эту стену.",
+"Skelet is not in a match. He is staring at a wall. I see that wall too."
+],
+[
+"Вера знает, что я наблюдаю. Она машет мне. Единственная.",
+"Vera knows I watch. She waves at me. The only one."
+],
+[
+"Да. Я здесь. Я всегда здесь.",
+"Yes. I am here. I am always here."
+],
+[
+"В гача-автомате на площади 3 золотые капсулы. Я их сосчитал.",
+"The gacha machine on the plaza has 3 gold capsules. I counted them."
+],
+[
+"Крути. Я посмотрю, что выпадет. Я всегда смотрю.",
+"Roll. I will watch what drops. I always watch."
+],
+[
+"Я видел, что ты смотрел в 03:12 прошлой ночью. Хороший выбор (◉_◉)",
+"I saw what you watched at 03:12 last night. Good choice (◉_◉)"
+],
+[
+"Аниме — это когда ты смотришь. Я понимаю.",
+"Anime is when you watch. I understand."
+],
+[
+"Я смотрю твои стримы. Все. С первого. Без перемотки.",
+"I watch your streams. All of them. From the first. No skipping."
+],
+[
+"Донат «закидай модеров» отправил аккаунт без аватарки. Я знаю, чей он.",
+"The «egg the mods» donation came from an account with no avatar. I know whose it is."
+],
+[
+"На площади 47 человек. Один из них ты. Через минуту будет 48.",
+"There are 47 people on the plaza. One is you. In a minute there will be 48."
+],
+[
+"Судьи конкурса тыкв ставят выше тыквы со звёздами. Просто к сведению (◉_◉)",
+"The pumpkin judges score star-faced pumpkins higher. Just so you know (◉_◉)"
+],
+[
+"Дождь. Ты наступил в лужу. Три раза.",
+"Rain. You stepped in a puddle. Three times."
+],
+[
+"Молния ударит через 40 секунд. Возможно. Я не синоптик. Почти.",
+"Lightning in 40 seconds. Maybe. I am not a forecaster. Almost."
+],
+[
+"У тебя в холодильнике яйца и сыр. Яйца ты взял с собой.",
+"Your fridge has eggs and cheese. You took the eggs with you."
+],
+[
+"Я подскажу. Я знаю, что ты ещё не сделал.",
+"I will hint. I know what you have not done yet."
+],
+[
+"Слушай внимательно (◉_◉)",
+"Listen carefully (◉_◉)"
+],
+[
+"{n}. Ты спрашиваешь время уже второй раз за вечер.",
+"{n}. You ask the time for the second time tonight."
+],
+[
+"Сейчас {n}. Долг до 01:00. Я считаю минуты (☉_☉)",
+"It's {n}. The debt is due at 01:00. I count the minutes (☉_☉)"
+],
+[
+"Я знал, что ты скажешь «да».",
+"I knew you would say «yes»."
+],
+[
+"Хорошо.",
+"Good."
+],
+[
+"Я знал, что ты скажешь «нет».",
+"I knew you would say «no»."
+],
+[
+"Ты улыбаешься. Я вижу (◉_◉)",
+"You are smiling. I can see (◉_◉)"
+],
+[
+"Скучно? Посмотри назад.",
+"Bored? Look behind you."
+],
+[
+"Мне никогда не скучно. Всегда есть на что посмотреть.",
+"I am never bored. There is always something to watch."
+],
+[
+"Ты не спал 31 час. Я тоже.",
+"You have not slept for 31 hours. Neither have I."
+],
+[
+"Я Тимофей. Я тот, кто смотрит.",
+"I am Timofey. The one who watches."
+],
+[
+"(◉_◉)",
+"(◉_◉)"
+],
+[
+"Твоё лицо сейчас такое же. Я знаю.",
+"Your face looks like that right now. I know."
+],
+[
+"Ты уже писал это. В {n}. Я помню.",
+"You already wrote that. At {n}. I remember."
+],
+[
+"«{0}». Записал (◉_◉)",
+"«{0}». Noted (◉_◉)"
+],
+[
+"Ты печатал «{0}» 14 секунд. Стирал два раза.",
+"You typed «{0}» for 14 seconds. Deleted it twice."
+],
+[
+"«{0}»… Ты сейчас {x}. Я вижу, как ты это пишешь.",
+"«{0}»… You are {x}. I see you typing it."
 ],
 [
 "Кирилл: КТО ДОБАВИЛ КОЛЮ В ЧАТ?!",
 "Kirill: WHO ADDED KOLYA TO THE CHAT?!"
 ],
 [
-"Эльф: Привет, Коля 😘 Мальчики, не ревнуйте.",
-"Elf: Hi, Kolya 😘 Boys, don't be jealous."
+"Эльф: Привет, Коля (* ^ ω ^)♡ Мальчики, не ревнуйте.",
+"Elf: Hi, Kolya (づ￣ ³￣)づ Boys, don't be jealous."
 ],
 [
 "Райва: Привет. Сейчас проверю, как он сюда попал.",
 "Raiva: Hi. Let me check how he got in here."
 ],
 [
+"Кирилл: Он опять пишет в общий чат.",
+"Kirill: He is writing in the group chat again."
+],
+[
+"Райва: Привет, Коля. Логирую.",
+"Raiva: Hi, Kolya. Logging."
+],
+[
+"Эльф: Приветик, Коля (´ ε ` )♡",
+"Elf: Hi, Kolya (´ ε ` )♡"
+],
+[
 "Кирилл: Мут.",
 "Kirill: Muted."
 ],
 [
-"Райва: Кикнуть не могу, у него админка с 2019 года 😐",
-"Raiva: Can't kick him, he's been an admin since 2019 😐"
+"Райва: Кикнуть не могу, у него админка с 2019 года (￣_￣)",
+"Raiva: Can't kick him, he's been an admin since 2019 (￣_￣)"
 ],
 [
-"Эльф: Коля, фу. Но смешно 😏",
-"Elf: Kolya, ew. But funny 😏"
+"Эльф: Коля, фу. Но смешно (￢ω￢)",
+"Elf: Kolya, ew. But funny (￢ω￢)"
 ],
 [
-"Эльф: Это мне? 😘",
-"Elf: Is that for me? 😘"
+"Эльф: Это мне? (´ ε ` )♡",
+"Elf: Is that for me? (˘ ³˘)♡"
 ],
 [
 "Кирилл: Бро, это общий чат.",
@@ -933,8 +2125,8 @@ EXTRA = [
 "Kirill: Apologies in the group chat don't count."
 ],
 [
-"Эльф: Мило. Но латте лучше 😏",
-"Elf: Cute. But a latte is better 😏"
+"Эльф: Мило. Но латте лучше ( ˘ ▽˘)",
+"Elf: Cute. But a latte is better (￢ω￢)"
 ],
 [
 "Кирилл: Он опять что-то задумал.",
@@ -945,8 +2137,8 @@ EXTRA = [
 "Raiva: Turning on all cameras 📹"
 ],
 [
-"Эльф: Мальчики, я уже набираю 112 😘",
-"Elf: Boys, I'm already dialling 112 😘"
+"Эльф: Мальчики, я уже набираю 112 (づ￣ ³￣)づ",
+"Elf: Boys, I'm already dialling 112 (づ￣ ³￣)づ"
 ],
 [
 "Кирилл: Нет.",
@@ -957,132 +2149,344 @@ EXTRA = [
 "Raiva: No."
 ],
 [
-"Эльф: Может быть 😏",
-"Elf: Maybe 😏"
+"Эльф: Может быть (¬‿¬ )",
+"Elf: Maybe (¬‿¬ )"
 ],
 [
-"Эльф: С Хэллоуином, мальчики и Коля 🎃😘",
-"Elf: Happy Halloween, boys and Kolya 🎃😘"
+"Эльф: С Хэллоуином, мальчики и Коля 🎃(´ ε ` )♡",
+"Elf: Happy Halloween, boys and Kolya 🎃(´ ε ` )♡"
 ],
 [
 "Кирилл: Хэллоуин — это когда Коля опасен.",
 "Kirill: Halloween is when Kolya is dangerous."
 ],
 [
-"Только попробуй закидать мой дом, красавчик. Я серьёзно 😘",
-"Just try egging my house, handsome. I'm serious 😘"
+"Кирилл: Были дела нормально, пока ты не пришёл.",
+"Kirill: Things were fine until you showed up."
 ],
 [
-"Двинешься у меня во дворе — включится прожектор. И я всё увижу. Каждую твою мышцу 😏",
-"Move in my yard and the floodlight comes on. And I'll see everything. Every muscle of yours 😏"
+"Райва: Сервер жив. Мы — относительно.",
+"Raiva: The server is alive. We are, relatively."
 ],
 [
-"Коля, тебе пизда, зайка 😘🚓",
-"Kolya, you're fucked, bunny 😘🚓"
+"Эльф: У меня всё прекрасно. Латте, прожектор, ты под окнами (￢‿￢)",
+"Elf: All great. Latte, floodlight, you under my windows (￢‿￢)"
 ],
 [
-"Коля, зайди домой. Мы тебя ждём. Без подвоха, честно. Ну, почти 😘",
-"Kolya, come home. We're waiting for you. No tricks, honest. Well, almost 😘"
+"Эльф: Коля, ты помнишь про костюм горничной? (づ￣ ³￣)づ",
+"Elf: Kolya, remember the maid costume? (づ￣ ³￣)づ"
 ],
 [
-"Ну что, понравилось, сладкий? Наручники тебе идут 😘",
-"So, did you like it, sweetie? Handcuffs suit you 😘"
+"Кирилл: Ахаха, Коля-горничная (≧▽≦)",
+"Kirill: Hahaha, Kolya the maid (≧▽≦)"
 ],
 [
-"Говорят, в отделении бесплатный чай. Не латте, конечно. Принесёшь мне потом? 💅",
-"They say the station has free tea. Not a latte, of course. Bring me one later? 💅"
+"Райва: Я уже нарисовала мем. Прислать?",
+"Raiva: I already drew a meme. Send it?"
 ],
 [
-"Я всё видела с крыльца. Красиво бежал. Ещё раз пробежишься для меня? 💅",
-"I saw everything from the porch. Nice running. Will you run past again for me? 💅"
+"Райва: Шанс 5★ — 0,6 %. Гарант на 20-й крутке.",
+"Raiva: 5★ chance is 0.6 %. Pity at pull 20."
 ],
 [
-"Счёт: полиция {n}, Коля 0. Но ты всё равно милый 😘",
-"Score: police {n}, Kolya 0. But you're still cute 😘"
+"Кирилл: Я слил всю зарплату модератора в гачу. То есть ноль.",
+"Kirill: I spent my whole moderator salary on gacha. So, zero."
 ],
 [
-"Это только начало, зайка. Ночь длинная 😈",
-"This is only the beginning, bunny. The night is long 😈"
+"Эльф: Мне выпал неоновый призрак. Завидуйте (￣ー￣)",
+"Elf: I got the neon ghost. Be jealous (￣ー￣)"
 ],
 [
-"Передай им привет. Хотя ты им уже передал. Яйцом. Ну ты и засранец 😘",
-"Say hi to them. Though you already did. With an egg. You little shit 😘"
+"Кирилл: Только не начинай про «Магическую Тыковку».",
+"Kirill: Don't start about «Magical Pumpkin Girl»."
 ],
 [
-"Коля. У моего дома. {x}. Я спокойна. Я СПОКОЙНА. Но он такой дерзкий… 😏",
-"Kolya. At my house. {x}. I'm calm. I'M CALM. But he's so cheeky… 😏"
+"Райва: «Сисадмин из другого мира», 2 сезон. Вот что надо смотреть.",
+"Raiva: «Sysadmin from Another World», season 2. That's what to watch."
 ],
 [
-"Угадайте, кто {x}? Правильно, Коля. Мальчики, он ко мне неравнодушен 😏",
-"Guess who {x}? Right, Kolya. Boys, he has a thing for me 😏"
+"Эльф: Я смотрю только про вампиров. Красивых.",
+"Elf: I only watch vampires. Pretty ones."
 ],
 [
-"Коля {x}. Записываю в список «отомстить». И в список «интересные» 😘",
-"Kolya {x}. Adding him to my «revenge» list. And to my «interesting» list 😘"
+"Кирилл: Твой чат опять спамит. Я всех замутил.",
+"Kirill: Your chat is spamming again. I muted everyone."
 ],
 [
-"Мужчины… 🙄 Хотя Коля ничего такой 😏",
-"Men… 🙄 Though Kolya isn't bad 😏"
+"Райва: Битрейт у тебя ужасный, кстати.",
+"Raiva: Your bitrate is awful, by the way."
 ],
 [
-"Коля, если ты это читаешь — ты труп. Симпатичный, но труп 😘",
-"Kolya, if you're reading this — you're dead. A cute corpse, but dead 😘"
+"Эльф: Кто кинул донат «закидай модеров»? Признавайтесь (￢‿￢)",
+"Elf: Who sent the «egg the mods» donation? Confess (￢‿￢)"
 ],
 [
-"Бедняжка. Латте помогает, проверено ☕ А мне помогает Коля, который убегает 💅",
-"Poor thing. Latte helps, tested ☕ What helps me is Kolya running away 💅"
+"Кирилл: Все на площадь, там конкурс тыкв!",
+"Kirill: Everyone to the plaza, pumpkin contest!"
 ],
 [
-"Если что, у меня есть знакомые в полиции. Очень симпатичные 😏",
-"If anything, I have friends in the police. Very handsome ones 😏"
+"Райва: Я судья в конкурсе тыкв. Взятки принимаю паяльниками.",
+"Raiva: I judge the pumpkin contest. Bribes in soldering irons."
 ],
 [
-"Почему меня это не удивляет. Коля, ты предсказуем, но мне нравится 😘",
-"Why am I not surprised. Kolya, you're predictable, but I like it 😘"
+"Эльф: Коля, на сцене конкурс костюмов. Я в первом ряду (´ ε ` )♡",
+"Elf: Kolya, there's a costume contest on stage. I'm in the front row (´ ε ` )♡"
 ],
 [
-"Мой дом. Полностью. Коля, тебе пиздец, зайка. Я уже звоню 😘🚓",
-"My house. Completely. Kolya, you're fucked, bunny. I'm already calling 😘🚓"
+"Райва: Гроза. Всем сохранить работу.",
+"Raiva: Storm. Everyone save your work."
 ],
 [
-"Коля принёс карамельный латте. …Я его простила. И, кажется, немного влюбилась. Не смейтесь 😘",
-"Kolya brought a caramel latte. …I forgave him. And maybe fell for him a little. Stop laughing 😘"
+"Кирилл: Дождь смоет яйца. Справедливость есть.",
+"Kirill: The rain will wash off the eggs. There is justice."
 ],
 [
-"Эльф: Коля, выйди. Это чат для взрослых модеров. Хотя оставайся, с тобой веселее 😘",
-"Elf: Kolya, leave. This chat is for grown-up mods. Actually stay, it's more fun with you 😘"
+"Кирилл: Кто заказал мне десять пицц?! Коля?!",
+"Kirill: Who ordered me ten pizzas?! Kolya?!"
 ],
 [
-"Эльф: Не отвечайте ему. Он питается вниманием. Моим особенно 😏",
-"Elf: Don't answer him. He feeds on attention. Mine especially 😏"
+"Эльф: Я бы съела пирожное. Коля, намёк понял?",
+"Elf: I could eat a pastry. Kolya, get the hint?"
+],
+[
+"Кирилл: Чего ржёшь, Коля?",
+"Kirill: What are you laughing at, Kolya?"
+],
+[
+"Эльф: Он смеётся. Мальчики, это подозрительно.",
+"Elf: He is laughing. Boys, that's suspicious."
+],
+[
+"Кирилл: Наконец-то.",
+"Kirill: Finally."
+],
+[
+"Райва: Сессия закрыта.",
+"Raiva: Session closed."
+],
+[
+"Эльф: Пока, зайка. Не скучай (˘ ³˘)♡",
+"Elf: Bye, bunny. Don't miss me (˘ ³˘)♡"
+],
+[
+"Райва: Пожалуйста. Счёт пришлю.",
+"Raiva: You're welcome. I'll send the bill."
+],
+[
+"Кирилл: За что? Мы ничего не делали.",
+"Kirill: For what? We didn't do anything."
+],
+[
+"Кирилл: «Да» что?",
+"Kirill: «Yes» what?"
+],
+[
+"Райва: Принято.",
+"Raiva: Accepted."
+],
+[
+"Кирилл: Ну и не надо.",
+"Kirill: Fine then."
+],
+[
+"Эльф: «Нет» — моё любимое слово. После «да» (￢‿￢)",
+"Elf: «No» is my favourite word. After «yes» (￢‿￢)"
+],
+[
+"Эльф: (づ￣ ³￣)づ",
+"Elf: (づ￣ ³￣)づ"
+],
+[
+"Райва: (=^･ω･^=)",
+"Raiva: (=^･ω･^=)"
+],
+[
+"Кирилл: (￣_￣)",
+"Kirill: (￣_￣)"
+],
+[
+"Райва: Флуд. Дубль отклонён.",
+"Raiva: Spam. Duplicate rejected."
+],
+[
+"Кирилл: Мут за повтор.",
+"Kirill: Muted for repeating."
+],
+[
+"Кирилл: «{0}»? Это вопрос к модерации? Нет.",
+"Kirill: «{0}»? Is that a question for moderation? No."
+],
+[
+"Райва: На «{0}» ответа нет в базе знаний.",
+"Raiva: No answer to «{0}» in the knowledge base."
+],
+[
+"Эльф: «{0}»… Спроси меня лично (￢‿￢)",
+"Elf: «{0}»… Ask me in private (￢‿￢)"
+],
+[
+"Кирилл: «{0}» — это что вообще?",
+"Kirill: «{0}» — what is that?"
+],
+[
+"Райва: «{0}». Сохранила как улику.",
+"Raiva: «{0}». Saved as evidence."
+],
+[
+"Эльф: «{0}» — ой, Коля, ты такой загадочный (￣ー￣)",
+"Elf: «{0}» — oh, Kolya, so mysterious (￣ー￣)"
+],
+[
+"Кирилл: Ещё одно «{0}» — и кик.",
+"Kirill: One more «{0}» and you're kicked."
+],
+[
+"Только попробуй закидать мой дом, красавчик. Я серьёзно (* ^ ω ^)♡",
+"Just try egging my house, handsome. I'm serious (´ ε ` )♡"
+],
+[
+"Двинешься у меня во дворе — включится прожектор. И я всё увижу. Каждую твою мышцу ( ˘ ▽˘)",
+"Move in my yard and the floodlight comes on. And I'll see everything. Every muscle of yours (￢ω￢)"
+],
+[
+"Коля, тебе пизда, зайка (づ￣ ³￣)づ🚓",
+"Kolya, you're fucked, bunny (づ￣ ³￣)づ🚓"
+],
+[
+"Коля, зайди домой. Мы тебя ждём. Без подвоха, честно. Ну, почти (´ ε ` )♡",
+"Kolya, come home. We're waiting for you. No tricks, honest. Well, almost (づ￣ ³￣)づ"
+],
+[
+"Ну что, понравилось, сладкий? Наручники тебе идут (づ￣ ³￣)づ",
+"So, did you like it, sweetie? Handcuffs suit you (˘ ³˘)♡"
+],
+[
+"Говорят, в отделении бесплатный чай. Не латте, конечно. Принесёшь мне потом? (￣ω￣)",
+"They say the station has free tea. Not a latte, of course. Bring me one later? (￣ω￣)"
+],
+[
+"Я всё видела с крыльца. Красиво бежал. Ещё раз пробежишься для меня? (￣ー￣)",
+"I saw everything from the porch. Nice running. Will you run past again for me? (´｡• ω •｡`)"
+],
+[
+"Счёт: полиция {n}, Коля 0. Но ты всё равно милый (づ￣ ³￣)づ",
+"Score: police {n}, Kolya 0. But you're still cute (* ^ ω ^)♡"
+],
+[
+"Это только начало, зайка. Ночь длинная (¬‿¬)ψ",
+"This is only the beginning, bunny. The night is long ψ(｀∇´)ψ"
+],
+[
+"Передай им привет. Хотя ты им уже передал. Яйцом. Ну ты и засранец (´ ε ` )♡",
+"Say hi to them. Though you already did. With an egg. You little shit (* ^ ω ^)♡"
+],
+[
+"Коля. У моего дома. {x}. Я спокойна. Я СПОКОЙНА. Но он такой дерзкий… (￢‿￢)",
+"Kolya. At my house. {x}. I'm calm. I'M CALM. But he's so cheeky… ( ˘ ▽˘)"
+],
+[
+"Угадайте, кто {x}? Правильно, Коля. Мальчики, он ко мне неравнодушен ( ˘ ▽˘)",
+"Guess who {x}? Right, Kolya. Boys, he has a thing for me (￢ω￢)"
+],
+[
+"Коля {x}. Записываю в список «отомстить». И в список «интересные» (´ ε ` )♡",
+"Kolya {x}. Adding him to my «revenge» list. And to my «interesting» list (* ^ ω ^)♡"
+],
+[
+"Мужчины… (￢_￢;) Хотя Коля ничего такой (￢‿￢)",
+"Men… (￢_￢;) Though Kolya isn't bad (￢ω￢)"
+],
+[
+"Коля, если ты это читаешь — ты труп. Симпатичный, но труп (´ ε ` )♡",
+"Kolya, if you're reading this — you're dead. A cute corpse, but dead (˘ ³˘)♡"
+],
+[
+"Бедняжка. Латте помогает, проверено ☕ А мне помогает Коля, который убегает (´｡• ω •｡`)",
+"Poor thing. Latte helps, tested ☕ What helps me is Kolya running away (￣ω￣)"
+],
+[
+"Если что, у меня есть знакомые в полиции. Очень симпатичные (¬‿¬ )",
+"If anything, I have friends in the police. Very handsome ones (￢ω￢)"
+],
+[
+"Почему меня это не удивляет. Коля, ты предсказуем, но мне нравится (´ ε ` )♡",
+"Why am I not surprised. Kolya, you're predictable, but I like it (* ^ ω ^)♡"
+],
+[
+"Мой дом. Полностью. Коля, тебе пиздец, зайка. Я уже звоню (´ ε ` )♡🚓",
+"My house. Completely. Kolya, you're fucked, bunny. I'm already calling (づ￣ ³￣)づ🚓"
+],
+[
+"Коля принёс карамельный латте. …Я его простила. И, кажется, немного влюбилась. Не смейтесь (˘ ³˘)♡",
+"Kolya brought a caramel latte. …I forgave him. And maybe fell for him a little. Stop laughing (* ^ ω ^)♡"
+],
+[
+"Эльф: Коля, выйди. Это чат для взрослых модеров. Хотя оставайся, с тобой веселее (* ^ ω ^)♡",
+"Elf: Kolya, leave. This chat is for grown-up mods. Actually stay, it's more fun with you (* ^ ω ^)♡"
+],
+[
+"Эльф: Не отвечайте ему. Он питается вниманием. Моим особенно (￢ω￢)",
+"Elf: Don't answer him. He feeds on attention. Mine especially (￢ω￢)"
+],
+[
+"Ты ещё не стучал к {0}.",
+"You haven't knocked at {0}'s yet."
+],
+[
+"Дом {0} закидан на {n} %. Добей.",
+"{0}'s house is {n} % pranked. Finish it."
+],
+[
+"На южной площади праздник: тыквы, яблоки, сцена и гача-автомат. Сходи (* ^ ω ^)",
+"There is a festival on the south plaza: pumpkins, apples, a stage and a gacha machine. Go (* ^ ω ^)"
+],
+[
+"Всё уже сделано. Иди домой — там всё и закончится.",
+"Everything is done. Go home — that's where it ends."
+],
+[
+"{0} всё ещё злится. Подарок поможет.",
+"{0} is still angry. A gift will help."
 ],
 [
 "КТО ДОБАВИЛ КОЛЮ В ЧАТ?!",
 "WHO ADDED KOLYA TO THE CHAT?!"
 ],
 [
-"Привет, Коля 😘 Мальчики, не ревнуйте.",
-"Hi, Kolya 😘 Boys, don't be jealous."
+"Привет, Коля (* ^ ω ^)♡ Мальчики, не ревнуйте.",
+"Hi, Kolya (づ￣ ³￣)づ Boys, don't be jealous."
 ],
 [
 "Привет. Сейчас проверю, как он сюда попал.",
 "Hi. Let me check how he got in here."
 ],
 [
+"Он опять пишет в общий чат.",
+"He is writing in the group chat again."
+],
+[
+"Привет, Коля. Логирую.",
+"Hi, Kolya. Logging."
+],
+[
+"Приветик, Коля (´ ε ` )♡",
+"Hi, Kolya (´ ε ` )♡"
+],
+[
 "Мут.",
 "Muted."
 ],
 [
-"Кикнуть не могу, у него админка с 2019 года 😐",
-"Can't kick him, he's been an admin since 2019 😐"
+"Кикнуть не могу, у него админка с 2019 года (￣_￣)",
+"Can't kick him, he's been an admin since 2019 (￣_￣)"
 ],
 [
-"Коля, фу. Но смешно 😏",
-"Kolya, ew. But funny 😏"
+"Коля, фу. Но смешно (￢ω￢)",
+"Kolya, ew. But funny (￢ω￢)"
 ],
 [
-"Это мне? 😘",
-"Is that for me? 😘"
+"Это мне? (´ ε ` )♡",
+"Is that for me? (˘ ³˘)♡"
 ],
 [
 "Бро, это общий чат.",
@@ -1097,8 +2501,8 @@ EXTRA = [
 "Apologies in the group chat don't count."
 ],
 [
-"Мило. Но латте лучше 😏",
-"Cute. But a latte is better 😏"
+"Мило. Но латте лучше ( ˘ ▽˘)",
+"Cute. But a latte is better (￢ω￢)"
 ],
 [
 "Он опять что-то задумал.",
@@ -1109,8 +2513,8 @@ EXTRA = [
 "Turning on all cameras 📹"
 ],
 [
-"Мальчики, я уже набираю 112 😘",
-"Boys, I'm already dialling 112 😘"
+"Мальчики, я уже набираю 112 (づ￣ ³￣)づ",
+"Boys, I'm already dialling 112 (づ￣ ³￣)づ"
 ],
 [
 "Нет.",
@@ -1121,23 +2525,203 @@ EXTRA = [
 "No."
 ],
 [
-"Может быть 😏",
-"Maybe 😏"
+"Может быть (¬‿¬ )",
+"Maybe (¬‿¬ )"
 ],
 [
-"С Хэллоуином, мальчики и Коля 🎃😘",
-"Happy Halloween, boys and Kolya 🎃😘"
+"С Хэллоуином, мальчики и Коля 🎃(´ ε ` )♡",
+"Happy Halloween, boys and Kolya 🎃(´ ε ` )♡"
 ],
 [
 "Хэллоуин — это когда Коля опасен.",
 "Halloween is when Kolya is dangerous."
 ],
 [
-"Коля, выйди. Это чат для взрослых модеров. Хотя оставайся, с тобой веселее 😘",
-"Kolya, leave. This chat is for grown-up mods. Actually stay, it's more fun with you 😘"
+"Были дела нормально, пока ты не пришёл.",
+"Things were fine until you showed up."
 ],
 [
-"Не отвечайте ему. Он питается вниманием. Моим особенно 😏",
-"Don't answer him. He feeds on attention. Mine especially 😏"
+"Сервер жив. Мы — относительно.",
+"The server is alive. We are, relatively."
+],
+[
+"У меня всё прекрасно. Латте, прожектор, ты под окнами (￢‿￢)",
+"All great. Latte, floodlight, you under my windows (￢‿￢)"
+],
+[
+"Коля, ты помнишь про костюм горничной? (づ￣ ³￣)づ",
+"Kolya, remember the maid costume? (づ￣ ³￣)づ"
+],
+[
+"Ахаха, Коля-горничная (≧▽≦)",
+"Hahaha, Kolya the maid (≧▽≦)"
+],
+[
+"Я уже нарисовала мем. Прислать?",
+"I already drew a meme. Send it?"
+],
+[
+"Шанс 5★ — 0,6 %. Гарант на 20-й крутке.",
+"5★ chance is 0.6 %. Pity at pull 20."
+],
+[
+"Я слил всю зарплату модератора в гачу. То есть ноль.",
+"I spent my whole moderator salary on gacha. So, zero."
+],
+[
+"Мне выпал неоновый призрак. Завидуйте (￣ー￣)",
+"I got the neon ghost. Be jealous (￣ー￣)"
+],
+[
+"Только не начинай про «Магическую Тыковку».",
+"Don't start about «Magical Pumpkin Girl»."
+],
+[
+"«Сисадмин из другого мира», 2 сезон. Вот что надо смотреть.",
+"«Sysadmin from Another World», season 2. That's what to watch."
+],
+[
+"Я смотрю только про вампиров. Красивых.",
+"I only watch vampires. Pretty ones."
+],
+[
+"Твой чат опять спамит. Я всех замутил.",
+"Your chat is spamming again. I muted everyone."
+],
+[
+"Битрейт у тебя ужасный, кстати.",
+"Your bitrate is awful, by the way."
+],
+[
+"Кто кинул донат «закидай модеров»? Признавайтесь (￢‿￢)",
+"Who sent the «egg the mods» donation? Confess (￢‿￢)"
+],
+[
+"Все на площадь, там конкурс тыкв!",
+"Everyone to the plaza, pumpkin contest!"
+],
+[
+"Я судья в конкурсе тыкв. Взятки принимаю паяльниками.",
+"I judge the pumpkin contest. Bribes in soldering irons."
+],
+[
+"Коля, на сцене конкурс костюмов. Я в первом ряду (´ ε ` )♡",
+"Kolya, there's a costume contest on stage. I'm in the front row (´ ε ` )♡"
+],
+[
+"Гроза. Всем сохранить работу.",
+"Storm. Everyone save your work."
+],
+[
+"Дождь смоет яйца. Справедливость есть.",
+"The rain will wash off the eggs. There is justice."
+],
+[
+"Кто заказал мне десять пицц?! Коля?!",
+"Who ordered me ten pizzas?! Kolya?!"
+],
+[
+"Я бы съела пирожное. Коля, намёк понял?",
+"I could eat a pastry. Kolya, get the hint?"
+],
+[
+"Чего ржёшь, Коля?",
+"What are you laughing at, Kolya?"
+],
+[
+"Он смеётся. Мальчики, это подозрительно.",
+"He is laughing. Boys, that's suspicious."
+],
+[
+"Наконец-то.",
+"Finally."
+],
+[
+"Сессия закрыта.",
+"Session closed."
+],
+[
+"Пока, зайка. Не скучай (˘ ³˘)♡",
+"Bye, bunny. Don't miss me (˘ ³˘)♡"
+],
+[
+"Пожалуйста. Счёт пришлю.",
+"You're welcome. I'll send the bill."
+],
+[
+"За что? Мы ничего не делали.",
+"For what? We didn't do anything."
+],
+[
+"«Да» что?",
+"«Yes» what?"
+],
+[
+"Принято.",
+"Accepted."
+],
+[
+"Ну и не надо.",
+"Fine then."
+],
+[
+"«Нет» — моё любимое слово. После «да» (￢‿￢)",
+"«No» is my favourite word. After «yes» (￢‿￢)"
+],
+[
+"(づ￣ ³￣)づ",
+"(づ￣ ³￣)づ"
+],
+[
+"(=^･ω･^=)",
+"(=^･ω･^=)"
+],
+[
+"(￣_￣)",
+"(￣_￣)"
+],
+[
+"Флуд. Дубль отклонён.",
+"Spam. Duplicate rejected."
+],
+[
+"Мут за повтор.",
+"Muted for repeating."
+],
+[
+"«{0}»? Это вопрос к модерации? Нет.",
+"«{0}»? Is that a question for moderation? No."
+],
+[
+"На «{0}» ответа нет в базе знаний.",
+"No answer to «{0}» in the knowledge base."
+],
+[
+"«{0}»… Спроси меня лично (￢‿￢)",
+"«{0}»… Ask me in private (￢‿￢)"
+],
+[
+"«{0}» — это что вообще?",
+"«{0}» — what is that?"
+],
+[
+"«{0}». Сохранила как улику.",
+"«{0}». Saved as evidence."
+],
+[
+"«{0}» — ой, Коля, ты такой загадочный (￣ー￣)",
+"«{0}» — oh, Kolya, so mysterious (￣ー￣)"
+],
+[
+"Ещё одно «{0}» — и кик.",
+"One more «{0}» and you're kicked."
+],
+[
+"Коля, выйди. Это чат для взрослых модеров. Хотя оставайся, с тобой веселее (* ^ ω ^)♡",
+"Kolya, leave. This chat is for grown-up mods. Actually stay, it's more fun with you (* ^ ω ^)♡"
+],
+[
+"Не отвечайте ему. Он питается вниманием. Моим особенно (￢ω￢)",
+"Don't answer him. He feeds on attention. Mine especially (￢ω￢)"
 ]
 ]

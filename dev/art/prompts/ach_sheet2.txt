@@ -1,0 +1,7 @@
+A game UI sheet of exactly 5 separate square achievement badge icons in ONE ROW of 5 equal cells, each icon centred in its own cell with wide empty gaps. Every badge is the same size and the same style as Image 1's game: a rounded square tile with a deep purple-black background, a thin glowing orange rim and a chunky readable pixel-art emblem in the middle, dark outlines, warm Halloween night lighting. Left to right:
+1. a computer monitor showing a tiny pink-haired anime girl next to an energy drink can and a sleeping zzz cloud
+2. a carved jack-o'-lantern with an elaborate star-shaped face and a small golden first-place ribbon
+3. a shiny red apple with a big bite taken out and water splashes
+4. a small stage with a spotlight beam and a glowing golden star above it
+5. a glowing golden gacha capsule bursting open with five tiny golden stars flying out
+No text, no letters, no numbers anywhere. Transparent background between the tiles.

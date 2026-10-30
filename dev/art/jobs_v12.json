@@ -1,0 +1,119 @@
+[
+ {
+  "name": "pro1_room",
+  "prompt": "art/prompts/pro1_room.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya"
+  ]
+ },
+ {
+  "name": "pro2_stream",
+  "prompt": "art/prompts/pro2_stream.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya"
+  ]
+ },
+ {
+  "name": "pro3_phone",
+  "prompt": "art/prompts/pro3_phone.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya"
+  ]
+ },
+ {
+  "name": "pro4_window",
+  "prompt": "art/prompts/pro4_window.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya"
+  ]
+ },
+ {
+  "name": "pro5_gear",
+  "prompt": "art/prompts/pro5_gear.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya"
+  ]
+ },
+ {
+  "name": "pro6_door",
+  "prompt": "art/prompts/pro6_door.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya"
+  ]
+ },
+ {
+  "name": "epi_party",
+  "prompt": "art/prompts/epi_party.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya"
+  ]
+ },
+ {
+  "name": "epi_peace",
+  "prompt": "art/prompts/epi_peace.txt",
+  "size": "1536x1024",
+  "alpha": "none",
+  "quality": "high",
+  "no_style_ref": true,
+  "ref": [
+   "refs/party_style.png=STYLE reference (art style, lighting, mood)",
+   "refs/kolya.png=character sheet: kolya"
+  ]
+ },
+ {
+  "name": "fest_props",
+  "prompt": "art/prompts/fest_props.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium"
+ },
+ {
+  "name": "fest_ui",
+  "prompt": "art/prompts/fest_ui.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium"
+ },
+ {
+  "name": "ach_sheet2",
+  "prompt": "art/prompts/ach_sheet2.txt",
+  "size": "1536x1024",
+  "alpha": "native",
+  "quality": "medium"
+ }
+]

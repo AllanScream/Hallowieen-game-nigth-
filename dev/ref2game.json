@@ -63,7 +63,12 @@
    "k16c_p*[0-9]",
    "k16c_m*[0-9]",
    "ka_p*[0-9]",
-   "ka_m*[0-9]"
+   "ka_m*[0-9]",
+   "costume_*",
+   "vm_avatar",
+   "fest_props",
+   "fest_ui",
+   "ach2"
   ],
   "max": 2048,
   "walk": {

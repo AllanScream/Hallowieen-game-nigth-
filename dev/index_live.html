@@ -164,11 +164,13 @@ input[type=range]{accent-color:var(--or);width:190px;cursor:pointer}
     <p>Хэллоуин, 22:00. Коля выходит из дома с коробкой яиц и рулоном туалетной бумаги. В переулке живут три модера: Кирилл, Райва и Эльф.</p>
     <p>Постучи в дверь и попроси сладость. Отказали — устрой гадость и закидай дом на 100 %. Только учти, что каждый модер мстит по-своему.</p>
     <p>Подарок может всё исправить. Когда разберёшься со всеми тремя, возвращайся домой: там тебя кое-что ждёт.</p>
-    <p>Концовок две: вечеринка-сюрприз и добрая — если помириться со всеми подарками и не сделать им ни одной гадости. 15 достижений собираются в телефоне (Tab → Достижения).</p>
+    <p>Пролог — в комнате Коли: стрим «КоляРеакт», донат «закидай модеров» и голосовое в чате модеров. Он показывается в первой новой игре, а посмотреть его ещё раз можно кнопкой ниже.</p>
+    <p>За южным забором, через ворота, — праздник: резьба по тыкве (рисуй что хочешь), яблоки из бочки, конкурс костюмов и гача-автомат с легендарными костюмами.</p>
+    <p>Концовок две: вечеринка-сюрприз и добрая — если помириться со всеми подарками и не сделать им ни одной гадости. После обеих Коля возвращается к стриму, и чат делится впечатлениями. 20 достижений собираются в телефоне (Tab → Достижения).</p>
     <p>Иногда идёт дождь, а в грозу молния гасит фонари — в темноте патрулю хуже видно. Дворы за домами открыты. После задания Веры у неё можно переодеться: призрак, тыква, колдун или чертёнок.</p>
     <p>Музыка главного меню — «お菓子の森» от whiteelv (её можно поменять в настройках). А в меню тебя ждёт голосовое сообщение.</p>
     <p style="color:#a88a70;font-size:14px">Пиксельная изометрия, звук синтезируется на лету. Консоль разработчика есть в телефоне (Tab → Консоль).</p>
-    <button class="sbtn back">‹ Назад</button></div>
+    <button class="sbtn" id="a_prologue">▶ Смотреть пролог</button> <button class="sbtn back">‹ Назад</button></div>
   <div class="foot" id="foot"></div>
 </div>
 <div id="dev"></div><div id="flash">reloaded</div>
@@ -262,7 +264,7 @@ const MEDIA = (() => {
     if (!voice.paused || voice.currentTime > 0) { const f = voice.duration ? voice.currentTime / voice.duration : 0, n = Math.round(f * BARS.length);
       [...wave.children].forEach((b, i) => b.classList.toggle('on', i < n)); dur.textContent = fmt(voice.paused ? voice.duration || 18 : voice.currentTime); }
     playB.textContent = voice.paused ? '▶' : '❚❚';
-    if (window.AUDIO) AUDIO.voiceOn = !voice.paused; }
+    }
   setInterval(tick, 50);
   const unlock = () => { if (unlocked) return; unlocked = true; tick(); };
   addEventListener('pointerdown', unlock, true); addEventListener('keydown', unlock, true);
@@ -271,7 +273,12 @@ const MEDIA = (() => {
   voice.addEventListener('ended', () => { heard = true; LS.set('sog_vm_heard', 1); mark(); voice.currentTime = 0; [...wave.children].forEach((b) => b.classList.remove('on')); });
   const toggle = (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } unlocked = true; if (voice.paused) voice.play().catch(() => {}); else voice.pause(); tick(); };
   card.addEventListener('click', toggle); card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') toggle(e); });
-  return { theme, voice, tick, stopVoice: () => voice.pause() };
+  // v12: Elf's voice note from the prologue (also in the mods' chat in the phone): the scene draws its progress from __vprog / __vplaying
+  const pro = new Audio('media/prologue_voice.mp3'); pro.preload = 'auto';
+  setInterval(() => { pro.volume = Math.max(0, Math.min(1, vol() * SET.voice / 100)); window.__vplaying = !pro.paused; window.__vprog = pro.duration ? pro.currentTime / pro.duration : 0;
+    if (window.AUDIO) AUDIO.voiceOn = !voice.paused || !pro.paused; }, 50);
+  const playPro = () => { unlocked = true; try { pro.currentTime = 0; } catch (e) {} pro.play().catch(() => {}); };
+  return { theme, voice, tick, stopVoice: () => voice.pause(), playPro, stopPro: () => { pro.pause(); } };
 })();
 const fullscreen = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); } catch (e) {} };
 $('s_full').onclick = fullscreen; $('m_full').onclick = fullscreen;
@@ -308,10 +315,10 @@ if (!render) openMenu('main');
 
   const keys = {}, dev = $('dev'), flash = $('flash'), txt = $('txt'), cv = $('c');
   const SPEEDS = [0.1, 0.25, 0.5, 1];
-  let play = null, prevSnap = null, acc = 0, simT = 0, speed = 1, paused = false, stepOnce = false, fps = 60, lastSave = 0;
+  let play = null, prevSnap = null, acc = 0, simT = 0, speed = 1, paused = false, stepOnce = false, fps = 60, lastSave = 0, introVoice = -1, vreq = 0;
   window.__PLAY = () => play;
   const start = (S, t) => { play = S; simT = t; prevSnap = null; acc = 0; closeMenu(); for (const k in keys) keys[k] = 0; if (window.AUDIO && AUDIO.unlock) AUDIO.unlock(); };
-  const autosave = () => { if (play && !play.finale) LS.set('sog_save', { v: SIM.VERSION, simT, play, at: Date.now() }); };
+  const autosave = () => { if (play && !play.finale && !play.intro) LS.set('sog_save', { v: SIM.VERSION, simT, play, at: Date.now() }); };
   // live preview: keep the play state across reloads; Claude's hot restore can drop straight into play
   if (!STATIC) try { const sv = JSON.parse(sessionStorage.getItem('live') || 'null');
     if (sv) { speed = sv.speed; paused = sv.paused; if (sv.play) start(Object.assign(SIM.create(), sv.play), sv.simT); flash.style.opacity = 1; setTimeout(() => (flash.style.opacity = 0), 1200); } } catch (e) {}
@@ -324,7 +331,8 @@ if (!render) openMenu('main');
   loadSave = (sv) => { if (play) autosave(); start(Object.assign(SIM.create(), sv.play), sv.simT || 0); lastSave = performance.now(); };
   $('m_new').onclick = () => { const sv = LS.get('sog_save'); if (sv && sv.play && Date.now() - newArm > 2500) { newArm = Date.now(); $('m_new').lastChild.textContent = 'Начать заново? Автосохранение перезапишется';
       setTimeout(() => ($('m_new').lastChild.textContent = 'Новая игра'), 2500); return; }
-    $('m_new').lastChild.textContent = 'Новая игра'; LS.del('sog_save'); start(SIM.spawn(simT), simT); lastSave = performance.now(); };
+    $('m_new').lastChild.textContent = 'Новая игра'; LS.del('sog_save'); const S0 = SIM.spawn(simT); if (!LS.get('sog_prologue_seen')) SIM.startIntro(S0); start(S0, simT); lastSave = performance.now(); };
+  $('a_prologue').onclick = () => { if (play) autosave(); const S0 = SIM.spawn(simT); SIM.startIntro(S0, true); start(S0, simT); };   // v12: the prologue alone, back to the menu after
   $('m_cont').onclick = () => { const sv = allSaves()[0]; if (sv) loadSave(sv); };
   $('p_resume').onclick = () => closeMenu();
   $('p_exit').onclick = () => { autosave(); play = null; SCENE.state = null; openMenu('main'); };
@@ -357,7 +365,7 @@ if (!render) openMenu('main');
       if (c === 'Period') { stepOnce = true; paused = true; e.preventDefault(); return; }
       if (c === 'BracketLeft') { speed = SPEEDS[Math.max(0, SPEEDS.indexOf(speed) - 1)]; return; }
       if (c === 'BracketRight') { speed = SPEEDS[Math.min(SPEEDS.length - 1, SPEEDS.indexOf(speed) + 1)]; return; } }
-    if (c === 'Escape' && !play.dlg && !play.phone && !play.chalk && !play.finale) { e.preventDefault(); autosave(); openMenu('pause'); return; }
+    if (c === 'Escape' && !play.dlg && !play.phone && !play.chalk && !play.finale && !play.intro && !play.mg) { e.preventDefault(); autosave(); openMenu('pause'); return; }
     if (c === 'F11') return;
     keys[c] = 1;
     const dg = /^Digit(\d)$/.exec(c); if (dg) pend.slot = +dg[1] || 10;                     // 1–9, 0 → inp.slot (hotbars)
@@ -389,7 +397,12 @@ if (!render) openMenu('main');
           inp.slot = pend.slot = 0; inp.wheel = pend.wheel = 0; inp.text = ''; acc -= SIM.DT; }
         if (SIM.outOfPlay && SIM.outOfPlay(play)) { play = SIM.respawn ? SIM.respawn(play, simT) : SIM.spawn(simT); prevSnap = null; }
         if (play.ach) { let dirty = false; for (const id in play.ach) if (!ACHG[id]) { ACHG[id] = Date.now(); dirty = true; } if (dirty) LS.set('sog_ach', ACHG); }
-        if (play.finale && play.finale.over) { LS.del('sog_save'); play = null; SCENE.state = null; openMenu('main'); }
+        { const I = play.intro, ln = I && !I.over ? I.lines[I.i] : null, key = ln && ln.voice ? I.i : -1;                       // v12: Elf's voice note plays on its prologue line
+          if (key !== introVoice) { if (key >= 0) MEDIA.playPro(); else if (introVoice >= 0) MEDIA.stopPro(); introVoice = key; }
+          if (play.vplayReq && play.vplayReq !== vreq) { vreq = play.vplayReq; if (window.__vplaying) MEDIA.stopPro(); else MEDIA.playPro(); }
+          if (play.introDone && !LS.get('sog_prologue_seen')) LS.set('sog_prologue_seen', 1); }
+        if (play.intro && play.intro.over) { MEDIA.stopPro(); introVoice = -1; play = null; SCENE.state = null; openMenu('main'); }
+        else if (play.finale && play.finale.over) { LS.del('sog_save'); play = null; SCENE.state = null; openMenu('main'); }
         else if (STATIC && now - lastSave > 10000) { lastSave = now; autosave(); } }
       if (play) SCENE.state = run && SIM.lerpState ? SIM.lerpState(prevSnap, play, acc / SIM.DT) : play;      // draw between the last two fixed steps: smooth at any refresh rate
     } else SCENE.state = null;
