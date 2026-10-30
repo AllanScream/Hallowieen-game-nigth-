@@ -3,7 +3,7 @@
 # The port is taken exclusively, so an old version's server still running elsewhere can never answer instead of this one.
 import functools, http.server, os, socket, sys, threading, webbrowser
 
-VERSION, FIRST_PORT = 'v12', 8012
+VERSION, FIRST_PORT = 'v12.1', 8012
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'game')
 
 

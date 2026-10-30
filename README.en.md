@@ -41,7 +41,8 @@ Opening `game/index.html` with a double click won't work: browsers don't let Web
 | WASD | walk, Shift — run |
 | RMB | throw exactly at the cursor (toilet paper — hold and release) |
 | 1–0, wheel | choose a trick |
-| E | action on the spot (at a post with a flyer — take it down) |
+| E | action on the spot (at a post with a flyer — take it down, at a festival stall — open it) |
+| Q | hide / show the quests |
 | G | put the rotten pumpkin down |
 | F | airsoft rifle (RMB — shoot) |
 | Tab | phone: map, chats, flashlight, shop, pizza, contacts, console |
@@ -59,7 +60,7 @@ Opening `game/index.html` with a double click won't work: browsers don't let Web
 - Rain and thunderstorms: puddles and splashes underfoot, thunder, lightning knocks the street lights out (in the dark the patrol sees less).
 - Costumes from Vera's chest after her quest: ghost, pumpkin head, wizard's hat, little devil horns.
 - 10 tricks and a «egged» meter for every moderator, favourite gifts for the peaceful path.
-- Tricks anywhere: firecrackers stun passers-by and the patrol, chalk, an alarm-clock decoy, the doorbell and slime on any door.
+- Tricks anywhere: firecrackers stun passers-by and the patrol, chalk (draw anything, five colours), an alarm-clock decoy, the doorbell and slime on any door.
 - Passers-by hold grudges: after three hits they chase you and take revenge (eggs back, «damages», a toilet-paper mummy).
 - Three revenges: an underpants auction (Kirill), a virus on your phone (Raiva), a police and army raid (Elf).
 - The phone: a list of conversations (each contact has their own thread), the mods' group chat with Elf's voice note, contacts who answer what you write — gacha, anime, the stream, the festival, the weather, «help» with a real hint and two dozen more topics (each in their own way, with kaomoji, sometimes with swearing), debts and a developer console (`help`, the wheel scrolls).

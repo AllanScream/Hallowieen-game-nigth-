@@ -206,7 +206,7 @@ function openMenu(mode) { menuMode = mode; menu.classList.add('on'); menu.classL
   $('load').style.display = mode === 'main' && !ready ? '' : 'none'; showPanel(null); refreshSave(); $('c').classList.toggle('dim', mode === 'pause');
   const b = menu.querySelector(mode === 'pause' ? '#p_resume' : (!$('m_cont').disabled ? '#m_cont' : '#m_new')); if (b && !b.disabled) b.focus({ preventScroll: true }); }
 function closeMenu() { menuMode = null; menu.classList.remove('on'); showPanel(null); $('c').classList.remove('dim'); }
-const NSLOT = 6, okv = (sv) => !!(sv && sv.play && /^v([6-9]|\d\d)$/.test(sv.v || ''));          // saves from v6 on load (new fields get defaults)
+const NSLOT = 6, okv = (sv) => !!(sv && sv.play && /^v([6-9]|\d\d)(\.\d+)?$/.test(sv.v || ''));          // saves from v6 on load (new fields get defaults)
 const getSlots = () => { const a = LS.get('sog_slots'); return Array.isArray(a) ? a : []; }, setSlots = (a) => LS.set('sog_slots', a);
 const allSaves = () => [LS.get('sog_save'), ...getSlots()].filter(okv).sort((a, b) => (b.at || 0) - (a.at || 0));   // the autosave + the named slots, newest first
 let saveToSlot = () => false, loadSave = () => {}, savesMode = 'load';                  // set once the game has loaded
@@ -299,7 +299,7 @@ if (!render) openMenu('main');
   const VW = (SIM.VIEW || {}).W || 1920, VH = (SIM.VIEW || {}).H || 1080;             // view size and aspect come from the sim
   document.documentElement.style.setProperty('--ar', VW / VH);
   $('foot').textContent = 'версия ' + (SIM.VERSION || '') + ' · Esc — пауза';
-  $('keyList').innerHTML = (SIM.HINT || '').split(' · ').concat(['Esc — пауза и меню', 'Tab → Консоль — команды разработчика (help)', 'Tab → Контакты — написать модерам, занять денег'])
+  $('keyList').innerHTML = (SIM.HINT || '').split(' · ').concat(['Esc — пауза и меню', 'Q — скрыть или показать задания', 'Tab → Консоль — команды разработчика (help)', 'Tab → Контакты — написать модерам, занять денег'])
     .map((s) => { const i = s.indexOf(' — '); return i < 0 ? `<li><span>${s}</span></li>` : `<li><b>${s.slice(0, i)}</b><span>${s.slice(i + 3)}</span></li>`; }).join('');
   G.init($('c'), VW, VH);
   const rep = new Set(SCENE.REPEAT || []), near = (n) => SCENE.NEAREST === true || (SCENE.NEAREST || []).includes(n);   // NEAREST: true = all
@@ -344,7 +344,7 @@ if (!render) openMenu('main');
   // side buttons of gaming mice go «back»: buttons other than the left one do nothing to the page, and «back» lands in the pause menu
   const noBrowse = (e) => { if (e.button > 0 && !(e.target && e.target.closest && e.target.closest('#menu .panel'))) e.preventDefault(); };
   for (const ty of ['mousedown', 'mouseup', 'auxclick']) addEventListener(ty, noBrowse, { passive: false });
-  try { history.pushState({ sog: 1 }, ''); addEventListener('popstate', () => { try { history.pushState({ sog: 1 }, ''); } catch (e) {} if (play && !menuMode && !play.finale) { autosave(); openMenu('pause'); } }); } catch (e) {}
+  try { history.pushState({ sog: 1 }, ''); addEventListener('popstate', () => { try { history.pushState({ sog: 1 }, ''); } catch (e) {} }); } catch (e) {}   // v12.1: a gesture «back» does nothing (Esc pauses)
   // the phone's text field: a real <input> laid over the drawn field (console commands, messages to contacts)
   const pend = { slot: 0, wheel: 0, texts: [] }; let txtApp = null;
   txt.addEventListener('keydown', (e) => { e.stopPropagation();
@@ -369,6 +369,7 @@ if (!render) openMenu('main');
     if (c === 'Escape' && !play.dlg && !play.phone && !play.chalk && !play.finale && !play.intro && !play.mg) { e.preventDefault(); autosave(); openMenu('pause'); return; }
     if (c === 'F11') return;
     keys[c] = 1;
+    if (c === 'KeyQ') { window.__questsHidden = !window.__questsHidden; LS.set('sog_quests_hidden', window.__questsHidden ? 1 : 0); e.preventDefault(); return; }   // v12.1
     const dg = /^Digit(\d)$/.exec(c); if (dg) pend.slot = +dg[1] || 10;                     // 1–9, 0 → inp.slot (hotbars)
     e.preventDefault();
   });
@@ -379,7 +380,10 @@ if (!render) openMenu('main');
   addEventListener('contextmenu', (e) => e.preventDefault());
   const toView = (e) => { const r = cv.getBoundingClientRect(); ptr.x = (e.clientX - r.left) / r.width * VW; ptr.y = (e.clientY - r.top) / r.height * VH; };
   addEventListener('pointermove', toView);
-  addEventListener('pointerdown', (e) => { if (menuMode || !play) return; toView(e); if (txtApp && document.activeElement === txt) txt.blur(); if (e.button > 0) e.preventDefault();
+  window.__questsHidden = !!LS.get('sog_quests_hidden');
+  addEventListener('pointerdown', (e) => { if (menuMode || !play) return; toView(e);
+    { const Q = SCENE.QHDR; if (e.button === 0 && Q && !play.dlg && !play.phone && !play.mg && !play.chalk && ptr.x > Q.x && ptr.x < Q.x + Q.w && ptr.y > Q.y && ptr.y < Q.y + Q.h) {
+      window.__questsHidden = !window.__questsHidden; LS.set('sog_quests_hidden', window.__questsHidden ? 1 : 0); return; } } if (txtApp && document.activeElement === txt) txt.blur(); if (e.button > 0) e.preventDefault();
     if (e.button === 2) { ptr.rdown = 1; ptr.rclick = 1; } else { ptr.down = 1; ptr.click = 1; } });
   addEventListener('pointerup', (e) => { if (e.button === 2) ptr.rdown = 0; else ptr.down = 0; });
   addEventListener('blur', () => { for (const k in keys) keys[k] = 0; ptr.down = ptr.rdown = 0; });

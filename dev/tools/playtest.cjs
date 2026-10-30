@@ -39,7 +39,7 @@ S.slot = 5; goto(HK.mail[0], HK.mail[1] + 40); waitWindow(); key('e'); idle(9);
 ok((S.kir.pr.alarm || 0) >= 8, `alarm → ${S.kir.p.toFixed(1)} %`);
 // chalk minigame: trace all points
 S.slot = 6; goto(HK.gate, -270); key('e'); ok(!!S.chalk, 'chalk started');
-if (S.chalk) for (const p of S.chalk.pts) { const [px, py] = scr(p[0], p[1]); SIM.step(S, { press: 1, px, py }); }
+if (S.chalk) { { const c = S.chalk; for (let k = 0; k < 6; k++) { const p = []; for (let i = 0; i < 12; i++) p.push([c.at[0] - 120 + k * 40 + 6 * Math.sin(i), c.at[1] - 100 + i * 17]); c.strokes.push({ col: k % 5, p }); } } key('enter'); }
 idle(0.2); ok((S.kir.pr.chalk || 0) > 0, `chalk → ${S.kir.p.toFixed(1)} %`);
 // firecrackers: place, run
 S.slot = 7; goto(HK.door[0], F + 60); waitWindow(); key('e'); goto(HK.door[0] - 400, 150, 4); idle(3);
@@ -102,7 +102,7 @@ console.log(log.join('\n')); console.log('clock', SIM.clockStr(S), 'money', S.mo
   R(rk().p > 10, `eggs → ${rk().p.toFixed(0)} %`);
   S2.slot = 3; go(HR.door[0], SIM.FACADE + 60); camFree(); key('e'); go(HR.door[0] - 300, 150, 4); idl(3.5); R((rk().pr.bell || 0) >= 8, `bell → ${rk().p.toFixed(0)} %`);
   S2.slot = 5; go(HR.mail[0], HR.mail[1] + 40); key('e'); idl(9); R((rk().pr.alarm || 0) >= 8, `alarm → ${rk().p.toFixed(0)} %`);
-  S2.slot = 6; go(HR.gate, -270); key('e'); if (S2.chalk) for (const p of S2.chalk.pts) { const [px, py] = sc(p[0], p[1]); SIM.step(S2, { press: 1, px, py }); } idl(0.2); R((rk().pr.chalk || 0) > 0, `chalk → ${rk().p.toFixed(0)} %`);
+  S2.slot = 6; go(HR.gate, -270); key('e'); if (S2.chalk) { { const c = S2.chalk; for (let k = 0; k < 6; k++) { const p = []; for (let i = 0; i < 12; i++) p.push([c.at[0] - 120 + k * 40 + 6 * Math.sin(i), c.at[1] - 100 + i * 17]); c.strokes.push({ col: k % 5, p }); } } key('enter'); } idl(0.2); R((rk().pr.chalk || 0) > 0, `chalk → ${rk().p.toFixed(0)} %`);
   S2.slot = 7; go(HR.door[0], SIM.FACADE + 60); key('e'); go(HR.door[0] - 400, 150, 4); idl(3); R((rk().pr.fire || 0) >= 10, `fire → ${rk().p.toFixed(0)} %`);
   S2.slot = 8; go(HR.door[0], SIM.FACADE + 60); idl(4.5); camFree(3.4); key('e'); for (let k = 0; k < 330; k++) SIM.step(S2, { e: 1 }); st({}); R(rk().slime === 1, `slime → ${rk().p.toFixed(0)} %`);
   key('tab'); st({ phone: 'pizza' }); st({ phone: 'order_pizza' }); idl(34); R((rk().pr.pizza || 0) >= 10, `pizza → ${rk().p.toFixed(0)} %`);
@@ -138,7 +138,7 @@ console.log(log.join('\n')); console.log('clock', SIM.clockStr(S), 'money', S.mo
   S3.slot = 3; go(HE.door[0], SIM.FACADE + 60); dark(); const hp0 = S3.hp; key('e'); idl(4.5); R(S3.hp < hp0, `bell, staying in the yard: a suction-cup arrow (hp ${hp0} → ${S3.hp})`);
   idl(17); go(HE.door[0], SIM.FACADE + 60); dark(); key('e'); go(HE.door[0] - 300, 150, 4); idl(3.5); R((ek().pr.bell || 0) >= 8, `bell and run → ${ek().p.toFixed(0)} %`);
   S3.slot = 5; go(HE.mail[0], HE.mail[1] + 40); key('e'); idl(9); R((ek().pr.alarm || 0) >= 8, `alarm → ${ek().p.toFixed(0)} %`);
-  S3.slot = 6; go(HE.gate, -270); key('e'); if (S3.chalk) for (const p of S3.chalk.pts) { const [px, py] = sc(p[0], p[1]); SIM.step(S3, { press: 1, px, py }); } idl(0.2); R((ek().pr.chalk || 0) > 0, `chalk → ${ek().p.toFixed(0)} %`);
+  S3.slot = 6; go(HE.gate, -270); key('e'); if (S3.chalk) { const c = S3.chalk; for (let k = 0; k < 6; k++) { const p = []; for (let i = 0; i < 12; i++) p.push([c.at[0] - 120 + k * 40 + 6 * Math.sin(i), c.at[1] - 100 + i * 17]); c.strokes.push({ col: k % 5, p }); } key('enter'); } idl(0.2); R((ek().pr.chalk || 0) > 0, `chalk → ${ek().p.toFixed(0)} %`);
   S3.slot = 7; go(HE.door[0], SIM.FACADE + 60); dark(); key('e'); go(HE.door[0] - 400, 150, 4); idl(3); R((ek().pr.fire || 0) >= 10, `fire → ${ek().p.toFixed(0)} %`);
   S3.slot = 8; go(HE.door[0], SIM.FACADE + 60); idl(4.5); dark(); key('e'); for (let k = 0; k < 330; k++) SIM.step(S3, { e: 1 }); st({}); R(ek().slime === 1, `slime in the dark → ${ek().p.toFixed(0)} %`);
   key('tab'); st({ phone: 'pizza' }); st({ phone: 'order_pizza' }); idl(34); R((ek().pr.pizza || 0) >= 10, `pizza → ${ek().p.toFixed(0)} %`);

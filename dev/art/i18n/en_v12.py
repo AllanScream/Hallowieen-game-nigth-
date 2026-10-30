@@ -119,4 +119,12 @@ EXTRA = [
  ['Пролог — в комнате Коли: стрим «КоляРеакт», донат «закидай модеров» и голосовое в чате модеров. Он показывается в первой новой игре, а посмотреть его ещё раз можно кнопкой ниже.', "The prologue is set in Kolya's room: the «KolyaReacts» stream, an «egg the mods» donation and a voice note in the mods' chat. It plays in your first new game; the button below shows it again."],
  ['За южным забором, через ворота, — праздник: резьба по тыкве (рисуй что хочешь), яблоки из бочки, конкурс костюмов и гача-автомат с легендарными костюмами.', 'Beyond the south fence, through the gate, there is a festival: pumpkin carving (draw anything), apple bobbing, a costume contest and a gacha machine with legendary costumes.'],
  ['Концовок две: вечеринка-сюрприз и добрая — если помириться со всеми подарками и не сделать им ни одной гадости. После обеих Коля возвращается к стриму, и чат делится впечатлениями. 20 достижений собираются в телефоне (Tab → Достижения).', 'There are two endings: a surprise party, and a kind one — make peace with everyone with gifts and never prank them. After both, Kolya goes back to his stream and the chat shares its impressions. 20 achievements are collected in the phone (Tab → Achievements).'],
+
+ # v12.1
+ ['ψ Чертёнок', 'ψ Little devil'], ['Не подойти — обойди с другой стороны', "Can't get there — go around the other side"], ['Все команды (колесо мыши — листать):', 'All commands (mouse wheel — scroll):'],
+ ['Мелки: рисуй что хочешь — зажми ЛКМ. 1–5 или колесо — цвет, ПКМ — отменить штрих, Enter — готово', 'Chalk: draw anything — hold LMB. 1–5 or the wheel — colour, RMB — undo a stroke, Enter — done'],
+ ['Рисунок мелом у дома {0}: +{1} %', "A chalk drawing at {0}'s house: +{1} %"], ['Рисунок мелом готов. Прохожие оценят', 'The chalk drawing is done. Passers-by will appreciate it'],
+ ['Нарисовать мелками большой рисунок (5+ линий)', 'Draw a big chalk picture (5+ lines)'], ['Мелки: рисуй что хочешь', 'Chalk: draw anything'],
+ ['ЛКМ — рисовать · 1–5 / колесо — цвет · ПКМ — отменить штрих · Enter — готово', 'LMB — draw · 1–5 / wheel — colour · RMB — undo a stroke · Enter — done'],
+ ['▸ Q — показать', '▸ Q — show'], ['▾ Q — скрыть', '▾ Q — hide'], ['Q — скрыть или показать задания', 'Q — hide or show the quests'],
 ]

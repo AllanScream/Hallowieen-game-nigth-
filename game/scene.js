@@ -210,11 +210,11 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
   const cosView = (name) => { const m = /_(p|m)(\d+)w$/.exec(name); if (!m) return 1; const yw = (m[1] === 'p' ? 1 : -1) * +m[2]; return Math.max(0, Math.min(4, Math.round((90 - yw) / 45))); };
   function costumeOver(cos0, r, a, walking) { const f = r.af, v = cosView(f.name), fl = f.flip, cos = cos0.split('_')[0], gold = /_gold$/.test(cos0), neon = /_neon$/.test(cos0);   // v12: gacha variants tint the base costume
     const u = { alpha: a, tint: ST.hp < 30 ? [1, 0.6, 0.6, 0.3] : gold ? [1, 0.8, 0.22, 0.62] : neon ? [0.35, 1, 0.95, 0.58] : [1, 1, 1, 0], rim: [0.3, fl ? 0.004 : -0.004, -0.004, 1], rimCol: gold ? [1, 0.9, 0.4] : neon ? [0.4, 1, 1] : [1, 0.7, 0.4] };
-    if (neon) L.glow(f.X, f.Y - KH * 0.5, KH * 0.9, [0.3, 1, 0.95], 0.35 + 0.1 * Math.sin(T * 4), 2.5); if (gold) L.glow(f.X, f.Y - KH * 0.85, KH * 0.45, [1, 0.8, 0.3], 0.3 + 0.1 * Math.sin(T * 3), 2.5);
+    const spr = (n, x, y, o) => { L.sprite(n, x, y, o); if (gold || neon) { G.blend('add'); L.sprite(n, x, y, Object.assign({}, o, { u: Object.assign({}, o.u, { alpha: o.u.alpha * (neon ? 0.32 + 0.12 * Math.sin(T * 4) : 0.22 + 0.08 * Math.sin(T * 3)) }) })); G.blend(); } };
     if (cos === 'ghost') { const n = 'cos_ghost_' + v, md = (window.COSMETA || {}).ghost, g = md ? md[v] : { gf: 0.99, tf: 0.01, cx: 0.5 }; if (!has(n)) return;
       const Hs = KH * 1.04, sc = Hs / ((g.gf - g.tf) * A[n].h), w = A[n].w * sc, h = A[n].h * sc, gx = f.X, gy = f.Y + (walking ? -1.5 * Math.abs(Math.sin(Math.PI * 2 * ST.gph)) : 0);
       const x0 = fl ? gx - (1 - g.cx) * w : gx - g.cx * w, y0 = gy - g.gf * h, rot = walking ? 0.03 * Math.sin(Math.PI * 2 * ST.gph) : 0.012 * Math.sin(T * 1.7);
-      L.sprite(n, x0, y0, { w, h, flip: fl, u, rot, pivot: [fl ? (1 - g.cx) * w : g.cx * w, g.gf * h] });
+      spr(n, x0, y0, { w, h, flip: fl, u, rot, pivot: [fl ? (1 - g.cx) * w : g.cx * w, g.gf * h] });
       r.head = [gx, y0 + g.tf * h];
       if (ST.carry === 'rotten' && has('rotten')) { const hh = 44, ww = L.hsz('rotten', hh); L.sprite('rotten', gx - ww / 2 + (fl ? -10 : 10), gy - KH * 0.48, { w: ww, h: hh }); }
       if (ST.gun && !(ST.hidden)) drawRifle(gx, gy);
@@ -222,7 +222,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     const hd = f.hd; if (!hd) return; const n = 'cos_' + cos + '_' + v; if (!has(n)) return;
     const spec = { pumpkin: [0.31, 0.6, 0.0], hat: [0.42, 0.86, -0.05], horns: [0.27, 1.0, -0.035] }[cos];
     let w = KH * spec[0], h = w * A[n].h / A[n].w; if (cos === 'horns') { h = KH * 0.105; w = h * A[n].w / A[n].h; }      // the horns keep their height in every view
-    L.sprite(n, hd[0] - w / 2, hd[1] + KH * spec[2] - h * spec[1], { w, h, flip: fl, u });
+    spr(n, hd[0] - w / 2, hd[1] + KH * spec[2] - h * spec[1], { w, h, flip: fl, u });
     if (cos === 'pumpkin' && v <= 2) { const q = [hd[0] + (fl ? -1 : 1) * w * [0, 0.12, 0.3][v], hd[1] - h * 0.12]; L.glow(q[0], q[1], 16, [1, 0.7, 0.25], 0.5 + 0.15 * Math.sin(T * 9), 2.5); }
     r.head = [hd[0], hd[1] - (cos === 'hat' ? KH * 0.3 : KH * 0.12)]; }
   const K16XF = 0.07, MZ = new WeakMap();                                     // MZ: where each BB left the drawn muzzle                                                            // crossfade between neighbouring directions (s)
@@ -415,12 +415,15 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     // puddles reflecting lamps (wet road)
     SIM.LAMPS.forEach(([x, y], i) => { const ry = y < 0 ? -150 : 150, q = P(x + 60, ry); if (!onScreen(q)) return; glowE(q[0], q[1] + 30, 24, 110, LAMPC, 0.16 * flick(i, 0.3), 2); });
     // chalk drawing
-    MD.forEach(([id, k, h]) => { const live = ST.chalk && ST.chalk.mod === id; if (!(k.chalk > 0) && !live) return;
+    MD.forEach(([id, k, h]) => { const live = ST.chalk && ST.chalk.mod === id && !ST.chalk.free; if ((!(k.chalk > 0) && !live) || (!live && (ST.drawings || []).some((d) => d.free && d.mod === id))) return;
       const pts = SIM.chalkShape(h), hit = live ? ST.chalk.hit : pts.map(() => 1), a = live ? 0.9 : 0.25 + 0.6 * k.chalk;
       pts.forEach((p, i) => { if (!hit[i]) return; const q = P(p[0], p[1]); L.puff(q[0], q[1], 9, [0.92, 0.9, 0.95], a, i); }); });
     // chalk drawings anywhere (v9) and the one being drawn
-    (ST.drawings || []).forEach((d, j) => { if (!vis0(d.x, d.y)) return; const a = 0.25 + 0.6 * d.acc; SIM.chalkPts(d.kind, d.x, d.y).forEach((p, i) => { if (L.rnd(j * 31 + i, 3) > d.acc + 0.15) return; const q = P(p[0], p[1]); L.puff(q[0], q[1], 9, [0.92, 0.9, 0.95], a, i + j * 50); }); });
-    if (ST.chalk && !ST.chalk.mod) ST.chalk.pts.forEach((p, i) => { if (!ST.chalk.hit[i]) return; const q = P(p[0], p[1]); L.puff(q[0], q[1], 9, [0.92, 0.9, 0.95], 0.9, i); });
+    (ST.drawings || []).forEach((d) => { if (d.free && vis0(d.x, d.y, 700)) chalkSprite('chalk_' + d.id, d.strokes, d.x, d.y, SIM.CHALK_R, 0.92); });   // v12.1: free drawings
+    if (ST.chalk && ST.chalk.free) { const c = ST.chalk, q = P(c.at[0], c.at[1]), R = c.r || SIM.CHALK_R; L.ring(q[0], q[1], 1.264 * R, 0.632 * R, [1, 1, 1], 0.35 + 0.15 * Math.sin(T * 3), 0.012);
+      chalkSprite('chalk_live', c.strokes, c.at[0], c.at[1], SIM.CHALK_R, 1); }
+    (ST.drawings || []).forEach((d, j) => { if (d.free || !vis0(d.x, d.y)) return; const a = 0.25 + 0.6 * d.acc; SIM.chalkPts(d.kind, d.x, d.y).forEach((p, i) => { if (L.rnd(j * 31 + i, 3) > d.acc + 0.15) return; const q = P(p[0], p[1]); L.puff(q[0], q[1], 9, [0.92, 0.9, 0.95], a, i + j * 50); }); });
+    if (ST.chalk && !ST.chalk.mod && !ST.chalk.free) ST.chalk.pts.forEach((p, i) => { if (!ST.chalk.hit[i]) return; const q = P(p[0], p[1]); L.puff(q[0], q[1], 9, [0.92, 0.9, 0.95], 0.9, i); });
     // trash spilled from kicked bins
     SIM.BINS.forEach(([x, y], i) => { const dn = ST.binsDown && ST.binsDown[i] !== undefined ? GT - ST.binsDown[i] : 99; if (dn > 60 || !vis0(x, y)) return;
       for (let j = 0; j < 9; j++) { const q = P(x - 30 - 70 * L.rnd(i, j), y + 20 + 60 * (L.rnd(j, i) - 0.3)), f = Math.min(1, dn / 0.4);
@@ -920,11 +923,12 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     L.label('mgt', title, p.x + 40, p.y + 52, { size: 40, col: '#ffb45a', out: '#120806', font: SERIF }); if (sub) L.label('mgs', sub, p.x + 42, p.y + 96, { size: 22, col: '#d8c8b0', out: '#120806', weight: 'normal' });
     const c = U.close, hv = inRr(c); L.rrect(c.x, c.y, c.w, c.h, 12, hv ? [0.8, 0.25, 0.15] : [0.4, 0.15, 0.1], [0.25, 0.08, 0.05], 0.95); L.label('mgx', '✕', c.x + c.w / 2, c.y + c.h / 2, { size: 30, col: '#ffe8d0', out: null, al: 0.5 }); }
   function timerBar(x, y, w, f) { L.rrect(x, y, w, 16, 8, [0.2, 0.12, 0.1], [0.1, 0.06, 0.05], 0.95); L.rrect(x + 2, y + 2, Math.max(0, (w - 4) * f), 12, 6, f < 0.25 ? [1, 0.35, 0.2] : [1, 0.75, 0.3], f < 0.25 ? [0.7, 0.15, 0.05] : [0.85, 0.45, 0.1]); }
-  function resultCard(G2, lines, big) { const p = { x: W / 2 - 600, y: 230, w: 1200, h: 120 + lines.length * 46 + 110 }; L.solid(0, 0, W, H, [0.02, 0.01, 0.03], 0, 0, 0, 0.45);
+  function resultCard(G2, lines, big, icon) { const ok = SIM.FUI.ok, p = { x: W / 2 - 600, y: 220, w: 1200, h: ok.y + ok.h + 26 - 220 };   // v12.1: the button where the sim reads the click L.solid(0, 0, W, H, [0.02, 0.01, 0.03], 0, 0, 0, 0.45);
     panel(p.x, p.y, p.w, p.h, 22, 0.97); L.uiBox('mgres', p.x, p.y, p.w, p.h, 6); L.glow(W / 2, p.y + 60, 260, big ? [1, 0.8, 0.3] : [0.9, 0.5, 0.2], 0.35, 2.5);
     L.label('mgrt', G2.res.title, W / 2, p.y + 64, { size: 48, col: big ? '#ffd76a' : '#ffb45a', out: '#2a0a02', al: 0.5, font: SERIF });
-    lines.forEach((l, i) => L.label('mgrl' + i, l, W / 2, p.y + 138 + i * 46, { size: 26, col: '#f6e7c8', out: '#120806', al: 0.5, weight: 'normal' }));
-    const ok = Object.assign({}, SIM.FUI.ok, { y: p.y + p.h - 96 }); fbtn('mgok', ok, 'Дальше'); }
+    if (icon) icon(W / 2, p.y + 220);
+    const ly = p.y + (icon ? 330 : 150); lines.forEach((l, i) => L.label('mgrl' + i, l, W / 2, ly + i * 46, { size: 26, col: '#f6e7c8', out: '#120806', al: 0.5, weight: 'normal' }));
+    fbtn('mgok', ok, 'Дальше'); }
   const RIVALSTROKES = [[[[-0.42, -0.25], [-0.3, -0.42], [-0.18, -0.25], [-0.36, -0.3], [-0.24, -0.3]], [[0.18, -0.25], [0.3, -0.42], [0.42, -0.25], [0.24, -0.3], [0.36, -0.3]], [[-0.4, 0.15], [-0.2, 0.35], [0.2, 0.35], [0.4, 0.15]], [[-0.1, -0.05], [0, 0.05], [0.1, -0.05]]],
     [[[-0.4, -0.3], [-0.2, -0.3]], [[0.2, -0.3], [0.4, -0.3]], [[-0.25, 0.05], [-0.25, 0.4], [-0.05, 0.4], [-0.05, 0.05], [-0.25, 0.05]], [[0.1, 0.05], [0.3, 0.05], [0.3, 0.4], [0.1, 0.4], [0.1, 0.22], [0.3, 0.22]]],
     [[[-0.45, -0.2], [-0.35, -0.3], [-0.25, -0.2]], [[-0.15, -0.2], [-0.05, -0.3], [0.05, -0.2]], [[0.15, -0.2], [0.25, -0.3], [0.35, -0.2]], [[-0.3, 0.2], [0, 0.32], [0.3, 0.2]]]];
@@ -938,7 +942,7 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     timerBar(x, 690, 460, left); L.label('mgtm', Math.ceil(left * C2.dur) + ' с', x + 470, 698, { size: 22, col: '#f6e7c8', out: '#120806' });
     fbtn('mgclear', U.clear, 'Стереть', [0.55, 0.35, 0.3], !G2.res); fbtn('mgdone', U.done, 'Готово!', [0.95, 0.5, 0.12], !G2.res);
     if (G2.res) { const R = G2.res, lines = R.judges.map(([n, s, c]) => `${n}: ${s.toFixed(1)} — «${c}»`).concat([`Итог: ${R.score.toFixed(1)} · ${R.place}-е место из 4` + (R.prize ? ` · приз ${R.prize} ₽` : ''), R.line]);
-      resultCard(G2, lines, R.place === 1); } }
+      resultCard(G2, lines, R.place === 1, (x, y) => { L.glow(x, y, 120, [1, 0.6, 0.2], 0.5, 2.5); carvedPumpkin('carve_live', G2.strokes, x, y, 150); }); } }
   function applesOverlay(G2) { const AP = SIM.APPLE, left = Math.max(0, 1 - (GT - G2.t0) / AP.dur);
     mgFrame('Яблоки из бочки', 'Кликай по яблокам, пока они над водой. Золотое — за три.');
     const ellS = (rx, ry, col, col2, step = 6, dy = 0) => { for (let y = -ry; y < ry; y += step) { const f = (y + step / 2) / ry, w = rx * Math.sqrt(Math.max(0, 1 - f * f)), k = (y + ry) / (2 * ry);
@@ -953,7 +957,8 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       if (a.gold && up) L.glow(q[0], q[1] - 18, 70, [1, 0.85, 0.3], 0.6, 3); });
     if (G2.pop && GT - G2.pop.t < 0.8) { const a = (GT - G2.pop.t) / 0.8; L.label('mgpop', G2.pop.gold ? '+3!' : '+1', G2.pop.x[0], G2.pop.x[1] - 40 - 60 * a, { size: 40, col: G2.pop.gold ? '#ffd76a' : '#ffffff', out: '#2a0a02', al: 0.5, a: 1 - a }); }
     timerBar(560, 920, 800, left); L.label('mgsc', 'Яблок: ' + G2.n, 1500, 190, { size: 40, col: '#ffd76a', out: '#120806', al: 1 });
-    if (G2.res) { const R = G2.res; resultCard(G2, [`Выловлено яблок: ${R.n}`, `+${R.prize} ₽ и +${R.hp} HP`, `Рекорд: ${R.best}`], R.n >= 10); } }
+    if (G2.res) { const R = G2.res; resultCard(G2, [`Выловлено яблок: ${R.n}`, `+${R.prize} ₽ и +${R.hp} HP`, `Рекорд: ${R.best}`], R.n >= 10, (x, y) => { const k = Math.min(R.n, 7);
+      for (let i = 0; i < k; i++) { const n = i % 3 === 2 ? 'ui_apple_g' : 'ui_apple_r', s2 = 84, xx = x + (i - (k - 1) / 2) * 70; if (has(n)) L.sprite(n, xx - s2 / 2, y - s2 / 2 + (i % 2) * 14, { w: s2, h: s2 }); } }); } }
   const ARROW = ['▲', '▶', '▼', '◀'];
   function stageOverlay(G2) { const n = G2.seq.length, x0 = W / 2 - n * 46, y = H - 230;
     panel(x0 - 30, y - 70, n * 92 + 60, 160, 20, 0.9); L.label('stt', 'Конкурс костюмов: держи позу!', W / 2, y - 40, { size: 26, col: '#ffb45a', out: '#120806', al: 0.5 });
@@ -964,7 +969,8 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     if (GT < G2.at && G2.i === 0) L.label('stc', String(Math.ceil(G2.at - GT)), W / 2, H / 2 - 120, { size: 120, col: '#ffd76a', out: '#2a0a02', al: 0.5, font: SERIF });
     if (G2.flash && GT - G2.flash.t < 0.6) L.label('stf', G2.flash.ok ? 'ПОЗА!' : 'Мимо…', W / 2, H / 2 - 160 - 40 * (GT - G2.flash.t), { size: 64, col: G2.flash.ok ? '#ffd76a' : '#ff8a7a', out: '#2a0a02', al: 0.5, a: 1 - (GT - G2.flash.t) / 0.6 });
     L.label('sth', `${G2.hits}/${n} · стрелки или WASD · Esc — уйти со сцены`, W / 2, y + 108, { size: 20, col: '#d8c8b0', out: '#120806', al: 0.5, weight: 'normal' });
-    if (G2.res) { const R = G2.res; resultCard(G2, [`Позы: ${R.hits} из ${n}` + (R.bonus ? ' + бонус за легендарный костюм' : ''), R.prize ? `Приз зрительских симпатий: ${R.prize} ₽` : 'Для победы нужно 6 поз из 8'], !!R.prize); } }
+    if (G2.res) { const R = G2.res; resultCard(G2, [`Позы: ${R.hits} из ${n}` + (R.bonus ? ' + бонус за легендарный костюм' : ''), R.prize ? `Приз зрительских симпатий: ${R.prize} ₽` : 'Для победы нужно 6 поз из 8'], !!R.prize, (x, y) => {
+      for (let i = 0; i < 5; i++) { const nm = i < Math.round(R.score * 5 / 8) ? 'ui_star_g' : 'ui_star_s', s2 = i === 2 ? 110 : 80; if (has(nm)) L.sprite(nm, x + (i - 2) * 100 - s2 / 2, y - s2 / 2, { w: s2, h: s2 }); } }); } }
   const RCOL = { 3: [0.3, 0.6, 1], 4: [0.75, 0.35, 1], 5: [1, 0.8, 0.25] };
   function capsule(x, y, r, col, open = 0, a = 1) { const c2 = col.map((v) => v * 0.55);
     if (open > 0) { const k = 1 - open; L.glow(x, y, r * (2.2 + 2 * open), col, 0.75 * open * a, 2.5);                 // opened: the shell flies apart, a star of the rarity's colour
@@ -972,6 +978,30 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       L.star(x, y, r * (0.9 + 0.5 * open), col.map((v) => Math.min(1, v + 0.25)), a * open); L.glow(x, y, r * 0.6, [1, 1, 1], 0.6 * open * a, 3); return; }
     L.rrect(x - r, y - r, r * 2, r * 2, r, col, c2, a); clipOn(x - r - 2, y - r - 2, r * 2 + 4, r + 2); L.rrect(x - r, y - r, r * 2, r * 2, r, [0.95, 0.97, 1], [0.72, 0.78, 0.88], a * 0.92); clipOff();
     L.solid(x - r, y - 2, r * 2, 4, [0.2, 0.12, 0.15], 0, 0, 0, a * 0.8); L.glow(x - r * 0.35, y - r * 0.45, r * 0.5, [1, 1, 1], 0.35 * a, 3); }
+  // v12.1: what dropped, as a picture: hotbar icons, a coin, the costume itself, a candy / latte / sticker glyph
+  function itemIcon(id, x, y, sz, a = 1) { const spr = { eggs3: 'icon_eggs', tp1: 'icon_tp', fire2: 'icon_fire', flyers3: 'icon_flyers', slime1: 'icon_slime', coins10: 'coin', coins100: 'coin', coins1000: 'coin' }[id];
+    if (spr && has(spr)) { const k = Math.min(sz / A[spr].w, sz / A[spr].h); L.sprite(spr, x - A[spr].w * k / 2, y - A[spr].h * k / 2, { w: A[spr].w * k, h: A[spr].h * k, u: { alpha: a } });
+      if (id === 'coins100' || id === 'coins1000') L.label('ii' + id + x, id === 'coins100' ? '×100' : '×1000', x + sz * 0.3, y + sz * 0.35, { size: Math.round(sz * 0.26), col: '#ffd76a', out: '#120806', al: 0.5, a }); return; }
+    const cos = { pumpkin_gold: ['cos_pumpkin_0', [1, 0.8, 0.22, 0.6]], ghost_neon: ['cos_ghost_0', [0.35, 1, 0.95, 0.58]] }[id];
+    if (cos && has(cos[0])) { const n = cos[0], k = Math.min(sz / A[n].w, sz / A[n].h); L.sprite(n, x - A[n].w * k / 2, y - A[n].h * k / 2, { w: A[n].w * k, h: A[n].h * k, u: { alpha: a, tint: cos[1] } }); return; }
+    const gl = { candy: '🍬', latte: '☕', sticker: '♡' }[id]; if (gl) L.label('ii' + id + Math.round(x), gl, x, y, { size: Math.round(sz * 0.7), col: id === 'sticker' ? '#ff8ad8' : '#ffffff', out: null, al: 0.5, a }); }
+  // v12.1: chalk drawings on the ground — strokes in world points; the iso projection is affine, so a drawing is one canvas texture
+  let CHNOISE = null;
+  function chalkSprite(name, strokes, ax, ay, R, a) { const k = 0.7, w = Math.round(2.528 * R * k), h = Math.round(1.264 * R * k), sig = strokes.length + ':' + strokes.reduce((q, st) => q + st.p.length, 0);
+    if (CARVESIG[name] !== sig) { CARVESIG[name] = sig;
+      cvTex(name, w, h, (g) => { const X = (p) => (C * ((p[0] - ax) + (p[1] - ay)) + 1.264 * R) * k, Y = (p) => (SN * ((p[1] - ay) - (p[0] - ax)) + 0.632 * R) * k; g.lineCap = 'round'; g.lineJoin = 'round';
+        for (const st of strokes) { g.strokeStyle = SIM.CHALKCOL[st.col] || '#fff'; g.globalAlpha = 0.85; g.lineWidth = 9 * k; g.beginPath(); st.p.forEach((p, i) => (i ? g.lineTo(X(p), Y(p)) : g.moveTo(X(p), Y(p)))); if (st.p.length === 1) g.lineTo(X(st.p[0]) + 1, Y(st.p[0])); g.stroke();
+          g.globalAlpha = 0.35; g.strokeStyle = '#ffffff'; g.lineWidth = 3 * k; g.stroke(); }
+        if (!CHNOISE) { const nc = document.createElement('canvas'); nc.width = nc.height = 48; const ng = nc.getContext('2d'); for (let i = 0; i < 260; i++) { ng.fillStyle = `rgba(0,0,0,${0.3 + 0.7 * L.rnd(i, 1)})`; ng.fillRect(48 * L.rnd(i, 2), 48 * L.rnd(i, 3), 1 + 2 * L.rnd(i, 4), 1 + L.rnd(i, 5)); } CHNOISE = nc; }
+        g.globalAlpha = 0.55; g.globalCompositeOperation = 'destination-out'; g.fillStyle = g.createPattern(CHNOISE, 'repeat'); g.fillRect(0, 0, w, h); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; }); }
+    const q = P(ax, ay); L.sprite(name, q[0] - 1.264 * R, q[1] - 0.632 * R, { w: 2.528 * R, h: 1.264 * R, u: { alpha: a } }); }
+  function chalkHud(c) { const left = Math.max(0, SIM.CHALK_T - (GT - c.t0)), w = 760, x = W / 2 - w / 2, y = H - 310; panel(x, y, w, 124, 16, 0.9); L.uiBox('chalk', x, y, w, 124, 0);
+    L.label('chalkt', 'Мелки: рисуй что хочешь', x + 20, y + 26, { size: 22, col: '#ffb45a', out: '#120806' }); L.label('chalkl', Math.ceil(left) + ' с', x + w - 20, y + 26, { size: 22, col: '#f6e7c8', out: '#120806', al: 1 });
+    SIM.CHALKCOL.forEach((col, i) => { const bx = x + 20 + i * 62, by = y + 46, on = c.col === i, rgb = [1, 3, 5].map((o) => parseInt(col.slice(o, o + 2), 16) / 255);
+      L.rrect(bx - (on ? 4 : 0), by - (on ? 4 : 0), 44 + (on ? 8 : 0), 36 + (on ? 8 : 0), 10, on ? [1, 0.75, 0.3] : [0.25, 0.18, 0.15], on ? [0.8, 0.4, 0.1] : [0.15, 0.1, 0.08]); L.rrect(bx + 4, by + 4, 36, 28, 8, rgb, rgb.map((v) => v * 0.8));
+      L.label('chalkn' + i, String(i + 1), bx + 22, by + 18, { size: 16, col: '#2a1408', out: null, al: 0.5 }); });
+    L.label('chalkh', 'ЛКМ — рисовать · 1–5 / колесо — цвет · ПКМ — отменить штрих · Enter — готово', x + 20, y + 104, { size: 17, col: '#d8c8b0', out: '#120806', weight: 'normal' });
+    if (ST.ptr) { const rgb = [1, 3, 5].map((o) => parseInt(SIM.CHALKCOL[c.col].slice(o, o + 2), 16) / 255); L.rrect(ST.ptr[0] - 6, ST.ptr[1] - 6, 12, 12, 6, rgb, rgb.map((v) => v * 0.7)); } }
   function gachaOverlay(G2) { const U = SIM.FUI, g = (ST.fest || {}).gacha || { pity: 0, pulls: 0 }, GA = SIM.GACHA;
     mgFrame('Гача-автомат «Тыквенный баннер»', `★5 — ${String(GA.p5 * 100).replace('.', ',')} % · ★4 — ${Math.round(GA.p4 * 100)} % · гарант ★5 на ${GA.pity}-й крутке`);
     if (has('fest_gacha')) { const h = 640, w = L.hsz('fest_gacha', h); L.glow(420, 560, 380, [1, 0.45, 0.85], 0.3 + 0.1 * Math.sin(T * 2), 2.4); L.sprite('fest_gacha', 420 - w / 2, 230, { w, h }); }
@@ -985,10 +1015,10 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     const R = G2.res2, busy = R && GT - R.t < (R.n === 10 ? 2.4 : 1.7);
     if (R) { const age = GT - R.t;
       if (R.n === 1) { const it = R.items[0], col = RCOL[it.r], op = Math.max(0, Math.min(1, (age - 0.9) / 0.35)), sh = age < 0.9 ? Math.sin(age * 40) * 8 * Math.min(1, age * 3) : 0, cx2 = x + 420, cy2 = 600;
-        capsule(cx2 + sh, cy2 - Math.max(0, 1 - age * 2.5) * 200, 70, col, op); if (op > 0.5) { for (let k = 0; k < it.r * 2; k++) { const an = k / (it.r * 2) * 6.283 + age; L.star(cx2 + Math.cos(an) * 150 * op, cy2 + Math.sin(an) * 90 * op, 18, col, op); }
+        capsule(cx2 + sh, cy2 - Math.max(0, 1 - age * 2.5) * 200, 70, col, op); if (op > 0.5) { itemIcon(it.id, cx2, cy2, 130, Math.min(1, (op - 0.5) * 2)); for (let k = 0; k < it.r * 2; k++) { const an = k / (it.r * 2) * 6.283 + age; L.star(cx2 + Math.cos(an) * 150 * op, cy2 + Math.sin(an) * 90 * op, 18, col, op); }
           L.label('gr1', '★'.repeat(it.r), cx2, cy2 + 120, { size: 40, col: it.r === 5 ? '#ffd76a' : it.r === 4 ? '#d9a0ff' : '#9ac8ff', out: '#120806', al: 0.5, a: op }); L.label('gr2', it.name, cx2, cy2 + 168, { size: 30, col: '#fff3dc', out: '#120806', al: 0.5, a: op }); } }
       else R.items.forEach((it, i) => { const col = RCOL[it.r], bx = x + (i % 5) * 176, by = 470 + Math.floor(i / 5) * 156, d = i * 0.14, op = Math.max(0, Math.min(1, (age - 0.5 - d) / 0.3));
-        L.rrect(bx, by, 164, 146, 14, col.map((v) => v * 0.5), col.map((v) => v * 0.2), 0.95 * Math.max(0.25, op)); capsule(bx + 82, by + 52, 34, col, op, Math.max(0.3, op));
+        L.rrect(bx, by, 164, 146, 14, col.map((v) => v * 0.5), col.map((v) => v * 0.2), 0.95 * Math.max(0.25, op)); capsule(bx + 82, by + 52, 34, col, op, Math.max(0.3, op)); if (op > 0.4) itemIcon(it.id, bx + 82, by + 50, 70, Math.min(1, (op - 0.4) * 2));
         if (op > 0) { L.label('grs' + i, '★'.repeat(it.r), bx + 82, by + 104, { size: 20, col: it.r === 5 ? '#ffd76a' : '#e8dcff', out: '#120806', al: 0.5, a: op });
           wrap(it.name.replace(/^Костюм /, ''), 17, 150, 'normal').slice(0, 2).forEach((l, j) => L.label('grn' + i + '_' + j, l, bx + 82, by + 126 + j * 18, { size: 17, col: '#fff3dc', out: '#120806', al: 0.5, weight: 'normal', a: op })); } }); }
     else L.label('ghint', 'Крути! Выпадают яйца, бумага, петарды, слайм, деньги — и легендарные костюмы.', x, 560, { size: 24, col: '#d8c8b0', out: '#120806', weight: 'normal' });
@@ -1087,7 +1117,8 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
       panel(x, y, w, big ? 50 : 42, 14, 0.85 * a, big); L.uiBox('toast' + i, x, y, w, big ? 50 : 42, 2); L.label('toast' + i, q.text, W / 2, y + (big ? 25 : 21), { size: sz, col: big ? '#ffc56a' : '#f6e7c8', out: '#120806', al: 0.5, a }); }); }
     // prank progress over Kirill's house when refused
     // chalk minigame overlay
-    if (ST.chalk) { const c = ST.chalk; c.pts.forEach((p, i) => { const q = P(p[0], p[1]); L.rrect(q[0] - 7, q[1] - 7, 14, 14, 7, c.hit[i] ? [1, 1, 1] : [1, 0.7, 0.3], c.hit[i] ? [0.8, 0.8, 0.9] : [0.8, 0.4, 0.1], c.hit[i] ? 0.5 : 0.95); });
+    if (ST.chalk && ST.chalk.free) chalkHud(ST.chalk);
+    else if (ST.chalk) { const c = ST.chalk; c.pts.forEach((p, i) => { const q = P(p[0], p[1]); L.rrect(q[0] - 7, q[1] - 7, 14, 14, 7, c.hit[i] ? [1, 1, 1] : [1, 0.7, 0.3], c.hit[i] ? [0.8, 0.8, 0.9] : [0.8, 0.4, 0.1], c.hit[i] ? 0.5 : 0.95); });
       const left = Math.max(0, 12 - (GT - c.t0)), w = 420, x = W / 2 - w / 2, y = 250; panel(x, y, w, 40, 14); L.rrect(x + 6, y + 6, (w - 12) * left / 12, 28, 12, [1, 0.7, 0.3], [0.8, 0.4, 0.1]); L.uiBox('chalk', x, y, w, 40, 0);
       L.label('chalk', 'Обведи рисунок: ' + Math.round(c.hit.filter(Boolean).length / c.hit.length * 100) + ' %', W / 2, y + 20, { size: 22, col: '#fff', out: '#120806', al: 0.5 }); }
     // charge (TP) and slime hold rings above Kolya
@@ -1148,7 +1179,10 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     for (const who of Object.keys(ST.loans || {})) { const Ln = ST.loans[who]; if (Ln.paid) continue; items.push(['', Ln.over ? `${who} помогает модерам (долг ${Ln.amt} ₽ не вернул)` : `Вернуть ${who === 'Скелет' ? 'Скелету' : 'Тимофею'} ${Ln.amt} ₽ до 01:00`, false]); }
     if (ST.raid) { const RD = ST.raid; items.push(['☠', 'Месть Эльфа', true]);
       items.push(['', RD.st === 'search' ? `Полиция и военные ищут тебя. Прячься в толпе, в кустах, в мусорке или в тёмном переулке (задержаний: ${RD.arrests})` : 'Сирены всё ближе…', false]); }
-    L.label('qhead', 'Задания', x + 8, y, { size: 30, col: '#f6e7c8', out: '#120806' }); L.solid(x + 8, y + 22, 380, 2, [0.6, 0.4, 0.2], 0, 0, 0, 0.8);
+    const fold = !!window.__questsHidden; S.QHDR = { x: x - 10, y: y - 26, w: 420, h: 50 };                      // v12.1: Q or a click on the title folds the list
+    L.label('qhead', 'Задания', x + 8, y, { size: 30, col: '#f6e7c8', out: '#120806' }); L.label('qfold', fold ? '▸ Q — показать' : '▾ Q — скрыть', x + 400, y + 2, { size: 17, col: '#a08a70', out: '#120806', al: 1, weight: 'normal' });
+    L.solid(x + 8, y + 22, 380, 2, [0.6, 0.4, 0.2], 0, 0, 0, 0.8);
+    if (fold) { L.uiBox('quests', x - 10, y - 26, 420, 60, 0); return; }
     let yy = y + 56;
     items.forEach(([ic, s, done, bar], i) => { if (ic) { L.label('qi' + i, ic, x + 8, yy, { size: 24, col: '#ffb030', out: '#120806' }); L.label('qt' + i, s, x + 40, yy, { size: 22, col: '#ffc56a', out: '#120806' }); }
       else { L.rrect(x + 14, yy - 9, 18, 18, 3, done ? [0.9, 0.6, 0.2] : [0.2, 0.15, 0.13], done ? [0.7, 0.4, 0.1] : [0.12, 0.09, 0.08], 0.95); if (done) L.label('qc' + i, '✓', x + 23, yy, { size: 18, col: '#200a00', out: null, al: 0.5 });
@@ -1193,7 +1227,8 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     wrap(d.text, 25, p.w - 200, 'normal').slice(0, 3).forEach((l, i) => L.label('dlgt' + i, l, p.x + 160, p.y + 76 + i * 32, { size: 25, col: '#f6e7c8', out: '#120806', weight: 'normal' }));
     lay.choices.forEach((r, i) => { const hov = ST.ptr && ST.ptr[0] > r.x && ST.ptr[0] < r.x + r.w && ST.ptr[1] > r.y && ST.ptr[1] < r.y + r.h;
       L.rrect(r.x, r.y, r.w, r.h, 14, hov ? [1, 0.65, 0.25] : [0.55, 0.3, 0.12], hov ? [0.85, 0.35, 0.08] : [0.32, 0.15, 0.06], 0.95); L.uiBox('ch' + i, r.x, r.y, r.w, r.h, 4);
-      L.label('ch' + i, (i + 1) + '. ' + TR(d.choices[i][0]), r.x + r.w / 2, r.y + r.h / 2, { size: 22, col: '#fff3dc', out: '#200a00', al: 0.5 }); });
+      const lab = (i + 1) + '. ' + TR(d.choices[i][0]), fs = Math.max(14, Math.min(22, 22 * (r.w - 22) / Math.max(1, textW(lab, 22))));   // v12.1: fits the button
+      L.label('ch' + i, lab, r.x + r.w / 2, r.y + r.h / 2, { size: fs, col: '#fff3dc', out: '#200a00', al: 0.5 }); });
   }
   function drawPortrait(X, Y) { L.rrect(X - 30, Y - 10, 60, 60, 26, [0.32, 0.16, 0.36], [0.2, 0.1, 0.22]); L.rrect(X - 22, Y - 44, 44, 44, 22, [0.95, 0.75, 0.6], [0.8, 0.55, 0.45]); L.solid(X - 40, Y - 52, 80, 10, [0.15, 0.08, 0.2]); L.solid(X - 14, Y - 90, 28, 40, [0.15, 0.08, 0.2], 0.1); }
   // Raiva's virus: the map (and now and then the whole phone) glitches — shifted slices, colour fringes, error text
@@ -1247,8 +1282,8 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
         const mwrap = (str, maxW) => { const out = []; let line = ''; for (const w of str.split(' ')) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > maxW && line) { out.push(line); line = '  ' + w; } else line = t; } out.push(line); return out; };   // wrap in the monospace font it is drawn with
         for (const m of [...(ST.devLog || [])].reverse()) { const lines = mwrap((m.me ? '> ' : '') + (m.me ? m.text : TR(m.text)), p.w - 96); for (let i = lines.length - 1; i >= 0; i--) L2.push([lines[i], m.me]); }
         const off = Math.min(Math.max(0, L2.length - 8), ph.scroll || 0);                    // v12: the wheel scrolls back through the log (every command of help fits)
-        for (const [l, me] of L2.slice(off)) { if (y < 170) break; g.fillStyle = me ? '#ffd76a' : '#9affb4'; g.textAlign = 'left'; g.fillText(l, 42, y); y -= 19; }
-        if (L2.length > 24) { g.fillStyle = '#4a7a5a'; g.textAlign = 'right'; g.fillText(off ? TR('↓ колесо вниз — к новым') : TR('↑ колесо вверх — к старым'), p.w - 44, 146); }
+        for (const [l, me] of L2.slice(off)) { if (y < 188) break; g.fillStyle = me ? '#ffd76a' : '#9affb4'; g.textAlign = 'left'; g.fillText(l, 42, y); y -= 19; }
+        if (L2.length > 24) { g.fillStyle = '#4a7a5a'; g.textAlign = 'right'; g.fillText(off ? TR('↓ колесо вниз — к новым') : TR('↑ колесо вверх — к старым'), p.w - 44, 170); }
         field('команда, например: money 5000 · help'); }
       if (ph.app === 'map') phoneMap(g, p, ph, rr, T2);
       if (ph.app === 'ach') phoneAch(g, p, ph, rr, T2);
@@ -1284,17 +1319,19 @@ void main(){ vec2 q = v_px - u_o; float l = max(length(q), 1.0); float c = dot(q
     L.sprite('phone', p.x + ox, p.y, { w: p.w, h: p.h }); L.uiBox('phone', p.x, p.y, p.w, p.h, 0);
   }
 
-  // phone «Достижения»: 15 achievements, hardest first; got this game (✓), got in an earlier game (ранее), progress for counters
+  // phone «Достижения»: 20 achievements, hardest first; got this game (✓), got in an earlier game (ранее), progress for counters
   const assetUrl = (n) => (window.ASSET_URL ? window.ASSET_URL(n) : 'assets/' + n + '.png');
   const ACHIMG = new Image(); ACHIMG.src = assetUrl('ach_icons');                     // the phone draws on a 2D canvas: its own copy of the icon atlas
+  const ACHIMG2 = new Image(); ACHIMG2.src = assetUrl('ach_icons2');                   // v12.1: achievements 16-20
   function phoneAch(g, p, ph, rr, T2) {
     const G0 = window.ACHG || {}, got = (id) => (ST.ach && ST.ach[id]) ? 1 : G0[id] ? 2 : 0, n = SIM.ACH.filter((a) => got(a.id)).length, sc = Math.max(0, Math.min(SIM.ACH.length - 7, ph.scroll || 0));
     T2('Достижения', p.w / 2, 148, 26, '#fff', 'center'); T2(`Получено ${n} из ${SIM.ACH.length}`, p.w / 2, 176, 16, '#c8b8e0', 'center', 'normal');
     const TC = { 3: '#ffd76a', 2: '#dfe6f2', 1: '#e8a070' };
     for (let r = 0; r < 7; r++) { const i = r + sc, a = SIM.ACH[i]; if (!a) break; const y = 194 + r * 84, st = got(a.id);
       g.fillStyle = st ? '#2e2240' : '#1a1520'; rr(28, y, p.w - 56, 78, 12); g.fill(); g.fillStyle = TC[a.tier]; g.globalAlpha = st ? 0.9 : 0.3; rr(28, y, 5, 78, 2); g.fill(); g.globalAlpha = 1;
-      if (ACHIMG.complete && ACHIMG.naturalWidth) { const cw = ACHIMG.naturalWidth / 5, ch = ACHIMG.naturalHeight / 3; g.save(); if (!st) { g.globalAlpha = 0.4; g.filter = 'grayscale(1) brightness(0.7)'; }
-        g.drawImage(ACHIMG, (i % 5) * cw, Math.floor(i / 5) * ch, cw, ch, 40, y + 8, 62, 62); g.restore(); }
+      const IM = i >= 15 ? ACHIMG2 : ACHIMG, j = i >= 15 ? i - 15 : i, rowsN = i >= 15 ? 1 : 3;
+      if (IM.complete && IM.naturalWidth) { const cw = IM.naturalWidth / 5, ch = IM.naturalHeight / rowsN; g.save(); if (!st) { g.globalAlpha = 0.4; g.filter = 'grayscale(1) brightness(0.7)'; }
+        g.drawImage(IM, (j % 5) * cw, Math.floor(j / 5) * ch, cw, ch, 40, y + 8, 62, 62); g.restore(); }
       g.font = 'bold 17px ' + FONT; const nw = g.measureText(a.name).width, fs = Math.max(12, Math.min(17, 17 * 250 / Math.max(1, nw)));
       T2(a.name, 112, y + 25, fs, st ? TC[a.tier] : '#9a8aa8', 'left', 'bold');
       wrap(a.desc, 13, 262, 'normal').slice(0, 2).forEach((l, k) => T2(l, 112, y + 45 + k * 16, 13, st ? '#e8dcc8' : '#8a7a98', 'left', 'normal'));

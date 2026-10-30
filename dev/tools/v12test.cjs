@@ -72,7 +72,7 @@ const fest = (S, id) => { const st = SIM.FSTALLS.find((q) => q[1] === id), a = S
 { const S = fresh(); S.money = 50; S.hp = 50; fest(S, 'candy'); run(S, 1, { choose: 0 }); ok(S.hp === 75 && S.money === 20, 'a caramel apple: +25 HP for 30 ₽'); }
 // 8. the console: «help» fits, every command explained, the new ones work
 { const S = fresh(); S.phone = { app: 'dev', t: S.t - 1 }; const n0 = S.devLog.length; run(S, 1, { text: 'help' }); const out = S.devLog.slice(n0 + 1).map((l) => l.text);
-  ok(out.length <= 8, '«help» fits the console screen (' + out.length + ' lines)'); ok(out.join(' ').includes('weather') && out.join(' ').includes('prologue'), 'it names every command');
+  ok(out.length >= 27 && out.every((l, i) => !i || / — /.test(l)), 'v12.1: «help» lists every command with what it does (' + out.length + ' lines)'); ok(S.phone.scroll > 0, 'and the console opens at the top of the list'); ok(out.join(' ').includes('weather') && out.join(' ').includes('prologue'), 'it names every command');
   run(S, 1, { text: 'help tp' }); ok(/телепорт/.test(S.devLog[S.devLog.length - 1].text), '«help tp» explains tp');
   run(S, 1, { text: 'fest' }); ok(SIM.inPlaza(S.x, S.y), '«fest» teleports to the plaza'); run(S, 1, { text: 'gacha' }); ok(S.fest.gacha.pity === SIM.GACHA.pity - 1, '«gacha» sets the pity');
   run(S, 1, { text: 'clear' }); ok(S.devLog.length === 1, '«clear» empties the console'); S.phone = null; run(S, 1, { text: '' });
@@ -87,4 +87,24 @@ const fest = (S, id) => { const st = SIM.FSTALLS.find((q) => q[1] === id), a = S
 { const S = fresh(); const G = S.dm['Модеры 🎃']; ok(G.some((m) => m.voice) && G.some((m) => m.from === 'Кирилл'), 'the group thread opens with the voice note');
   S.phone = { app: 'dm', who: 'Модеры 🎃', t: S.t }; const b = SIM.phoneLayout ? SIM.phoneLayout(S).find((q) => q.id === 'vplay') : null; ok(!SIM.phoneLayout || b, 'a play button under it');
   ok(EN_ok(G[0].text) && EN_ok(G[1].text), 'both read in English'); }
+
+// 11. v12.1 fixes
+{ const S = fresh(); fest(S, 'carve'); run(S, 1, { choose: 0 }); run(S, 1); const U = SIM.FUI; run(S, 1, { click: 1, px: U.done.x + 5, py: U.done.y + 5 }); ok(!!S.mg.res, 'a result card');
+  run(S, 1, { click: 1, px: U.ok.x + U.ok.w / 2, py: U.ok.y + U.ok.h / 2 }); run(S, 1); ok(!S.mg, '«Дальше» closes the mini-game'); }
+{ let all = 0, good = 0; for (const st of SIM.FSTALLS) for (let x = 2280; x <= 2960; x += 136) for (let y = 450; y <= 1070; y += 124) { if (!SIM.findPath([x, y], [2620, 760]).length) continue; const S = fresh(); S.x = x; S.y = y; all++;
+    const q = SIM.proj(st[2], st[3]), c = SIM.pick(S, [q[0], q[1] - 40]); if (!c) continue; S.act = c; S.path = SIM.findPath([x, y], c.at); run(S, 120 * 8); if (S.dlg || S.mg) good++; }
+  ok(good === all, 'every stall opens from every side of the plaza (' + good + '/' + all + ')');
+  const S = fresh(); S.x = 3020 - 100; S.y = 960; ok(SIM.festNear(S) === 'candy', 'E works at the side of the candy stall'); }
+{ const S = fresh(); S.money = 100; S.hp = 40; S.x = 2800; S.y = 980; run(S, 2, { e: 1 }); run(S, 1); run(S, 1, { choose: 1 }); ok(S.hp === 52 && S.money === 80, 'cotton candy: +12 HP for 20 ₽'); }
+{ const S = fresh(); S.money = 100; fest(S, 'apples'); run(S, 1, { choose: 0 }); run(S, 1); let tries = 0, got = 0;
+  for (let i = 0; i < 120 * 19 && tries < 12; i++) { const G = S.mg; const up = G.apples.filter((a) => SIM.appleUp(a, S.t + 0.01) && SIM.appleUp(a, S.t + 0.1)); if (i % 40 === 0 && up.length) { const q = SIM.applePos(up[0], S.t); const n0 = G.n; tries++; run(S, 1, { click: 1, px: q[0], py: q[1] - 18 }); if (G.n > n0) got++; } else run(S, 1); }
+  ok(got === tries && tries >= 8, 'every click on an apple above the water lands (' + got + '/' + tries + ')'); }
+{ const S = fresh(); S.q.vera = 2; S.costume = 'ghost'; S.fest.cos = ['pumpkin_gold', 'ghost_neon']; const sv = S.npc.find((n) => n.id === 'vera'); S.x = sv.x + 60; S.y = sv.y + 40;
+  S.act = { k: 'npc', id: 'vera', at: [sv.x, sv.y + 50], r: SIM.K.TALK }; run(S, 3); const i = S.dlg.choices.findIndex((c) => c[1] === 'vera_wardrobe'); run(S, 1, { choose: i }); run(S, 1);
+  const L = SIM.dlgLayout(S); ok(S.dlg.choices.length === 7 && new Set(L.choices.map((r) => r.y)).size === 2 && L.choices.every((r) => r.w >= 240), 'Vera\'s seven costumes sit in two rows of wide buttons'); }
+{ const S = fresh(); S.inv.chalk = 1; S.slot = 6; S.x = SIM.MODH.kirill.gate; S.y = -270; SIM.runDev(S, 'refuse kirill'); run(S, 2, { e: 1 }); run(S, 1);
+  ok(S.chalk && S.chalk.free && S.chalk.mod === 'kirill', 'chalk at Kirill\'s gate: free drawing');
+  const c = S.chalk, base = SIM.proj(c.at[0], c.at[1]); for (let k = 0; k < 3; k++) { for (let i = 0; i < 30; i++) run(S, 1, { press: 1, px: base[0] - S.cam[0] - 60 + k * 50 + 3 * i, py: base[1] - S.cam[1] - 30 + 2 * i, slot: k + 1 }); run(S, 1, { px: 5, py: 5 }); }
+  ok(c.strokes.length === 3 && c.strokes.map((q) => q.col).join('') === '012' && S.slot === 6, 'the mouse draws, 1–3 pick colours, the hotbar stays');
+  run(S, 1, { enter: 1 }); run(S, 1); ok(!S.chalk && S.kir.pr.chalk > 0 && S.drawings.some((d) => d.free && d.mod === 'kirill'), 'Enter: the drawing stays on the sidewalk and counts as a prank'); }
 console.log(fails ? fails + ' FAILED' : 'all ok'); process.exit(fails ? 1 : 0);

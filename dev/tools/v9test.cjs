@@ -29,7 +29,7 @@ const at = (S, x, y) => { S.x = x; S.y = y; S.vx = S.vy = 0; S.path = []; };
   const S2 = SIM.spawn(0); run(S2, 10); SIM.runDev(S2, 'done all'); SIM.runDev(S2, 'finale'); ok(S2.finale.kind === 'party', 'party finale otherwise'); }
 // 8. chalk anywhere
 { const S = SIM.spawn(0); run(S, 10); at(S, 900, 250); S.inv.chalk = 1; S.slot = 6; run(S, 2, { e: 1 }); ok(S.chalk && !S.chalk.mod, 'chalk anywhere starts');
-  const c = S.chalk; c.hit = c.hit.map(() => 1); run(S, 2); ok(S.drawings.length === 1 && S.ach.picasso, 'drawing kept + Пикассо'); }
+  { const c = S.chalk; for (let k = 0; k < 6; k++) { const p = []; for (let i = 0; i < 12; i++) p.push([c.at[0] - 120 + k * 40 + 6 * Math.sin(i), c.at[1] - 100 + i * 17]); c.strokes.push({ col: k % 5, p }); } } run(S, 1, { enter: 1 }); run(S, 2); ok(S.drawings.length === 1 && S.drawings[0].free && S.ach.picasso, 'v12.1: a free drawing is kept + Пикассо (big drawing)'); }
 // 9. alarm decoy draws the patrol
 { const S = SIM.spawn(0); run(S, 10); S.raid = SIM.newRaid(S); S.raid.t0 = S.t; run(S, 120 * 12); S.ghost = true; at(S, 2000, 0); S.inv.alarm = 1; S.slot = 5; run(S, 2, { e: 1 }); run(S, 2);
   ok(S.decoys.length === 1, 'alarm on the ground'); run(S, 120 * 6.5); ok(S.raid.units.some((u) => u.alertAt || u.st === 'alert' || u.st === 'search'), 'patrol goes to check'); }
